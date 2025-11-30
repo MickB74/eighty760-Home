@@ -98,7 +98,7 @@
             <div class="flex justify-between h-16">
                 <div class="flex items-center gap-3">
                     <!-- CHANGED: Switched from 'image.jpg' back to the repo's 'logo.png' -->
-                    <img src="logo.png" alt="Eighty760 Logo" class="h-10 w-auto object-contain">
+                    <img src="image.png" alt="Eighty760 Logo" class="h-10 w-auto object-contain">
                     <!-- REMOVED: Span with text "Eighty760 Simulator" was here -->
                 </div>
                 <div class="hidden sm:flex items-center space-x-8">
