@@ -24,8 +24,13 @@
         style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s ease;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center" style="min-height: 180px;">
-                <div class="flex items-center gap-3">
-                    <img src="image.png" alt="Eighty760 Logo" class="w-auto object-contain" style="height: 240px;">
+                <div class="flex flex-col items-start gap-4">
+                    <img src="image.png" alt="Eighty760 Logo" class="w-auto object-contain" style="height: 350px;">
+                    <label class="theme-switch">
+                        <input type="checkbox" id="theme-checkbox" onchange="toggleTheme()">
+                        <span class="slider round"></span>
+                        <span class="ml-3 text-sm font-medium" style="color: var(--text-primary);">Dark Mode</span>
+                    </label>
                 </div>
                 <div class="flex items-center space-x-8">
                     <div class="hidden sm:flex items-center space-x-8">
@@ -36,9 +41,7 @@
                         <a href="#architecture" style="color: var(--text-secondary);"
                             class="hover:text-[#285477] font-medium transition">Architecture</a>
                     </div>
-                    <button onclick="toggleTheme()" class="theme-toggle" title="Toggle dark mode">
-                        <span id="theme-icon">🌙</span>
-                    </button>
+
                 </div>
             </div>
         </div>
@@ -184,13 +187,13 @@
                                 <div class="w-3 h-3 bg-gray-800 rounded-full"></div> Load
                             </div>
                             <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 rounded-full" style="background-color: #F59E0B;"></div> Solar
+                                <div class="w-3 h-3 rounded-full" style="background-color: #4B5563;"></div> Solar
                             </div>
                             <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 rounded-full" style="background-color: #6699CC;"></div> Wind
+                                <div class="w-3 h-3 rounded-full" style="background-color: #9CA3AF;"></div> Wind
                             </div>
                             <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 rounded-full" style="background-color: #A3C2E0;"></div> Battery
+                                <div class="w-3 h-3 rounded-full" style="background-color: #E5E7EB;"></div> Battery
                             </div>
                         </div>
                     </div>
@@ -333,11 +336,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
-                    <h3 class="text-2xl font-bold mb-4 brand-text">Eighty760</h3>
-                    <p class="text-sm max-w-sm" style="color: var(--text-secondary);">
-                        Enabling energy buyers and developers to design portfolios that achieve true decarbonization
-                        through hourly matching logic.
-                    </p>
+                    <img src="image.png" alt="Eighty760 Logo" class="w-auto object-contain mb-4" style="height: 120px;">
                 </div>
                 <div class="md:text-right">
                     <p class="text-sm" style="color: var(--text-secondary);">Based on Technical Whitepaper Version 1.0
@@ -409,8 +408,8 @@
                         {
                             label: 'Solar Gen',
                             data: [],
-                            backgroundColor: 'rgba(245, 158, 11, 0.85)', // Orange #F59E0B
-                            borderColor: '#F59E0B',
+                            backgroundColor: 'rgba(75, 85, 99, 0.85)', // Dark Gray #4B5563
+                            borderColor: '#4B5563',
                             borderWidth: 0,
                             fill: 'origin',
                             pointRadius: 0,
@@ -420,8 +419,8 @@
                         {
                             label: 'Wind Gen',
                             data: [],
-                            backgroundColor: 'rgba(102, 153, 204, 0.85)', // Blue #6699CC
-                            borderColor: '#6699CC',
+                            backgroundColor: 'rgba(156, 163, 175, 0.85)', // Medium Gray #9CA3AF
+                            borderColor: '#9CA3AF',
                             borderWidth: 0,
                             fill: '-1', // Stack on Solar
                             pointRadius: 0,
@@ -431,8 +430,8 @@
                         {
                             label: 'Battery Discharge',
                             data: [],
-                            backgroundColor: 'rgba(163, 194, 224, 0.85)', // Light Blue #A3C2E0
-                            borderColor: '#A3C2E0',
+                            backgroundColor: 'rgba(229, 231, 235, 0.85)', // Light Gray #E5E7EB
+                            borderColor: '#E5E7EB',
                             borderWidth: 0,
                             fill: '-1', // Stack on Wind
                             pointRadius: 0,
@@ -475,10 +474,10 @@
                         label: 'REC Multiplier',
                         data: [0.45, 1.0, 1.2, 2.0],
                         backgroundColor: [
-                            '#E3F2FD',
-                            '#BBDEFB',
-                            '#64B5F6',
-                            '#285477' // Darkest for Critical
+                            '#F3F4F6', // Lightest Gray
+                            '#D1D5DB',
+                            '#9CA3AF',
+                            '#4B5563'  // Darkest Gray
                         ],
                         borderColor: 'transparent',
                         borderWidth: 0
@@ -618,21 +617,30 @@
         // --- 6. Dark Mode Toggle ---
         function toggleTheme() {
             const html = document.documentElement;
-            const currentTheme = html.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            const checkbox = document.getElementById('theme-checkbox');
+            const isDark = checkbox.checked;
+            const newTheme = isDark ? 'dark' : 'light';
 
             html.setAttribute('data-theme', newTheme);
             localStorage.setItem('theme', newTheme);
+            updateChartTheme(newTheme);
+        }
 
-            // Update icon
-            document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        function updateChartTheme(theme) {
+            if (!simChart) return;
+            // Load Line Color: Always Black
+            const loadColor = '#000000';
+            simChart.data.datasets[0].borderColor = loadColor;
+            simChart.update();
         }
 
         // Load saved theme
         function loadTheme() {
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
-            document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+            document.getElementById('theme-checkbox').checked = savedTheme === 'dark';
+            // Ensure chart is initialized before updating theme, or handle in init
+            if (simChart) updateChartTheme(savedTheme);
         }
 
         // --- Initialization ---
@@ -641,6 +649,9 @@
             initCharts();
             setupListeners();
             runSimulation(); // Initial run
+            // Apply theme to chart after init
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            updateChartTheme(currentTheme);
         });
 
     </script>
