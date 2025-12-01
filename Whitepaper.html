@@ -317,13 +317,13 @@
                             </div>
                             <!-- CHANGED: Reverted to the darker Amber/Yellow (#F59E0B) for better visibility without borders -->
                             <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 bg-[#F59E0B] rounded-full"></div> Solar
+                                <div class="w-3 h-3 rounded-full" style="background-color: #F59E0B;"></div> Solar
                             </div>
                             <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 bg-[#6699CC] rounded-full"></div> Wind
+                                <div class="w-3 h-3 rounded-full" style="background-color: #9CA3AF;"></div> Wind
                             </div>
                             <div class="flex items-center gap-1">
-                                <div class="w-3 h-3 bg-[#A3C2E0] rounded-full"></div> Battery
+                                <div class="w-3 h-3 rounded-full" style="background-color: #93C5FD;"></div> Battery
                             </div>
                         </div>
                     </div>
@@ -554,8 +554,8 @@
                         {
                             label: 'Wind Gen',
                             data: [],
-                            backgroundColor: 'rgba(102, 153, 204, 0.4)', // Lighter Blue
-                            borderColor: '#6699CC',
+                            backgroundColor: 'rgba(156, 163, 175, 0.5)', // Gray tone
+                            borderColor: '#9CA3AF',
                             borderWidth: 0,
                             fill: '-1', // Stack on Solar
                             pointRadius: 0,
@@ -565,8 +565,8 @@
                         {
                             label: 'Battery Discharge',
                             data: [],
-                            backgroundColor: 'rgba(163, 194, 224, 0.6)', // Very Light Blue
-                            borderColor: '#A3C2E0',
+                            backgroundColor: 'rgba(147, 197, 253, 0.6)', // Light blue
+                            borderColor: '#93C5FD',
                             borderWidth: 0,
                             fill: '-1', // Stack on Wind
                             pointRadius: 0,
