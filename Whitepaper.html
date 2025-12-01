@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,45 +8,81 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Fonts matched to app.py: Inter for UI, IBM Plex Mono for Data -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@700&display=swap"
+        rel="stylesheet">
     <style>
-        /* Exact styles from app.py Light Mode */
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background-color: #FFFFFF; 
-            color: #1F2937; 
+        /* CSS Variables for Light/Dark Mode */
+        :root {
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #FAFAFA;
+            --bg-tertiary: #F5F5F5;
+            --text-primary: #1F2937;
+            --text-secondary: #666666;
+            --text-tertiary: #999999;
+            --border-color: #E5E7EB;
+            --brand-color: #285477;
+            --card-bg: #FFFFFF;
+            --nav-bg: #FFFFFF;
         }
-        
-        h1, h2, h3, h4 {
+
+        [data-theme="dark"] {
+            --bg-primary: #0F172A;
+            --bg-secondary: #1E293B;
+            --bg-tertiary: #334155;
+            --text-primary: #F1F5F9;
+            --text-secondary: #CBD5E1;
+            --text-tertiary: #94A3B8;
+            --border-color: #334155;
+            --brand-color: #60A5FA;
+            --card-bg: #1E293B;
+            --nav-bg: #0F172A;
+        }
+
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
             font-weight: 700;
-            color: #1F2937; /* Standard dark, specific headers will get brand color */
+            color: var(--text-primary);
         }
 
         .brand-text {
-            color: #285477; /* The specific blue from app.py */
+            color: var(--brand-color);
         }
 
         /* Metric Styling from app.py */
         .stMetric {
-            background-color: #F5F5F5;
+            background-color: var(--bg-tertiary);
             padding: 1rem;
             border-radius: 8px;
+            transition: background-color 0.3s ease;
         }
+
         .stMetricValue {
             font-family: 'IBM Plex Mono', monospace;
-            font-size: 1.875rem; /* 3rem in app, scaled for web context */
+            font-size: 1.875rem;
             font-weight: 700;
-            color: #285477;
+            color: var(--brand-color);
         }
+
         .stMetricLabel {
             font-size: 0.875rem;
-            color: #666666;
+            color: var(--text-secondary);
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        /* Primary Button Style from app.py */
+        /* Primary Button Style */
         .btn-primary {
             background-color: #000000;
             color: #FFFFFF;
@@ -53,36 +90,57 @@
             font-weight: 600;
             transition: background-color 0.2s;
         }
+
         .btn-primary:hover {
             background-color: #333333;
         }
 
+        /* Dark Mode Toggle Button */
+        .theme-toggle {
+            background-color: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg-secondary);
+        }
+
         /* Chart Container */
-        .chart-container { 
-            position: relative; 
-            width: 100%; 
-            height: 300px; 
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
             max-height: 400px;
         }
-        
+
         /* Slider Styling */
         input[type=range] {
-            -webkit-appearance: none; 
-            background: transparent; 
+            -webkit-appearance: none;
+            background: transparent;
         }
+
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
             height: 16px;
             width: 16px;
             border-radius: 50%;
-            background: #285477; /* Brand Blue */
+            background: var(--brand-color);
             cursor: pointer;
-            margin-top: -6px; 
+            margin-top: -6px;
         }
+
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
-            background: #E5E7EB;
+            background: var(--border-color);
             border-radius: 2px;
         }
     </style>
@@ -90,41 +148,53 @@
     <!-- Structure: Same as before, but styled to look like the Streamlit app -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
+
 <body class="antialiased">
 
     <!-- Navigation -->
-    <nav class="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <nav class="sticky top-0 z-50"
+        style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s ease;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
+            <div class="flex justify-between h-20">
                 <div class="flex items-center gap-3">
-                    <!-- CHANGED: Switched from 'image.jpg' back to the repo's 'logo.png' -->
-                    <img src="image.png" alt="Eighty760 Logo" class="h-10 w-auto object-contain">
-                    <!-- REMOVED: Span with text "Eighty760 Simulator" was here -->
+                    <img src="image.png" alt="Eighty760 Logo" class="h-16 w-auto object-contain">
                 </div>
-                <div class="hidden sm:flex items-center space-x-8">
-                    <a href="#simulator" class="text-gray-600 hover:text-[#285477] font-medium transition">Simulation</a>
-                    <a href="#methodology" class="text-gray-600 hover:text-[#285477] font-medium transition">Methodology</a>
-                    <a href="#architecture" class="text-gray-600 hover:text-[#285477] font-medium transition">Architecture</a>
+                <div class="flex items-center space-x-8">
+                    <div class="hidden sm:flex items-center space-x-8">
+                        <a href="#simulator" style="color: var(--text-secondary);"
+                            class="hover:text-[#285477] font-medium transition">Simulation</a>
+                        <a href="#methodology" style="color: var(--text-secondary);"
+                            class="hover:text-[#285477] font-medium transition">Methodology</a>
+                        <a href="#architecture" style="color: var(--text-secondary);"
+                            class="hover:text-[#285477] font-medium transition">Architecture</a>
+                    </div>
+                    <button onclick="toggleTheme()" class="theme-toggle" title="Toggle dark mode">
+                        <span id="theme-icon">🌙</span>
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
     <!-- Hero Section -->
-    <header class="bg-white pt-16 pb-12">
+    <header class="pt-16 pb-12" style="background-color: var(--bg-primary); transition: background-color 0.3s ease;">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="inline-flex items-center px-3 py-1 rounded-md bg-[#F5F5F5] text-[#666666] text-xs font-semibold uppercase tracking-wide mb-4 border border-gray-200">
+            <div class="inline-flex items-center px-3 py-1 rounded-md text-xs font-semibold uppercase tracking-wide mb-4"
+                style="background-color: var(--bg-tertiary); color: var(--text-secondary); border: 1px solid var(--border-color);">
                 Technical Whitepaper V1.0
             </div>
             <h1 class="text-4xl sm:text-5xl font-extrabold brand-text mb-6 leading-tight">
                 A Framework for <br class="hidden sm:block" />
                 24/7 Carbon-Free Energy
             </h1>
-            <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto leading-relaxed">
-                Moving beyond annual "Net Zero" accounting to hourly matching. Eighty760 is a simulation engine designed to model, analyze, and optimize energy portfolios against the rigorous standard of meeting demand with carbon-free energy every hour of the day.
+            <p class="text-lg mb-8 max-w-2xl mx-auto leading-relaxed" style="color: var(--text-secondary);">
+                Moving beyond annual "Net Zero" accounting to hourly matching. Eighty760 is a simulation engine designed
+                to model, analyze, and optimize energy portfolios against the rigorous standard of meeting demand with
+                carbon-free energy every hour of the day.
             </p>
             <div class="flex justify-center gap-4">
-                <button onclick="document.getElementById('simulator').scrollIntoView({behavior: 'smooth'})" class="btn-primary px-8 py-3 text-lg shadow-sm">
+                <button onclick="document.getElementById('simulator').scrollIntoView({behavior: 'smooth'})"
+                    class="btn-primary px-8 py-3 text-lg shadow-sm">
                     Launch Interactive Demo
                 </button>
             </div>
@@ -132,34 +202,42 @@
     </header>
 
     <!-- The Problem (Context) -->
-    <section class="py-12 bg-white border-y border-gray-100">
+    <section class="py-12"
+        style="background-color: var(--bg-primary); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-2 gap-12 items-center">
                 <div>
                     <h2 class="text-2xl font-bold brand-text mb-4">The Challenge: Variability</h2>
-                    <p class="text-gray-600 mb-4">
-                        Renewable energy sources like wind and solar are inherently variable. A solar farm generates peak energy at midday, often creating a surplus, while failing to address demand during evening peaks or winter mornings.
+                    <p class="mb-4" style="color: var(--text-secondary);">
+                        Renewable energy sources like wind and solar are inherently variable. A solar farm generates
+                        peak energy at midday, often creating a surplus, while failing to address demand during evening
+                        peaks or winter mornings.
                     </p>
-                    <p class="text-gray-600 font-medium">
-                        Eighty760 functions as a "digital twin," allowing users to simulate the complex interaction between load profiles and generation assets.
+                    <p class="font-medium" style="color: var(--text-secondary);">
+                        Eighty760 functions as a "digital twin," allowing users to simulate the complex interaction
+                        between load profiles and generation assets.
                     </p>
                 </div>
-                <div class="bg-[#F5F5F5] p-6 rounded-lg">
+                <div class="p-6 rounded-lg" style="background-color: var(--bg-tertiary);">
                     <h3 class="stMetricLabel mb-3">Traditional vs. 24/7 Matching</h3>
                     <div class="space-y-4">
-                        <div class="flex items-center justify-between p-3 bg-white rounded border border-gray-200">
+                        <div class="flex items-center justify-between p-3 rounded"
+                            style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
                             <div>
-                                <div class="font-bold text-gray-800">Annual Net Zero</div>
-                                <div class="text-xs text-gray-500">Offsets fossil use via annual volume</div>
+                                <div class="font-bold" style="color: var(--text-primary);">Annual Net Zero</div>
+                                <div class="text-xs" style="color: var(--text-tertiary);">Offsets fossil use via annual
+                                    volume</div>
                             </div>
-                            <div class="font-bold text-gray-400">~100% Volumetric</div>
+                            <div class="font-bold" style="color: var(--text-tertiary);">~100% Volumetric</div>
                         </div>
-                        <div class="flex items-center justify-between p-3 bg-white rounded border-l-4 border-[#285477] shadow-sm">
+                        <div class="flex items-center justify-between p-3 rounded border-l-4 shadow-sm"
+                            style="background-color: var(--card-bg); border-color: var(--brand-color);">
                             <div>
-                                <div class="font-bold text-[#285477]">24/7 CFE</div>
-                                <div class="text-xs text-gray-500">Matches supply & demand hourly</div>
+                                <div class="font-bold brand-text">24/7 CFE</div>
+                                <div class="text-xs" style="color: var(--text-tertiary);">Matches supply & demand hourly
+                                </div>
                             </div>
-                            <div class="font-bold text-[#285477]">Hourly Score</div>
+                            <div class="font-bold brand-text">Hourly Score</div>
                         </div>
                     </div>
                 </div>
@@ -168,69 +246,92 @@
     </section>
 
     <!-- Interactive Simulator Section -->
-    <section id="simulator" class="py-16 bg-white">
+    <section id="simulator" class="py-16" style="background-color: var(--bg-primary);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-10 text-center">
                 <h2 class="text-3xl font-bold brand-text">Interactive Portfolio Simulator</h2>
-                <p class="text-gray-600 mt-2 max-w-2xl mx-auto">
-                    Experience the <strong>Methodology</strong> described in the whitepaper. Adjust the generation capacities below to see how they stack up against a typical Office building load profile.
+                <p class="mt-2 max-w-2xl mx-auto" style="color: var(--text-secondary);">
+                    Experience the <strong>Methodology</strong> described in the whitepaper. Adjust the generation
+                    capacities below to see how they stack up against a typical Office building load profile.
                 </p>
             </div>
 
             <div class="grid lg:grid-cols-3 gap-8">
                 <!-- Controls -->
-                <div class="bg-[#F5F5F5] p-6 rounded-lg lg:col-span-1">
+                <div class="p-6 rounded-lg lg:col-span-1" style="background-color: var(--bg-tertiary);">
                     <h3 class="text-lg font-bold brand-text mb-6 flex items-center gap-2">
                         <span>🎛️</span> Portfolio Inputs
                     </h3>
-                    
+
                     <div class="space-y-8">
                         <!-- Solar Control -->
                         <div>
                             <div class="flex justify-between mb-2">
-                                <label class="text-sm font-semibold text-gray-700">Solar Capacity</label>
-                                <span id="solar-val" class="text-sm font-mono text-[#285477] bg-white px-2 py-1 rounded border border-gray-200">50 MW</span>
+                                <label class="text-sm font-semibold" style="color: var(--text-primary);">Solar
+                                    Capacity</label>
+                                <span id="solar-val" class="text-sm font-mono px-2 py-1 rounded"
+                                    style="color: var(--brand-color); background-color: var(--card-bg); border: 1px solid var(--border-color);">50
+                                    MW</span>
                             </div>
                             <input type="range" id="solar-input" min="0" max="200" value="50" class="w-full">
-                            <p class="text-xs text-gray-500 mt-1">Modeled with midday bell curve (Methodology 3.1)</p>
+                            <p class="text-xs mt-1" style="color: var(--text-tertiary);">Modeled with midday bell curve
+                                (Methodology 3.1)</p>
                         </div>
 
                         <!-- Wind Control -->
                         <div>
                             <div class="flex justify-between mb-2">
-                                <label class="text-sm font-semibold text-gray-700">Wind Capacity</label>
-                                <span id="wind-val" class="text-sm font-mono text-[#285477] bg-white px-2 py-1 rounded border border-gray-200">30 MW</span>
+                                <label class="text-sm font-semibold" style="color: var(--text-primary);">Wind
+                                    Capacity</label>
+                                <span id="wind-val" class="text-sm font-mono px-2 py-1 rounded"
+                                    style="color: var(--brand-color); background-color: var(--card-bg); border: 1px solid var(--border-color);">30
+                                    MW</span>
                             </div>
                             <input type="range" id="wind-input" min="0" max="200" value="30" class="w-full">
-                            <p class="text-xs text-gray-500 mt-1">Modeled with inverse-day variability</p>
+                            <p class="text-xs mt-1" style="color: var(--text-tertiary);">Modeled with inverse-day
+                                variability</p>
                         </div>
 
                         <!-- Battery Control -->
                         <div>
                             <div class="flex justify-between mb-2">
-                                <label class="text-sm font-semibold text-gray-700">Battery Storage</label>
-                                <span id="battery-val" class="text-sm font-mono text-[#285477] bg-white px-2 py-1 rounded border border-gray-200">0 MWh</span>
+                                <label class="text-sm font-semibold" style="color: var(--text-primary);">Battery
+                                    Storage</label>
+                                <span id="battery-val" class="text-sm font-mono px-2 py-1 rounded"
+                                    style="color: var(--brand-color); background-color: var(--card-bg); border: 1px solid var(--border-color);">0
+                                    MWh</span>
                             </div>
                             <input type="range" id="battery-input" min="0" max="500" value="0" step="10" class="w-full">
-                            <p class="text-xs text-gray-500 mt-1">Greedy dispatch algorithm</p>
+                            <p class="text-xs mt-1" style="color: var(--text-tertiary);">Greedy dispatch algorithm</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- Visualization -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200 lg:col-span-2 flex flex-col shadow-sm">
+                <div class="p-6 rounded-lg lg:col-span-2 flex flex-col shadow-sm"
+                    style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">24-Hour Generation Profile</h3>
-                        <div class="flex gap-4 text-xs">
-                            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-gray-800 rounded-full"></div> Load</div>
+                        <h3 class="text-lg font-bold" style="color: var(--text-primary);">24-Hour Generation Profile
+                        </h3>
+                        <div class="flex gap-4 text-xs" style="color: var(--text-secondary);">
+                            <div class="flex items-center gap-1">
+                                <div class="w-3 h-3 bg-gray-800 rounded-full"></div> Load
+                            </div>
                             <!-- CHANGED: Reverted to the darker Amber/Yellow (#F59E0B) for better visibility without borders -->
-                            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-[#F59E0B] rounded-full"></div> Solar</div>
-                            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-[#6699CC] rounded-full"></div> Wind</div>
-                            <div class="flex items-center gap-1"><div class="w-3 h-3 bg-[#A3C2E0] rounded-full"></div> Battery</div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-3 h-3 bg-[#F59E0B] rounded-full"></div> Solar
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-3 h-3 bg-[#6699CC] rounded-full"></div> Wind
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <div class="w-3 h-3 bg-[#A3C2E0] rounded-full"></div> Battery
+                            </div>
                         </div>
                     </div>
-                    
-                    <div class="flex-grow flex items-center justify-center bg-white rounded-lg p-2">
+
+                    <div class="flex-grow flex items-center justify-center rounded-lg p-2"
+                        style="background-color: var(--card-bg);">
                         <div class="chart-container">
                             <canvas id="simChart"></canvas>
                         </div>
@@ -241,17 +342,17 @@
                         <div class="stMetric text-center">
                             <div class="stMetricLabel mb-1">CFE Score</div>
                             <div id="cfe-score" class="stMetricValue">0%</div>
-                            <div class="text-xs text-gray-500 mt-1">Hourly Match</div>
+                            <div class="text-xs mt-1" style="color: var(--text-tertiary);">Hourly Match</div>
                         </div>
                         <div class="stMetric text-center">
                             <div class="stMetricLabel mb-1">Grid Needed</div>
                             <div id="grid-needed" class="stMetricValue">0</div>
-                            <div class="text-xs text-gray-500 mt-1">MWh Deficit</div>
+                            <div class="text-xs mt-1" style="color: var(--text-tertiary);">MWh Deficit</div>
                         </div>
                         <div class="stMetric text-center">
                             <div class="stMetricLabel mb-1">Overgeneration</div>
                             <div id="over-gen" class="stMetricValue">0</div>
-                            <div class="text-xs text-gray-500 mt-1">MWh Surplus</div>
+                            <div class="text-xs mt-1" style="color: var(--text-tertiary);">MWh Surplus</div>
                         </div>
                     </div>
                 </div>
@@ -260,47 +361,58 @@
     </section>
 
     <!-- Methodology Deep Dives -->
-    <section id="methodology" class="py-16 bg-[#FAFAFA] border-t border-gray-200">
+    <section id="methodology" class="py-16"
+        style="background-color: var(--bg-secondary); border-top: 1px solid var(--border-color);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold brand-text mb-8">Methodology & Logic</h2>
-            
+
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- 3.1 Generation Modeling -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition">
-                    <div class="w-10 h-10 bg-[#E3F2FD] rounded-md flex items-center justify-center mb-4 text-xl">☀️</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Generation Modeling</h3>
-                    <p class="text-gray-600 text-sm mb-4">
-                        Synthetic profiles replace missing historical data. Solar uses bell curves adjusted for seasonality.
+                <div class="p-6 rounded-lg hover:shadow-md transition"
+                    style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                    <div class="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl"
+                        style="background-color: #E3F2FD;">☀️</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Generation Modeling</h3>
+                    <p class="text-sm mb-4" style="color: var(--text-secondary);">
+                        Synthetic profiles replace missing historical data. Solar uses bell curves adjusted for
+                        seasonality.
                     </p>
-                    <div class="bg-[#F5F5F5] p-3 rounded text-xs text-gray-500 font-mono">
+                    <div class="p-3 rounded text-xs font-mono"
+                        style="background-color: var(--bg-tertiary); color: var(--text-tertiary);">
                         Seasonality = 1 + 0.4 * cos(day - peak)
                     </div>
                 </div>
 
                 <!-- 3.3 Emissions Analysis -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition">
-                    <div class="w-10 h-10 bg-[#E3F2FD] rounded-md flex items-center justify-center mb-4 text-xl">🌫️</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Emissions Analysis</h3>
-                    <p class="text-gray-600 text-sm mb-4">
+                <div class="p-6 rounded-lg hover:shadow-md transition"
+                    style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                    <div class="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl"
+                        style="background-color: #E3F2FD;">🌫️</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Emissions Analysis</h3>
+                    <p class="text-sm mb-4" style="color: var(--text-secondary);">
                         Calculates three distinct carbon metrics to ensure true abatement, not just paper offsets.
                     </p>
-                    <ul class="text-sm space-y-2 text-gray-600">
+                    <ul class="text-sm space-y-2" style="color: var(--text-secondary);">
                         <!-- CHANGED: Generalized the "Factor" label to be accurate for both modes -->
                         <li><strong>Location-Based:</strong> Total Load × Grid Intensity Factor</li>
                         <li><strong>Market-Based:</strong> Unmatched Load × Grid Intensity Factor</li>
                         <li><strong>Avoided:</strong> Renewable Gen × Grid Intensity Factor</li>
                     </ul>
                     <!-- ADDED: Clarification note about the switch -->
-                    <p class="text-xs text-gray-400 mt-3 italic border-t border-gray-100 pt-2">
-                        *The "Grid Intensity Factor" switches between <strong>Hourly Data</strong> and <strong>Annual Averages</strong> depending on the data source selected.
+                    <p class="text-xs mt-3 italic pt-2"
+                        style="color: var(--text-tertiary); border-top: 1px solid var(--border-color);">
+                        *The "Grid Intensity Factor" switches between <strong>Hourly Data</strong> and <strong>Annual
+                            Averages</strong> depending on the data source selected.
                     </p>
                 </div>
 
                 <!-- 3.4 Scarcity Pricing -->
-                <div class="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition lg:col-span-1 md:col-span-2">
-                    <div class="w-10 h-10 bg-[#E3F2FD] rounded-md flex items-center justify-center mb-4 text-xl">💲</div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Scarcity Pricing Model</h3>
-                    <p class="text-gray-600 text-sm mb-4">
+                <div class="p-6 rounded-lg hover:shadow-md transition lg:col-span-1 md:col-span-2"
+                    style="background-color: var(--card-bg); border: 1px solid var(--border-color);">
+                    <div class="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl"
+                        style="background-color: #E3F2FD;">💲</div>
+                    <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Scarcity Pricing Model</h3>
+                    <p class="text-sm mb-4" style="color: var(--text-secondary);">
                         REC values scale based on grid stress.
                     </p>
                     <div class="h-32 w-full">
@@ -312,51 +424,61 @@
     </section>
 
     <!-- Architecture Section -->
-    <section id="architecture" class="py-16 bg-white border-t border-gray-200">
+    <section id="architecture" class="py-16"
+        style="background-color: var(--bg-primary); border-top: 1px solid var(--border-color);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold brand-text mb-8 text-center">System Architecture</h2>
-            
+
             <div class="grid md:grid-cols-4 gap-4 text-center items-stretch">
                 <!-- Input Layer -->
-                <div class="bg-[#F5F5F5] p-6 rounded-lg border border-gray-200">
-                    <h4 class="font-bold text-gray-800 mb-2">Input Layer</h4>
-                    <p class="text-xs text-gray-500">Streamlit UI</p>
+                <div class="p-6 rounded-lg"
+                    style="background-color: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                    <h4 class="font-bold mb-2" style="color: var(--text-primary);">Input Layer</h4>
+                    <p class="text-xs" style="color: var(--text-tertiary);">Streamlit UI</p>
                 </div>
 
                 <!-- Arrow -->
-                <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">➝</div>
-
-                <!-- Simulation Engine -->
-                <div class="bg-[#F5F5F5] p-6 rounded-lg border border-gray-200 md:col-span-1">
-                    <h4 class="font-bold text-gray-800 mb-2">Simulation Engine</h4>
-                    <p class="text-xs text-gray-500">Python (Pandas/NumPy)</p>
+                <div class="hidden md:flex items-center justify-center text-2xl" style="color: var(--text-tertiary);">➝
                 </div>
 
-                 <!-- Arrow -->
-                 <div class="hidden md:flex items-center justify-center text-gray-300 text-2xl">➝</div>
+                <!-- Simulation Engine -->
+                <div class="p-6 rounded-lg md:col-span-1"
+                    style="background-color: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                    <h4 class="font-bold mb-2" style="color: var(--text-primary);">Simulation Engine</h4>
+                    <p class="text-xs" style="color: var(--text-tertiary);">Python (Pandas/NumPy)</p>
+                </div>
 
-                 <!-- Output Layer -->
-                 <div class="bg-[#F5F5F5] p-6 rounded-lg border border-gray-200">
-                    <h4 class="font-bold text-gray-800 mb-2">Visualization</h4>
-                    <p class="text-xs text-gray-500">Altair / Streamlit</p>
+                <!-- Arrow -->
+                <div class="hidden md:flex items-center justify-center text-2xl" style="color: var(--text-tertiary);">➝
+                </div>
+
+                <!-- Output Layer -->
+                <div class="p-6 rounded-lg"
+                    style="background-color: var(--bg-tertiary); border: 1px solid var(--border-color);">
+                    <h4 class="font-bold mb-2" style="color: var(--text-primary);">Visualization</h4>
+                    <p class="text-xs" style="color: var(--text-tertiary);">Altair / Streamlit</p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="bg-white border-t border-gray-200 py-12 text-gray-600">
+    <footer class="py-12"
+        style="background-color: var(--bg-primary); border-top: 1px solid var(--border-color); color: var(--text-secondary);">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid md:grid-cols-2 gap-8">
                 <div>
                     <h3 class="text-2xl font-bold mb-4 brand-text">Eighty760</h3>
-                    <p class="text-sm max-w-sm">
-                        Enabling energy buyers and developers to design portfolios that achieve true decarbonization through hourly matching logic.
+                    <p class="text-sm max-w-sm" style="color: var(--text-secondary);">
+                        Enabling energy buyers and developers to design portfolios that achieve true decarbonization
+                        through hourly matching logic.
                     </p>
                 </div>
                 <div class="md:text-right">
-                    <p class="text-sm">Based on Technical Whitepaper Version 1.0</p>
-                    <p class="text-sm mt-2">© 2025 Eighty760 Simulation Framework</p>
+                    <p class="text-sm" style="color: var(--text-secondary);">Based on Technical Whitepaper Version 1.0
+                    </p>
+                    <p class="text-sm mt-2" style="color: var(--text-secondary);">© 2025 Eighty760 Simulation Framework
+                    </p>
                 </div>
             </div>
         </div>
@@ -365,11 +487,11 @@
     <!-- JavaScript Logic -->
     <script>
         // --- 1. Simulation Data Logic (Synthetic Generation) ---
-        const HOURS = Array.from({length: 24}, (_, i) => i);
-        
+        const HOURS = Array.from({ length: 24 }, (_, i) => i);
+
         // Simplified Load Profile (Office: low night, high day)
         const BASE_LOAD_PROFILE = [
-            10, 10, 10, 10, 15, 25, 45, 65, 80, 85, 85, 80, 
+            10, 10, 10, 10, 15, 25, 45, 65, 80, 85, 85, 80,
             80, 85, 85, 80, 65, 45, 25, 20, 15, 10, 10, 10
         ];
 
@@ -382,7 +504,7 @@
         // Wind Profile (Inverse day for variability demo)
         const WIND_PROFILE = HOURS.map(h => {
             // Higher at night, dip during day
-            return 0.5 + 0.3 * Math.cos(((h - 4) * Math.PI) / 12); 
+            return 0.5 + 0.3 * Math.cos(((h - 4) * Math.PI) / 12);
         });
 
         // --- 2. State Management ---
@@ -462,7 +584,7 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     return context.dataset.label + ': ' + Math.round(context.raw) + ' MW';
                                 }
                             }
@@ -489,7 +611,7 @@
                         label: 'REC Multiplier',
                         data: [0.45, 1.0, 1.2, 2.0],
                         backgroundColor: [
-                            '#E3F2FD', 
+                            '#E3F2FD',
                             '#BBDEFB',
                             '#64B5F6',
                             '#285477' // Darkest for Critical
@@ -515,19 +637,19 @@
             // 1. Calculate Raw Generation
             const solarGen = SOLAR_PROFILE.map(v => v * state.solarCap);
             const windGen = WIND_PROFILE.map(v => v * state.windCap);
-            
+
             // 2. Battery Logic (Greedy Dispatch)
             // Start with empty battery for simulation 
-            let currentCharge = 0; 
+            let currentCharge = 0;
             const BATTERY_EFFICIENCY = 0.85;
-            
+
             const batteryDischargeProfile = [];
             const batteryChargeProfile = []; // For internal accounting
-            
+
             // First pass: Calculate Surplus/Deficit
             // Simplified: We assume starting charge is 0 for this 24h slice loop
             // In a real 8760, this carries over. Here we just show the concept.
-            
+
             // Let's pre-fill battery to 50% so we can see discharge early morning if needed
             currentCharge = state.batteryCap * 0.5;
 
@@ -535,7 +657,7 @@
                 const totalRenewable = solarGen[i] + windGen[i];
                 const load = state.loadData[i];
                 const net = totalRenewable - load;
-                
+
                 let discharged = 0;
                 let charged = 0;
 
@@ -552,12 +674,12 @@
                     // Usually efficiency is applied on R/T. Let's simplify: 
                     // Input * eff = stored. Output = stored. 
                     // Whitepaper says "Apply round-trip efficiency".
-                    
+
                     const maxOutput = currentCharge; // Simple
                     discharged = Math.min(deficit, maxOutput);
                     currentCharge -= discharged;
                 }
-                
+
                 batteryDischargeProfile.push(discharged);
             }
 
@@ -570,23 +692,23 @@
             for (let i = 0; i < 24; i++) {
                 const load = state.loadData[i];
                 const gen = solarGen[i] + windGen[i] + batteryDischargeProfile[i];
-                
+
                 totalLoad += load;
-                
+
                 // Match is min(gen, load)
                 const match = Math.min(gen, load);
                 totalMatched += match;
-                
+
                 // Overgeneration
                 if (gen > load) totalOver += (gen - load);
-                
+
                 // Grid Needed
                 if (gen < load) totalGrid += (load - gen);
             }
 
             // Update State
             state.genData = { solar: solarGen, wind: windGen, battery: batteryDischargeProfile };
-            
+
             // Update UI Numbers
             const cfeScore = totalLoad > 0 ? (totalMatched / totalLoad) * 100 : 0;
             document.getElementById('cfe-score').innerText = cfeScore.toFixed(1) + '%';
@@ -599,7 +721,7 @@
 
         function updateChart() {
             if (!simChart) return;
-            
+
             simChart.data.datasets[1].data = state.genData.solar;
             simChart.data.datasets[2].data = state.genData.wind;
             simChart.data.datasets[3].data = state.genData.battery;
@@ -611,16 +733,16 @@
             const sInput = document.getElementById('solar-input');
             const wInput = document.getElementById('wind-input');
             const bInput = document.getElementById('battery-input');
-            
+
             const handleUpdate = () => {
                 state.solarCap = parseInt(sInput.value);
                 state.windCap = parseInt(wInput.value);
                 state.batteryCap = parseInt(bInput.value);
-                
+
                 document.getElementById('solar-val').innerText = state.solarCap + ' MW';
                 document.getElementById('wind-val').innerText = state.windCap + ' MW';
                 document.getElementById('battery-val').innerText = state.batteryCap + ' MWh';
-                
+
                 runSimulation();
             };
 
@@ -629,8 +751,29 @@
             bInput.addEventListener('input', handleUpdate);
         }
 
+        // --- 6. Dark Mode Toggle ---
+        function toggleTheme() {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+
+            // Update icon
+            document.getElementById('theme-icon').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-icon').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+        }
+
         // --- Initialization ---
         window.addEventListener('load', () => {
+            loadTheme();
             initCharts();
             setupListeners();
             runSimulation(); // Initial run
@@ -638,4 +781,5 @@
 
     </script>
 </body>
+
 </html>
