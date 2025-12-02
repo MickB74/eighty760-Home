@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eighty760 | Simulator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts matched to app.py: Inter for UI, IBM Plex Mono for Data -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="antialiased flex flex-col h-screen overflow-hidden">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 flex-none"
+        style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s ease;">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex flex-row items-center gap-4">
+                    <a href="Whitepaper.html">
+                        <img src="image.png" alt="Eighty760 Logo" class="w-auto object-contain" style="height: 350px;">
+                    </a>
+                    <label class="theme-switch flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="theme-checkbox" onchange="toggleTheme()">
+                        <span class="slider round"></span>
+                        <span class="text-sm font-medium" style="color: var(--text-primary);">Dark Mode</span>
+                    </label>
+                </div>
+                <div class="flex items-center space-x-8">
+                    <div class="hidden sm:flex items-center space-x-8">
+                        <a href="Whitepaper.html#simulator" style="color: var(--text-secondary);"
+                            class="hover:text-[#285477] font-medium transition">Whitepaper</a>
+                        <a href="simulator.html" style="color: var(--brand-color);"
+                            class="font-bold transition">Simulator</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Iframe Container -->
+    <main class="flex-grow w-full relative">
+        <iframe src="https://cleanenergy8760.streamlit.app/?embed=true" frameborder="0"
+            class="absolute inset-0 w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen>
+        </iframe>
+    </main>
+
+    <script>
+        // Theme Management Logic (Copied from Whitepaper.html)
+        function toggleTheme() {
+            const html = document.documentElement;
+            const checkbox = document.getElementById('theme-checkbox');
+            const isDark = checkbox.checked;
+            const newTheme = isDark ? 'dark' : 'light';
+
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        }
+
+        // Load saved theme
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            document.getElementById('theme-checkbox').checked = savedTheme === 'dark';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', loadTheme);
+    </script>
+</body>
+
+</html>
