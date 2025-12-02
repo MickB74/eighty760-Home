@@ -395,45 +395,49 @@
                         {
                             label: 'Load (MW)',
                             data: state.loadData,
-                            borderColor: '#333333', // Dark Gray
+                            borderColor: '#333333', // Gray-800 (Light Mode Default)
                             borderWidth: 2,
                             borderDash: [5, 5],
                             pointRadius: 0,
                             fill: false,
                             tension: 0.4,
-                            order: 1
+                            order: 0,
+                            stack: 'load' // Separate stack for Load
                         },
                         {
                             label: 'Solar Gen',
                             data: [],
-                            backgroundColor: 'rgba(75, 85, 99, 0.85)', // Dark Gray #4B5563
-                            borderColor: '#4B5563',
+                            backgroundColor: 'rgba(245, 158, 11, 0.85)', // Orange #F59E0B
+                            borderColor: '#F59E0B',
                             borderWidth: 0,
-                            fill: 'origin',
+                            fill: true, // Fill for stacked area
                             pointRadius: 0,
                             tension: 0.4,
-                            order: 3
+                            order: 3,
+                            stack: 'gen' // Group in 'gen' stack
                         },
                         {
                             label: 'Wind Gen',
                             data: [],
-                            backgroundColor: 'rgba(156, 163, 175, 0.85)', // Medium Gray #9CA3AF
-                            borderColor: '#9CA3AF',
+                            backgroundColor: 'rgba(102, 153, 204, 0.85)', // Blue #6699CC
+                            borderColor: '#6699CC',
                             borderWidth: 0,
-                            fill: '-1', // Stack on Solar
+                            fill: true, // Fill for stacked area
                             pointRadius: 0,
                             tension: 0.4,
-                            order: 2
+                            order: 2,
+                            stack: 'gen' // Group in 'gen' stack
                         },
                         {
                             label: 'Battery Discharge',
                             data: [],
-                            backgroundColor: 'rgba(229, 231, 235, 0.85)', // Light Gray #E5E7EB
-                            borderColor: '#E5E7EB',
+                            backgroundColor: 'rgba(163, 194, 224, 0.85)', // Light Blue #A3C2E0
+                            borderColor: '#A3C2E0',
                             borderWidth: 0,
-                            fill: '-1', // Stack on Wind
+                            fill: true, // Fill for stacked area
                             pointRadius: 0,
-                            order: 1
+                            order: 1,
+                            stack: 'gen' // Group in 'gen' stack
                         }
                     ]
                 },
@@ -455,7 +459,7 @@
                         y: {
                             beginAtZero: true,
                             title: { display: true, text: 'Megawatts (MW)' },
-                            stacked: false // Load is separate
+                            stacked: true // Enable stacking on Y-axis
                         },
                         x: { grid: { display: false } }
                     }
