@@ -11,6 +11,7 @@
     --card-bg: #FFFFFF;
     --nav-bg: #FFFFFF;
     --chart-bg: #FFFFFF;
+    --slider-track: #E5E7EB;
 }
 
 [data-theme="dark"] {
@@ -25,6 +26,8 @@
     --card-bg: #1E293B;
     --nav-bg: #0F172A;
     --chart-bg: #1E293B;
+    --slider-track: #475569;
+    /* Slate-600 for better contrast */
 }
 
 /* Base Styles */
@@ -123,13 +126,12 @@ input[type=range] {
 
 input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    height: 24px;
-    width: 24px;
+    height: 16px;
+    width: 16px;
     border-radius: 50%;
-    background: #3B82F6;
-    /* Vibrant Blue */
+    background: var(--brand-color);
     cursor: pointer;
-    margin-top: -10px;
+    margin-top: -6px;
     /* Centers thumb on track */
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
@@ -137,7 +139,7 @@ input[type=range]::-webkit-slider-thumb {
 input[type=range]::-webkit-slider-runnable-track {
     width: 100%;
     height: 4px;
-    background: var(--border-color);
+    background: var(--slider-track);
     border-radius: 2px;
 }
 
