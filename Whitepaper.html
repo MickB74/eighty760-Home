@@ -232,10 +232,9 @@
                     <div class="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl"
                         style="background-color: #E3F2FD;">☀️</div>
                     <h3 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Generation Modeling</h3>
-                    <p class="text-sm mb-4" style="color: var(--text-secondary);">
-                        Synthetic profiles replace missing historical data. Solar uses bell curves adjusted for
-                        seasonality.
-                    </p>
+                    Leveraging NREL's PVGIS and ERA5 weather data, our model generates high-fidelity hourly generation
+                    profiles. We utilize Typical Meteorological Year (TMY) data to ensure statistical reliability, while
+                    accounting for seasonal variability and localized weather patterns.
                     <div class="p-3 rounded text-xs font-mono"
                         style="background-color: var(--bg-tertiary); color: var(--text-tertiary);">
                         Seasonality = 1 + 0.4 * cos(day - peak)
