@@ -23,8 +23,8 @@
     <nav class="sticky top-0 z-50"
         style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s ease;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center" style="min-height: 180px;">
-                <div class="flex flex-col items-start gap-4">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex flex-col items-start gap-2">
                     <img src="image.png" alt="Eighty760 Logo" class="w-auto object-contain" style="height: 350px;">
                     <label class="theme-switch">
                         <input type="checkbox" id="theme-checkbox" onchange="toggleTheme()">
@@ -38,8 +38,6 @@
                             class="hover:text-[#285477] font-medium transition">Simulation</a>
                         <a href="#methodology" style="color: var(--text-secondary);"
                             class="hover:text-[#285477] font-medium transition">Methodology</a>
-                        <a href="#architecture" style="color: var(--text-secondary);"
-                            class="hover:text-[#285477] font-medium transition">Architecture</a>
                     </div>
 
                 </div>
@@ -628,9 +626,24 @@
 
         function updateChartTheme(theme) {
             if (!simChart) return;
-            // Load Line Color: Always Black
-            const loadColor = '#000000';
+
+            const isDark = theme === 'dark';
+
+            // Colors
+            const loadColor = isDark ? '#F1F5F9' : '#333333'; // Slate-100 vs Gray-800
+            const tickColor = isDark ? '#94A3B8' : '#666666'; // Slate-400 vs Gray-500
+            const gridColor = isDark ? '#334155' : '#E5E7EB'; // Slate-700 vs Gray-200
+
+            // Update Load Line
             simChart.data.datasets[0].borderColor = loadColor;
+
+            // Update Scales
+            simChart.options.scales.y.ticks.color = tickColor;
+            simChart.options.scales.y.title.color = tickColor;
+            simChart.options.scales.y.grid.color = gridColor;
+
+            simChart.options.scales.x.ticks.color = tickColor;
+
             simChart.update();
         }
 

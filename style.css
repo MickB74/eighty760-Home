@@ -10,6 +10,7 @@
     --brand-color: #285477;
     --card-bg: #FFFFFF;
     --nav-bg: #FFFFFF;
+    --chart-bg: #FFFFFF;
 }
 
 [data-theme="dark"] {
@@ -23,6 +24,7 @@
     --brand-color: #60A5FA;
     --card-bg: #1E293B;
     --nav-bg: #0F172A;
+    --chart-bg: #1E293B;
 }
 
 /* Base Styles */
@@ -109,7 +111,8 @@ h4 {
 
 /* Force canvas to have white background for color consistency */
 canvas#simChart {
-    background-color: #FFFFFF !important;
+    background-color: var(--chart-bg) !important;
+    transition: background-color 0.3s ease;
 }
 
 /* Slider Styling */
