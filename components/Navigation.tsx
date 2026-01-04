@@ -50,6 +50,13 @@ export default function Navigation() {
                                 Analysis
                             </a>
                             <a
+                                href="/aggregation"
+                                style={{ color: 'var(--text-secondary)' }}
+                                className="hover:text-[#285477] font-medium transition"
+                            >
+                                Aggregation
+                            </a>
+                            <a
                                 href="/#methodology"
                                 style={{ color: 'var(--text-secondary)' }}
                                 className="hover:text-[#285477] font-medium transition"
