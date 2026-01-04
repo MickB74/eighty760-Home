@@ -4,28 +4,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eighty760 | 24/7 CFE Simulation Framework</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Fonts matched to app.py: Inter for UI, IBM Plex Mono for Data -->
+
+    <!-- SEO Meta Tags -->
+    <title>Eighty760 | 24/7 Carbon-Free Energy Simulation</title>
+    <meta name="description"
+        content="Model, analyze, and optimize clean energy portfolios with 24/7 Carbon-Free Energy matching. Interactive simulator for solar, wind, and battery storage.">
+    <meta name="keywords"
+        content="carbon-free energy, CFE, renewable energy, solar power, wind power, battery storage, energy simulation, clean energy portfolio">
+    <meta name="author" content="Eighty760">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://eighty760.vercel.app/">
+    <meta property="og:title" content="Eighty760 | 24/7 Carbon-Free Energy Simulation">
+    <meta property="og:description"
+        content="Interactive framework for modeling clean energy portfolios with hourly carbon-free energy matching">
+    <meta property="og:image" content="https://eighty760.vercel.app/image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://eighty760.vercel.app/">
+    <meta property="twitter:title" content="Eighty760 | 24/7 Carbon-Free Energy Simulation">
+    <meta property="twitter:description"
+        content="Interactive framework for modeling clean energy portfolios with hourly carbon-free energy matching">
+    <meta property="twitter:image" content="https://eighty760.vercel.app/image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/image.png">
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+    <!-- Fonts -->
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=IBM+Plex+Mono:wght@700&display=swap"
         rel="stylesheet">
+
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="style.css">
-    <!-- Chosen Palette: "Eighty760" App Theme (Light Mode) -->
-    <!-- Structure: Same as before, but styled to look like the Streamlit app -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Scripts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Vercel Analytics -->
+    <script defer src="https://cdn.vercel-insights.com/v1/script.js"></script>
 </head>
 
 <body class="antialiased">
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50"
+    <nav class="sticky top-0 z-50 backdrop-blur-sm bg-opacity-90"
         style="background-color: var(--nav-bg); border-bottom: 1px solid var(--border-color); transition: background-color 0.3s ease;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center py-4">
+            <div class="flex justify-between items-center py-3">
                 <div class="flex flex-row items-center gap-4">
-                    <img src="image.png" alt="Eighty760 Logo" class="w-auto object-contain" style="height: 350px;">
+                    <img src="image.png" alt="Eighty760 Logo" class="w-auto object-contain" style="height: 60px;">
                     <label class="theme-switch flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" id="theme-checkbox" onchange="toggleTheme()">
                         <span class="slider round"></span>
@@ -34,12 +71,9 @@
                 </div>
                 <div class="flex items-center space-x-8">
                     <div class="hidden sm:flex items-center space-x-8">
-                        <a href="simulator.html" style="color: var(--text-secondary);"
-                            class="hover:text-[#285477] font-medium transition">Simulation</a>
                         <a href="#methodology" style="color: var(--text-secondary);"
                             class="hover:text-[#285477] font-medium transition">Methodology</a>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -59,7 +93,7 @@
             <div class="flex justify-center gap-4">
                 <button onclick="document.getElementById('simulator').scrollIntoView({behavior: 'smooth'})"
                     class="btn-primary px-8 py-3 text-lg shadow-sm">
-                    Launch Interactive Demo
+                    Try Interactive Simulator
                 </button>
             </div>
         </div>
