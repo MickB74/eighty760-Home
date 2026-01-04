@@ -43,7 +43,14 @@ export default function Navigation() {
                     <div className="flex items-center space-x-8">
                         <div className="hidden sm:flex items-center space-x-8">
                             <a
-                                href="#methodology"
+                                href="/analysis"
+                                style={{ color: 'var(--text-secondary)' }}
+                                className="hover:text-[#285477] font-medium transition"
+                            >
+                                Analysis
+                            </a>
+                            <a
+                                href="/#methodology"
                                 style={{ color: 'var(--text-secondary)' }}
                                 className="hover:text-[#285477] font-medium transition"
                             >
