@@ -1,13 +1,7 @@
 {
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/Whitepaper.html"
-    }
-  ],
   "headers": [
     {
-      "source": "/Whitepaper.html",
+      "source": "/index.html",
       "headers": [
         {
           "key": "Cache-Control",
