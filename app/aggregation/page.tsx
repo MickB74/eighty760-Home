@@ -19,6 +19,7 @@ import { Participant, TechCapacity, FinancialParams, SimulationResult } from '@/
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { recommendPortfolio } from '@/lib/aggregation/optimizer';
 import { loadERCOTPrices, getAvailableYears, getYearLabel } from '@/lib/aggregation/price-loader';
+import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 
 // Register ChartJS
 ChartJS.register(
@@ -78,6 +79,32 @@ export default function AggregationPage() {
     };
 
     const handleClearParticipants = () => setParticipants([]);
+
+    const handleInstantDemo = () => {
+        // Clear and load demo scenario
+        const demoParticipant: Participant = {
+            id: Date.now().toString(),
+            name: 'Hyperscale Graph DC',
+            type: 'Data Center',
+            load_mwh: 250000 // 250 GWh/yr ~ 28.5 MW avg
+        };
+
+        setParticipants([demoParticipant]);
+
+        // Set portfolio for ~95% CFE
+        setCapacities({
+            Solar: 85,
+            Wind: 60,
+            'CCS Gas': 15,
+            Geothermal: 0,
+            Nuclear: 0,
+            Battery_MW: 30,
+            Battery_Hours: 4
+        });
+
+        // Set year to 2024
+        setSelectedYear(2024);
+    };
 
     const handleSmartFill = () => {
         setLoading(true);
@@ -159,88 +186,43 @@ export default function AggregationPage() {
 
                 {/* TAB 1: LOAD */}
                 {activeTab === 'load' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Inputs */}
-                        <div className="lg:col-span-1 space-y-6">
+                    <div className="grid grid-cols-1 gap-8">
+                        <div className="space-y-6">
+                            {/* Quick Actions */}
                             <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold mb-4">Add Participant</h2>
-                                <div className="space-y-4">
-                                    <p className="text-sm text-[var(--text-secondary)]">
-                                        Build your aggregation by adding simulated participants.
-                                    </p>
+                                <div className="flex justify-between items-center mb-4">
+                                    <div>
+                                        <h2 className="text-lg font-semibold">Quick Actions</h2>
+                                        <p className="text-sm text-[var(--text-secondary)]">Test scenarios instantly</p>
+                                    </div>
                                     <button
-                                        onClick={handleAddParticipant}
-                                        className="w-full bg-[#285477] text-white py-2 rounded-md hover:bg-[#1d3f5a] transition"
+                                        onClick={handleInstantDemo}
+                                        className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-md hover:from-indigo-600 hover:to-purple-700 transition font-medium shadow-md"
                                     >
-                                        + Add Random Participant
+                                        ⚡ Instant Demo (95% CFE)
                                     </button>
-                                    {participants.length > 0 && (
-                                        <button
-                                            onClick={handleClearParticipants}
-                                            className="w-full bg-red-50 text-red-600 py-2 rounded-md hover:bg-red-100 transition border border-red-100"
-                                        >
-                                            Clear All
-                                        </button>
-                                    )}
                                 </div>
+                                <p className="text-xs text-[var(--text-secondary)]">
+                                    Loads: 250 GWh Data Center • Portfolio: 85 MW Solar, 60 MW Wind, 15 MW CCS, 30 MW/4h Battery
+                                </p>
                             </div>
-                        </div>
 
-                        {/* List & Chart */}
-                        <div className="lg:col-span-2 space-y-6">
+                            {/* Participant Editor */}
                             <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold mb-4">Current Aggregation</h2>
-                                {participants.length === 0 ? (
-                                    <div className="text-center py-12 text-[var(--text-secondary)] border-2 border-dashed border-[var(--border-color)] rounded-lg">
-                                        No participants added.
-                                    </div>
-                                ) : (
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-sm">
-                                            <thead>
-                                                <tr className="border-b border-[var(--border-color)] text-left">
-                                                    <th className="py-2">Name</th>
-                                                    <th className="py-2">Type</th>
-                                                    <th className="py-2 text-right">Annual Load (MWh)</th>
-                                                    <th className="py-2"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {participants.map((p) => (
-                                                    <tr key={p.id} className="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--row-hover)]">
-                                                        <td className="py-3 font-medium">{p.name}</td>
-                                                        <td className="py-3 text-[var(--text-secondary)]">{p.type}</td>
-                                                        <td className="py-3 text-right">{p.load_mwh.toLocaleString()}</td>
-                                                        <td className="py-3 text-right">
-                                                            <button
-                                                                onClick={() => setParticipants(participants.filter(x => x.id !== p.id))}
-                                                                className="text-red-400 hover:text-red-600"
-                                                            >
-                                                                Remove
-                                                            </button>
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                                <tr className="bg-[var(--bg-secondary)] font-bold">
-                                                    <td className="py-3 pl-2">Total</td>
-                                                    <td></td>
-                                                    <td className="py-3 text-right">{participants.reduce((a, b) => a + b.load_mwh, 0).toLocaleString()}</td>
-                                                    <td></td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                )}
+                                <ParticipantEditor
+                                    participants={participants}
+                                    onChange={setParticipants}
+                                />
                             </div>
-
-                            {/* Load Chart Preview */}
-                            {result && (
-                                <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm h-80">
-                                    <h3 className="text-sm font-medium mb-4">Aggregated Hourly Load (Sample Week)</h3>
-                                    <LoadChart result={result} />
-                                </div>
-                            )}
                         </div>
+
+                        {/* Load Chart Preview */}
+                        {result && (
+                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm h-80">
+                                <h3 className="text-sm font-medium mb-4">Aggregated Hourly Load (Sample Week)</h3>
+                                <LoadChart result={result} />
+                            </div>
+                        )}
                     </div>
                 )}
 
