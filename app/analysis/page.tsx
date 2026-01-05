@@ -303,29 +303,79 @@ export default function AnalysisPage() {
                                 <p className="text-[var(--text-secondary)]">Region: {region} | Total Load: {simResult.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</p>
                             </div>
 
-                            {/* KPI Grid */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <MetricCard
-                                    label="CFE Score"
-                                    value={`${simResult?.results.cfe_percent.toFixed(1)}%`}
-                                    sub="Hourly Match"
-                                />
-                                <MetricCard
-                                    label="Grid Emissions"
-                                    value={simResult?.results.grid_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                    sub="Metric Tons CO2e"
-                                />
-                                <MetricCard
-                                    label="Avoided Emissions"
-                                    value={simResult?.results.avoided_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                    sub="Metric Tons CO2e"
-                                />
-                                <MetricCard
-                                    label="Net REC Cost"
-                                    value={`$${simResult?.results.net_rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
-                                    sub="Revenue - Cost"
-                                    color={simResult.results.net_rec_cost > 0 ? "text-green-500" : "text-red-500"}
-                                />
+                            {/* Operational Analysis */}
+                            <div>
+                                <h3 className="text-xl font-bold mb-4">Operational Analysis</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                                    <MetricCard
+                                        label="Total Electricity Usage"
+                                        value={`${simResult?.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="Clean Energy Generation"
+                                        value={`${simResult?.results.total_clean_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="CFE Score (24/7)"
+                                        value={`${simResult?.results.cfe_percent.toFixed(1)}%`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="Annual Clean Energy / Annual Load"
+                                        value={`${simResult?.results.clean_load_ratio.toFixed(1)}%`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="Battery Discharge"
+                                        value={`${simResult?.results.battery_discharge.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="MW Match Productivity"
+                                        value={`${simResult?.results.mw_match_productivity.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh/MW`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="Loss of Green Hours"
+                                        value={`${simResult?.results.loss_of_green_hours.toFixed(1)}%`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="Grid Consumption"
+                                        value={`${simResult?.results.grid_consumption.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
+                                        sub=""
+                                    />
+                                    <MetricCard
+                                        label="Excess Generation"
+                                        value={`${simResult?.results.excess_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
+                                        sub=""
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Financial & Environmental (kept separate or merged? Design only showed Operational. Keeping legacy metrics below for now but labelled) */}
+                            <div>
+                                <h3 className="text-xl font-bold mb-4">Financial & Environmental</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    <MetricCard
+                                        label="Grid Emissions"
+                                        value={simResult?.results.grid_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        sub="Metric Tons CO2e"
+                                    />
+                                    <MetricCard
+                                        label="Avoided Emissions"
+                                        value={simResult?.results.avoided_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        sub="Metric Tons CO2e"
+                                    />
+                                    <MetricCard
+                                        label="Net REC Cost"
+                                        value={`$${simResult?.results.net_rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+                                        sub="Revenue - Cost"
+                                        color={simResult.results.net_rec_cost > 0 ? "text-green-500" : "text-red-500"}
+                                    />
+                                </div>
                             </div>
 
                             {/* Chart */}

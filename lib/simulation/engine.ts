@@ -248,7 +248,11 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
     let matchedEnergy = 0;
     let totalRevenue = 0;
     let totalCost = 0;
-    let totalGridConsumption = 0;
+    let totalGridConsumption = 0; // Restored
+    let totalRawGen = 0;
+    let totalBatteryDischarge = 0;
+    let totalOverGen = 0;
+    let countGridHours = 0;
 
     const lbToMt = 0.000453592;
 
@@ -269,6 +273,12 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
         totalEffectiveGen += effectiveGen;
         totalGridConsumption += gridNeeded;
         matchedEnergy += cfeMwh;
+
+        // New Metrics Accumulation
+        totalRawGen += totalRenewable;
+        totalBatteryDischarge += batteryLogic.discharge[i];
+        totalOverGen += overGen;
+        if (gridNeeded > 0) countGridHours++;
 
         // Emissions
         let emissionsFactor = egridFactor;
@@ -374,7 +384,17 @@ export function runSimulation(inputs: SimulationInputs): SimulationResult {
             grid_emissions_mt: gridEmissionsMt,
             avoided_emissions_mt: avoidedEmissionsMt,
             net_rec_cost: netRecCost,
-            grid_consumption: totalGridConsumption
+            grid_consumption: totalGridConsumption, // Now this variable exists
+
+            // New Operational Metrics
+            total_clean_generation: totalRawGen,
+            clean_load_ratio: totalLoad > 0 ? (totalRawGen / totalLoad) * 100 : 0,
+            battery_discharge: totalBatteryDischarge,
+            mw_match_productivity: (solar_capacity + wind_capacity + nuclear_capacity + geothermal_capacity + hydro_capacity) > 0
+                ? totalRawGen / (solar_capacity + wind_capacity + nuclear_capacity + geothermal_capacity + hydro_capacity)
+                : 0,
+            loss_of_green_hours: (countGridHours / hours) * 100,
+            excess_generation: totalOverGen
         },
         df: results
     };

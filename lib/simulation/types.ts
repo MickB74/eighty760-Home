@@ -4,7 +4,22 @@ export interface BuildingPortfolioItem {
 }
 
 export interface SimulationResult {
-    results: Record<string, number>;
+    results: Record<string, number> & {
+        total_annual_load: number;
+        total_renewable_gen: number;
+        cfe_percent: number;
+        grid_emissions_mt: number;
+        avoided_emissions_mt: number;
+        net_rec_cost: number;
+        grid_consumption: number;
+        // New Operational Metrics
+        total_clean_generation: number;
+        clean_load_ratio: number;
+        battery_discharge: number;
+        mw_match_productivity: number;
+        loss_of_green_hours: number;
+        excess_generation: number;
+    };
     df: SimulationDataFrame[];
 }
 
