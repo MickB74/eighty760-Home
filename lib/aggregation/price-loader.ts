@@ -26,7 +26,7 @@ export async function loadERCOTPrices(year: number): Promise<number[] | null> {
 }
 
 export function getAvailableYears(): number[] {
-    return [2023, 2024, 2025];
+    return [2020, 2021, 2022, 2023, 2024, 2025];
 }
 
 export function getYearLabel(year: number | 'Synthetic'): string {
