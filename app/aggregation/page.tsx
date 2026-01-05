@@ -15,11 +15,13 @@ import {
     Filler,
 } from 'chart.js';
 
-import { Participant, TechCapacity, FinancialParams, SimulationResult } from '@/lib/aggregation/types';
+import { Participant, TechCapacity, FinancialParams, SimulationResult, BatteryFinancialParams } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { recommendPortfolio } from '@/lib/aggregation/optimizer';
 import { loadERCOTPrices, getAvailableYears, getYearLabel } from '@/lib/aggregation/price-loader';
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
+import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
+import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
 
 // Register ChartJS
 ChartJS.register(
@@ -57,6 +59,19 @@ export default function AggregationPage() {
     // 4. Price Data State
     const [selectedYear, setSelectedYear] = useState<number | 'Synthetic'>(2024);
     const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
+
+    // 5. Battery Financial Params (CVTA)
+    const [batteryParams, setBatteryParams] = useState<BatteryFinancialParams>({
+        capacity_mw: 0,
+        base_rate_monthly: 15000,      // $15k/MW-month default
+        guaranteed_availability: 0.95,  // 95%
+        guaranteed_rte: 0.85,           // 85%
+        vom_rate: 2.5,                  // $2.5/MWh
+        ancillary_type: 'Fixed',
+        ancillary_input: 50000          // $50k/month default
+    });
+
+    const [cvtaResult, setCvtaResult] = useState<BatteryCVTAResult | null>(null);
 
     // Results
     const [result, setResult] = useState<SimulationResult | null>(null);
@@ -124,6 +139,32 @@ export default function AggregationPage() {
         setTimeout(() => {
             const res = runAggregationSimulation(participants, capacities, financials, historicalPrices);
             setResult(res);
+
+            // Calculate Battery CVTA if battery exists
+            if (capacities.Battery_MW > 0 && res) {
+                const cvta = calculateBatteryCVTA(
+                    capacities.Battery_MW,
+                    capacities.Battery_Hours,
+                    res.battery_discharge,
+                    res.battery_charge,
+                    res.market_price_profile,
+                    {
+                        fixed_toll_mw_month: batteryParams.base_rate_monthly,
+                        guaranteed_rte: batteryParams.guaranteed_rte,
+                        vom_charge_mwh: batteryParams.vom_rate,
+                        availability_factor: batteryParams.guaranteed_availability,
+                        ancillary_revenue_monthly: batteryParams.ancillary_type === 'Fixed' ? batteryParams.ancillary_input : undefined,
+                        ancillary_revenue_pct: batteryParams.ancillary_type === 'Dynamic' ? batteryParams.ancillary_input / 100 : undefined
+                    }
+                );
+                setCvtaResult(cvta);
+
+                // Update battery capacity in params for UI sync
+                setBatteryParams(prev => ({ ...prev, capacity_mw: capacities.Battery_MW }));
+            } else {
+                setCvtaResult(null);
+            }
+
             setLoading(false);
         }, 50);
     };
@@ -404,6 +445,59 @@ export default function AggregationPage() {
                                         </table>
                                     </div>
                                 </div>
+                            )}
+
+                            {/* Battery Details (CVTA) */}
+                            {capacities.Battery_MW > 0 && (
+                                <details className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] shadow-sm">
+                                    <summary className="px-6 py-4 cursor-pointer hover:bg-[var(--row-hover)] font-medium text-lg">
+                                        🔋 Battery Details (CVTA Model)
+                                    </summary>
+                                    <div className="px-6 pb-6 pt-2 space-y-4">
+                                        {/* CVTA Parameters */}
+                                        <div className="grid grid-cols-2 gap-4 text-sm bg-[var(--bg-secondary)] rounded-lg p-4">
+                                            <div>
+                                                <label className="block text-[var(--text-secondary)] mb-1">Fixed Toll ($/MW-month)</label>
+                                                <input
+                                                    type="number"
+                                                    value={batteryParams.base_rate_monthly}
+                                                    onChange={(e) => setBatteryParams({ ...batteryParams, base_rate_monthly: parseFloat(e.target.value) || 0 })}
+                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[var(--text-secondary)] mb-1">Guaranteed RTE (%)</label>
+                                                <input
+                                                    type="number"
+                                                    value={(batteryParams.guaranteed_rte * 100).toFixed(0)}
+                                                    onChange={(e) => setBatteryParams({ ...batteryParams, guaranteed_rte: (parseFloat(e.target.value) || 0) / 100 })}
+                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[var(--text-secondary)] mb-1">VOM Rate ($/MWh)</label>
+                                                <input
+                                                    type="number"
+                                                    value={batteryParams.vom_rate}
+                                                    onChange={(e) => setBatteryParams({ ...batteryParams, vom_rate: parseFloat(e.target.value) || 0 })}
+                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-[var(--text-secondary)] mb-1">Availability (%)</label>
+                                                <input
+                                                    type="number"
+                                                    value={(batteryParams.guaranteed_availability * 100).toFixed(0)}
+                                                    onChange={(e) => setBatteryParams({ ...batteryParams, guaranteed_availability: (parseFloat(e.target.value) || 0) / 100 })}
+                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* CVTA Results Display */}
+                                        <BatteryFinancials cvtaResult={cvtaResult} />
+                                    </div>
+                                </details>
                             )}
                         </div>
                     </div>
