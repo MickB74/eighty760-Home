@@ -230,7 +230,8 @@ export function simulateBattery(
 export function runAggregationSimulation(
     participants: Participant[],
     capacities: TechCapacity,
-    financials: FinancialParams
+    financials: FinancialParams,
+    historicalPrices?: number[] | null
 ): SimulationResult {
 
     // 1. Build Aggregate Load
@@ -279,10 +280,6 @@ export function runAggregationSimulation(
     for (let i = 0; i < HOURS; i++) {
         const available_clean = total_gen_profile[i] + batt.discharge[i] - batt.charge[i]; // Net Generation
 
-        // Matched is min(Load, Available)
-        // But strictly: Matched = min(Load, Clean_Gen_Used_Directly + Battery_Discharge)
-        // Note: Battery Charge comes from Surplus, so it subtracts from Grid Export, fits within Total Gen.
-
         const used_clean = Math.min(total_load_profile[i], Math.max(0, available_clean));
 
         matched_profile[i] = used_clean;
@@ -299,14 +296,16 @@ export function runAggregationSimulation(
     }
 
     const cfe_score = total_load_mwh > 0 ? total_matched / total_load_mwh : 0;
-    const total_cap = Object.values(capacities).reduce((a, b) => a + b, 0) - capacities.Battery_Hours; // Dont add hours
+    const total_cap = Object.values(capacities).reduce((a, b) => a + b, 0) - capacities.Battery_Hours;
     const productivity = total_cap > 0 ? total_matched / total_cap : 0;
 
     // 5. Financials
-    const prices = generatePriceProfile(financials.market_price_avg);
+    // Use historical prices if provided, otherwise generate synthetic
+    const prices = historicalPrices && historicalPrices.length === HOURS
+        ? historicalPrices
+        : generatePriceProfile(financials.market_price_avg);
 
     // PPA Costs
-    // Cost = Gen * Price
     const solar_cost = solar.reduce((sum, mw) => sum + mw, 0) * financials.solar_price;
     const wind_cost = wind.reduce((sum, mw) => sum + mw, 0) * financials.wind_price;
     const geo_cost = geo.reduce((sum, mw) => sum + mw, 0) * financials.geo_price;
@@ -318,21 +317,12 @@ export function runAggregationSimulation(
     // Market Revenue (Capture) from ALL Gen (calculated hourly)
     let total_market_revenue = 0;
     for (let i = 0; i < HOURS; i++) {
-        // Sum of all gen * price[i]
         const gen = solar[i] + wind[i] + geo[i] + nuc[i] + ccs[i];
         total_market_revenue += gen * prices[i];
     }
 
     const settlement_value = total_market_revenue - total_ppa_cost;
     const rec_cost = total_matched * financials.rec_price;
-
-    // Net Cost to Load = (Deficit * Price) + PPA_Cost + REC - Market_Rev_Surplus
-    // Simplified: Net Cost = (Load * Price) - Settlement + REC
-    // Why? If perfectly matched: Load*Price (avoided) - PPA Cost.
-    // Wait, simpler: Net Cost = (Market Purchases for Deficit) + (PPA Contracts) - (Revenue from Surplus Sales)
-    // Market Purchases = Deficit * Price
-    // Revenue Surplus = Surplus * Price
-    // PPA Contracts = Fixed PPA payments
 
     let market_purchase_cost = 0;
     let market_surplus_revenue = 0;
@@ -376,8 +366,7 @@ export function runAggregationSimulation(
         weighted_ppa_price: total_matched > 0 ? total_ppa_cost / total_matched : 0,
 
         tech_details: {
-            'Solar': { matched_mwh: 0, total_mwh: 0, total_cost: solar_cost, market_value: 0, settlement: 0 }, // Simplified for now
-            // ... populate others if needed for charts
+            'Solar': { matched_mwh: 0, total_mwh: 0, total_cost: solar_cost, market_value: 0, settlement: 0 },
         }
     };
 }

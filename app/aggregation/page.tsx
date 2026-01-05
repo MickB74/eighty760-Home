@@ -18,6 +18,7 @@ import {
 import { Participant, TechCapacity, FinancialParams, SimulationResult } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { recommendPortfolio } from '@/lib/aggregation/optimizer';
+import { loadERCOTPrices, getAvailableYears, getYearLabel } from '@/lib/aggregation/price-loader';
 
 // Register ChartJS
 ChartJS.register(
@@ -51,6 +52,10 @@ export default function AggregationPage() {
         solar_price: 35, wind_price: 25, geo_price: 75, nuc_price: 90, ccs_price: 85,
         rec_price: 5, market_price_avg: 35, market_year: 2024
     });
+
+    // 4. Price Data State
+    const [selectedYear, setSelectedYear] = useState<number | 'Synthetic'>(2024);
+    const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
 
     // Results
     const [result, setResult] = useState<SimulationResult | null>(null);
@@ -90,11 +95,25 @@ export default function AggregationPage() {
     const runSimulation = () => {
         setLoading(true);
         setTimeout(() => {
-            const res = runAggregationSimulation(participants, capacities, financials);
+            const res = runAggregationSimulation(participants, capacities, financials, historicalPrices);
             setResult(res);
             setLoading(false);
         }, 50);
     };
+
+    // Load historical price data when year changes
+    useEffect(() => {
+        const loadPrices = async () => {
+            if (selectedYear === 'Synthetic') {
+                setHistoricalPrices(null);
+                return;
+            }
+
+            const prices = await loadERCOTPrices(selectedYear);
+            setHistoricalPrices(prices);
+        };
+        loadPrices();
+    }, [selectedYear]);
 
     // Run sim whenever inputs change (debounced slightly?)
     useEffect(() => {
@@ -103,7 +122,7 @@ export default function AggregationPage() {
         } else {
             setResult(null);
         }
-    }, [participants, capacities, financials]);
+    }, [participants, capacities, financials, historicalPrices]);
 
     // --- Render ---
 
@@ -346,6 +365,25 @@ export default function AggregationPage() {
                                             value={financials.market_price_avg}
                                             onChange={(e) => setFinancials({ ...financials, market_price_avg: parseFloat(e.target.value) })}
                                         />
+                                    </div>
+                                    <hr className="border-[var(--border-color)]" />
+                                    <div>
+                                        <label className="block text-sm mb-2 font-medium">Market Price Year</label>
+                                        <select
+                                            value={selectedYear}
+                                            onChange={(e) => setSelectedYear(e.target.value === 'Synthetic' ? 'Synthetic' : parseInt(e.target.value))}
+                                            className="w-full px-3 py-2 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
+                                        >
+                                            <option value="Synthetic">{getYearLabel('Synthetic')}</option>
+                                            {getAvailableYears().map(year => (
+                                                <option key={year} value={year}>{getYearLabel(year)}</option>
+                                            ))}
+                                        </select>
+                                        <p className="text-xs text-[var(--text-secondary)] mt-1">
+                                            {selectedYear !== 'Synthetic' && historicalPrices
+                                                ? `Using real ${selectedYear} HB_NORTH prices`
+                                                : 'Using synthetic duck curve model'}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
