@@ -1,10 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 
 export default function Navigation() {
     const [darkMode, setDarkMode] = useState(false);
+    const pathname = usePathname();
 
     useEffect(() => {
         // Load saved theme
@@ -21,14 +24,16 @@ export default function Navigation() {
         document.documentElement.classList.toggle('dark', newMode);
     };
 
+    const isActive = (path: string) => pathname === path;
+
     return (
         <nav className="sticky top-0 z-50 backdrop-blur-sm bg-opacity-90" style={{ backgroundColor: 'var(--nav-bg)', borderBottom: '1px solid var(--border-color)' }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-3">
                     <div className="flex flex-row items-center gap-4">
-                        <a href="/" className="flex items-center">
+                        <Link href="/" className="flex items-center">
                             <Image src="/image.png" alt="Eighty760 Logo" width={120} height={60} className="w-auto object-contain" style={{ height: '60px' }} priority />
-                        </a>
+                        </Link>
                         <label className="theme-switch flex items-center gap-2 cursor-pointer">
                             <input
                                 type="checkbox"
@@ -44,34 +49,21 @@ export default function Navigation() {
                     </div>
                     <div className="flex items-center space-x-8">
                         <div className="hidden sm:flex items-center space-x-8">
-                            <a
-                                href="/"
-                                style={{ color: 'var(--text-secondary)' }}
-                                className="hover:text-[#285477] font-medium transition"
-                            >
-                                Home
-                            </a>
-                            <a
-                                href="/analysis"
-                                style={{ color: 'var(--text-secondary)' }}
-                                className="hover:text-[#285477] font-medium transition"
-                            >
-                                Analysis
-                            </a>
-                            <a
-                                href="/aggregation"
-                                style={{ color: 'var(--text-secondary)' }}
-                                className="hover:text-[#285477] font-medium transition"
-                            >
-                                Aggregation
-                            </a>
-                            <a
-                                href="/#methodology"
-                                style={{ color: 'var(--text-secondary)' }}
-                                className="hover:text-[#285477] font-medium transition"
-                            >
-                                Methodology
-                            </a>
+                            {[
+                                { name: 'Home', path: '/' },
+                                { name: 'Analysis', path: '/analysis' },
+                                { name: 'Aggregation', path: '/aggregation' },
+                                { name: 'Methodology', path: '/#methodology' },
+                            ].map((link) => (
+                                <Link
+                                    key={link.path}
+                                    href={link.path}
+                                    className={`font-medium transition ${isActive(link.path) ? 'text-[var(--brand-color)]' : 'hover:text-[var(--brand-color)]'}`}
+                                    style={{ color: isActive(link.path) ? 'var(--brand-color)' : 'var(--text-secondary)' }}
+                                >
+                                    {link.name}
+                                </Link>
+                            ))}
                         </div>
                     </div>
                 </div>
