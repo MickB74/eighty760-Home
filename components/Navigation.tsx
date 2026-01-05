@@ -32,7 +32,7 @@ export default function Navigation() {
                 <div className="flex justify-between items-center py-3">
                     <div className="flex flex-row items-center gap-4">
                         <Link href="/" className="flex items-center">
-                            <Image src="/image.png" alt="Eighty760 Logo" width={120} height={60} className="w-auto object-contain" style={{ height: '60px' }} priority />
+                            <Image src="/image.png" alt="Eighty760 Logo" width={180} height={90} className="w-auto object-contain" style={{ height: '90px' }} priority />
                         </Link>
                         <label className="theme-switch flex items-center gap-2 cursor-pointer">
                             <input
