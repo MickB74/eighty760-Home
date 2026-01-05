@@ -302,7 +302,7 @@ export default function AggregationPage() {
                             )}
 
                             {/* Hourly Stack Chart */}
-                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm h-96">
+                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm" style={{ height: '500px' }}>
                                 <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year - Daily Averages)</h3>
                                 {result && <GenChart result={result} capacities={capacities} />}
                             </div>
