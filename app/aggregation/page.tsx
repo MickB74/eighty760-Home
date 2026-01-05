@@ -22,6 +22,7 @@ import { loadERCOTPrices, getAvailableYears, getYearLabel } from '@/lib/aggregat
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
 import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
+import Navigation from '@/components/Navigation';
 
 // Register ChartJS
 ChartJS.register(
@@ -39,7 +40,7 @@ ChartJS.register(
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    const [activeTab, setActiveTab] = useState<'load' | 'gen' | 'fin' | 'batt'>('load');
+    // activeTab removed (layout change)
     const [loading, setLoading] = useState(false);
 
     // 1. Load State
@@ -195,315 +196,228 @@ export default function AggregationPage() {
     // --- Render ---
 
     return (
-        <div className="min-h-screen bg-[var(--background)] text-[var(--foreground)] pb-20">
+        <main className="min-h-screen bg-[var(--bg-primary)]">
+            <Navigation />
 
-            {/* Header */}
-            <div className="bg-[var(--nav-bg)] border-b border-[var(--border-color)] sticky top-0 z-30">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <h1 className="text-2xl font-bold">ERCOT North Aggregation</h1>
-                    <p className="text-[var(--text-secondary)] text-sm">Aggregate loads and optimize 24/7 matching portfolios.</p>
-                </div>
-
-                {/* Tabs */}
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-6 overflow-x-auto">
-                    {['load', 'gen', 'fin'].map((t) => (
+            <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
+                {/* Sidebar - Configuration */}
+                <div className="w-full lg:w-96 p-6 border-r border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-y-auto h-auto lg:h-[calc(100vh-80px)]">
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold brand-text">Configuration</h2>
                         <button
-                            key={t}
-                            onClick={() => setActiveTab(t as any)}
-                            className={`py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === t
-                                ? 'border-[#285477] text-[#285477]'
-                                : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                                }`}
+                            onClick={handleSmartFill}
+                            disabled={loading}
+                            className="text-xs bg-[var(--bg-tertiary)] text-[var(--brand-color)] px-2 py-1 rounded border border-[var(--border-color)] hover:bg-[var(--row-hover)] disabled:opacity-50"
                         >
-                            {t === 'load' && '1. Load Setup'}
-                            {t === 'gen' && '2. Generation Portfolio'}
-                            {t === 'fin' && '3. Financial Analysis'}
+                            ✨ Smart Fill
                         </button>
-                    ))}
-                </div>
-            </div>
-
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-                {/* TAB 1: LOAD */}
-                {activeTab === 'load' && (
-                    <div className="grid grid-cols-1 gap-8">
-                        <div className="space-y-6">
-                            {/* Quick Actions */}
-                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
-                                <div className="flex justify-between items-center mb-4">
-                                    <div>
-                                        <h2 className="text-lg font-semibold">Quick Actions</h2>
-                                        <p className="text-sm text-[var(--text-secondary)]">Test scenarios instantly</p>
-                                    </div>
-                                    <button
-                                        onClick={handleInstantDemo}
-                                        className="px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-md hover:from-indigo-600 hover:to-purple-700 transition font-medium shadow-md"
-                                    >
-                                        ⚡ Instant Demo (95% CFE)
-                                    </button>
-                                </div>
-                                <p className="text-xs text-[var(--text-secondary)]">
-                                    Loads: 250 GWh Data Center • Portfolio: 85 MW Solar, 60 MW Wind, 15 MW CCS, 30 MW/4h Battery
-                                </p>
-                            </div>
-
-                            {/* Participant Editor */}
-                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
-                                <ParticipantEditor
-                                    participants={participants}
-                                    onChange={setParticipants}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Load Chart Preview */}
-                        {result && (
-                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm h-80">
-                                <h3 className="text-sm font-medium mb-4">Aggregated Hourly Load (Sample Week)</h3>
-                                <LoadChart result={result} />
-                            </div>
-                        )}
                     </div>
-                )}
 
-                {/* TAB 2: GEN */}
-                {activeTab === 'gen' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1 space-y-6">
-                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h2 className="text-lg font-semibold">Portfolio</h2>
-                                    <button
-                                        onClick={handleSmartFill}
-                                        disabled={loading}
-                                        className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-100 hover:bg-indigo-100"
+                    <div className="space-y-8">
+                        {/* 1. Market & Financials */}
+                        <section>
+                            <h3 className="font-semibold mb-3 border-b border-[var(--border-color)] pb-1">1. Market Settings</h3>
+                            <div className="space-y-3">
+                                <div>
+                                    <label className="text-xs text-[var(--text-secondary)] block mb-1">Price Year</label>
+                                    <select
+                                        value={selectedYear}
+                                        onChange={(e) => setSelectedYear(e.target.value === 'Synthetic' ? 'Synthetic' : parseInt(e.target.value))}
+                                        className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
                                     >
-                                        ✨ Smart Fill
-                                    </button>
+                                        <option value="Synthetic">{getYearLabel('Synthetic')}</option>
+                                        {getAvailableYears().map(year => (
+                                            <option key={year} value={year}>{getYearLabel(year)}</option>
+                                        ))}
+                                    </select>
                                 </div>
-
-                                <div className="space-y-5">
-                                    {(['Solar', 'Wind', 'CCS Gas', 'Geothermal', 'Nuclear'] as const).map(tech => (
-                                        <div key={tech}>
-                                            <div className="flex justify-between text-sm mb-1">
-                                                <span>{tech} (MW)</span>
-                                                <span className="font-medium text-[var(--text-primary)]">{capacities[tech].toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                                            </div>
-                                            <input
-                                                type="range"
-                                                min="0"
-                                                max="500" // Should operate on dynamic max based on load?
-                                                step="1"
-                                                value={capacities[tech]}
-                                                onChange={(e) => setCapacities({ ...capacities, [tech]: parseFloat(e.target.value) })}
-                                                className="w-full accent-[#285477]"
-                                            />
-                                        </div>
-                                    ))}
-
-                                    <hr className="border-[var(--border-color)]" />
-
+                                <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span>Battery Power (MW)</span>
-                                            <span className="font-medium text-[var(--text-primary)]">{capacities.Battery_MW.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-                                        </div>
+                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">REC Price ($)</label>
                                         <input
-                                            type="range" min="0" max="500" step="1"
-                                            value={capacities.Battery_MW}
-                                            onChange={(e) => setCapacities({ ...capacities, Battery_MW: parseFloat(e.target.value) })}
-                                            className="w-full accent-emerald-600"
+                                            type="number"
+                                            className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
+                                            value={financials.rec_price}
+                                            onChange={(e) => setFinancials({ ...financials, rec_price: parseFloat(e.target.value) })}
                                         />
                                     </div>
                                     <div>
-                                        <div className="flex justify-between text-sm mb-1">
-                                            <span>Duration (Hours)</span>
-                                            <span className="font-medium text-[var(--text-primary)]">{capacities.Battery_Hours}h</span>
-                                        </div>
+                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">Avg Market ($)</label>
                                         <input
-                                            type="range" min="1" max="8" step="0.5"
-                                            value={capacities.Battery_Hours}
-                                            onChange={(e) => setCapacities({ ...capacities, Battery_Hours: parseFloat(e.target.value) })}
-                                            className="w-full accent-emerald-600"
+                                            type="number"
+                                            className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
+                                            value={financials.market_price_avg}
+                                            onChange={(e) => setFinancials({ ...financials, market_price_avg: parseFloat(e.target.value) })}
                                         />
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </section>
 
-                        <div className="lg:col-span-2 space-y-6">
-                            {/* KPI Display */}
-                            {result && (
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    <KPICard label="CFE Score" value={(result.cfe_score * 100).toFixed(1) + '%'} sub="24/7 Match" />
-                                    <KPICard label="Grid Deficit" value={(result.total_load_mwh - result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Unmatched" />
-                                    <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
-                                    <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
+                        {/* 2. Portfolio Mix */}
+                        <section>
+                            <h3 className="font-semibold mb-3 border-b border-[var(--border-color)] pb-1">2. Portfolio Mix (MW)</h3>
+                            <div className="space-y-4">
+                                {(['Solar', 'Wind', 'CCS Gas', 'Geothermal', 'Nuclear'] as const).map(tech => (
+                                    <div key={tech}>
+                                        <div className="flex justify-between text-xs mb-1">
+                                            <span>{tech}</span>
+                                            <span className="font-medium text-[var(--text-primary)]">{capacities[tech].toLocaleString(undefined, { maximumFractionDigits: 0 })} MW</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="500"
+                                            step="1"
+                                            value={capacities[tech]}
+                                            onChange={(e) => setCapacities({ ...capacities, [tech]: parseFloat(e.target.value) })}
+                                            className="w-full accent-[#285477]"
+                                        />
+                                    </div>
+                                ))}
+
+                                <div className="pt-2 border-t border-[var(--border-color)]">
+                                    <div className="flex justify-between text-xs mb-1">
+                                        <span>Battery Power</span>
+                                        <span className="font-medium text-[var(--text-primary)]">{capacities.Battery_MW.toLocaleString(undefined, { maximumFractionDigits: 0 })} MW</span>
+                                    </div>
+                                    <input
+                                        type="range" min="0" max="500" step="1"
+                                        value={capacities.Battery_MW}
+                                        onChange={(e) => setCapacities({ ...capacities, Battery_MW: parseFloat(e.target.value) })}
+                                        className="w-full accent-emerald-600"
+                                    />
                                 </div>
-                            )}
-
-                            {/* Hourly Stack Chart */}
-                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm" style={{ height: '500px' }}>
-                                <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year - Daily Averages)</h3>
-                                {result && <GenChart result={result} capacities={capacities} />}
+                                <div>
+                                    <div className="flex justify-between text-xs mb-1">
+                                        <span>Duration</span>
+                                        <span className="font-medium text-[var(--text-primary)]">{capacities.Battery_Hours}h</span>
+                                    </div>
+                                    <input
+                                        type="range" min="1" max="8" step="0.5"
+                                        value={capacities.Battery_Hours}
+                                        onChange={(e) => setCapacities({ ...capacities, Battery_Hours: parseFloat(e.target.value) })}
+                                        className="w-full accent-emerald-600"
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                )}
+                        </section>
 
-                {/* TAB 3: FINANCIALS */}
-                {activeTab === 'fin' && (
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-1 space-y-6">
-                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
-                                <h2 className="text-lg font-semibold mb-4">Financial Assumptions</h2>
-                                <div className="space-y-4">
+                        {/* 3. Tech Colors / PPA Prices (Collapsible or just list) */}
+                        <section>
+                            <details className="text-sm">
+                                <summary className="font-semibold cursor-pointer text-[var(--text-secondary)] hover:text-[var(--text-primary)]">Advanced PPA Pricing</summary>
+                                <div className="mt-3 space-y-2 pl-2">
                                     {(['solar', 'wind', 'ccs', 'geo', 'nuc'] as const).map(tech => (
-                                        <div key={tech} className="flex items-center justify-between">
-                                            <label className="text-sm capitalize">{tech} PPA ($/MWh)</label>
+                                        <div key={tech} className="flex items-center justify-between text-xs">
+                                            <label className="capitalize">{tech} PPA</label>
                                             <input
                                                 type="number"
-                                                className="w-20 px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--bg-secondary)] text-right"
+                                                className="w-16 px-1 py-0.5 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-right"
                                                 value={(financials as any)[`${tech}_price`]}
                                                 onChange={(e) => setFinancials({ ...financials, [`${tech}_price`]: parseFloat(e.target.value) })}
                                             />
                                         </div>
                                     ))}
-                                    <hr className="border-[var(--border-color)]" />
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-sm">REC Price ($)</label>
-                                        <input
-                                            type="number"
-                                            className="w-20 px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--bg-secondary)] text-right"
-                                            value={financials.rec_price}
-                                            onChange={(e) => setFinancials({ ...financials, rec_price: parseFloat(e.target.value) })}
-                                        />
-                                    </div>
-                                    <div className="flex items-center justify-between">
-                                        <label className="text-sm">Avg Market Price ($)</label>
-                                        <input
-                                            type="number"
-                                            className="w-20 px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--bg-secondary)] text-right"
-                                            value={financials.market_price_avg}
-                                            onChange={(e) => setFinancials({ ...financials, market_price_avg: parseFloat(e.target.value) })}
-                                        />
-                                    </div>
-                                    <hr className="border-[var(--border-color)]" />
-                                    <div>
-                                        <label className="block text-sm mb-2 font-medium">Market Price Year</label>
-                                        <select
-                                            value={selectedYear}
-                                            onChange={(e) => setSelectedYear(e.target.value === 'Synthetic' ? 'Synthetic' : parseInt(e.target.value))}
-                                            className="w-full px-3 py-2 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
-                                        >
-                                            <option value="Synthetic">{getYearLabel('Synthetic')}</option>
-                                            {getAvailableYears().map(year => (
-                                                <option key={year} value={year}>{getYearLabel(year)}</option>
-                                            ))}
-                                        </select>
-                                        <p className="text-xs text-[var(--text-secondary)] mt-1">
-                                            {selectedYear !== 'Synthetic' && historicalPrices
-                                                ? `Using real ${selectedYear} HB_NORTH prices`
-                                                : 'Using synthetic duck curve model'}
-                                        </p>
-                                    </div>
+                                </div>
+                            </details>
+                        </section>
+                    </div>
+                </div>
+
+                {/* Main Content */}
+                <div className="flex-1 p-6 lg:p-10 overflow-y-auto">
+
+                    {/* Header Section */}
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h1 className="text-3xl font-bold brand-text">ERCOT North Aggregation</h1>
+                            <p className="text-[var(--text-secondary)]">24/7 CFE Portfolio Optimization</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <button
+                                onClick={handleInstantDemo}
+                                className="px-4 py-2 bg-[var(--brand-color)] text-white rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
+                            >
+                                ⚡ Load Demo
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Participant Editor (Collapsible or Card) */}
+                    <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm mb-8">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-lg font-semibold">Load Aggregation</h3>
+                            <span className="text-sm text-[var(--text-secondary)]">
+                                Total Load: <span className="font-bold text-[var(--text-primary)]">{(participants.reduce((a, b) => a + b.load_mwh, 0)).toLocaleString()} MWh</span>
+                            </span>
+                        </div>
+                        <ParticipantEditor
+                            participants={participants}
+                            onChange={setParticipants}
+                        />
+                    </div>
+
+                    {/* Results Section */}
+                    {result ? (
+                        <div className="space-y-8 animate-in fade-in duration-500">
+                            {/* KPI Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <KPICard label="CFE Score" value={(result.cfe_score * 100).toFixed(1) + '%'} sub="24/7 Match" />
+                                <KPICard label="Grid Deficit" value={(result.total_load_mwh - result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Unmatched" />
+                                <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
+                                <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
+                            </div>
+
+                            {/* Chart */}
+                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm h-[500px]">
+                                <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year)</h3>
+                                <GenChart result={result} capacities={capacities} />
+                            </div>
+
+                            {/* Financial Summary Table */}
+                            <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
+                                <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <tbody>
+                                            <tr className="border-b border-[var(--border-color)]">
+                                                <td className="py-3 font-medium">Net Settlement Value (PPA vs Market)</td>
+                                                <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                    {result.settlement_value >= 0 ? '+' : ''}${result.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                </td>
+                                            </tr>
+                                            <tr className="border-b border-[var(--border-color)]">
+                                                <td className="py-3">REC Cost (@ ${financials.rec_price})</td>
+                                                <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                            </tr>
+                                            <tr className="border-b border-[var(--border-color)]">
+                                                <td className="py-3 font-medium text-lg">Total Net Portfolio Cost</td>
+                                                <td className="py-3 text-right font-bold text-lg text-[var(--text-primary)]">
+                                                    ${result.total_cost_net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td className="py-3 text-[var(--text-secondary)]">Levelized Cost to Load ($/MWh)</td>
+                                                <td className="py-3 text-right text-[var(--text-secondary)]">
+                                                    ${result.avg_cost_per_mwh.toFixed(2)}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
-
-                        <div className="lg:col-span-2 space-y-6">
-                            {result && (
-                                <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm">
-                                    <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-sm">
-                                            <tbody>
-                                                <tr className="border-b border-[var(--border-color)]">
-                                                    <td className="py-3 font-medium">Net Settlement Value (PPA vs Market)</td>
-                                                    <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                        {result.settlement_value >= 0 ? '+' : ''}${result.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                    </td>
-                                                </tr>
-                                                <tr className="border-b border-[var(--border-color)]">
-                                                    <td className="py-3">REC Cost (@ ${financials.rec_price})</td>
-                                                    <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                                                </tr>
-                                                <tr className="border-b border-[var(--border-color)]">
-                                                    <td className="py-3 font-medium text-lg">Total Net Portfolio Cost</td>
-                                                    <td className="py-3 text-right font-bold text-lg text-[var(--text-primary)]">
-                                                        ${result.total_cost_net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-3 text-[var(--text-secondary)]">Levelized Cost to Load ($/MWh)</td>
-                                                    <td className="py-3 text-right text-[var(--text-secondary)]">
-                                                        ${result.avg_cost_per_mwh.toFixed(2)}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Battery Details (CVTA) */}
-                            {capacities.Battery_MW > 0 && (
-                                <details className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] shadow-sm">
-                                    <summary className="px-6 py-4 cursor-pointer hover:bg-[var(--row-hover)] font-medium text-lg">
-                                        🔋 Battery Details (CVTA Model)
-                                    </summary>
-                                    <div className="px-6 pb-6 pt-2 space-y-4">
-                                        {/* CVTA Parameters */}
-                                        <div className="grid grid-cols-2 gap-4 text-sm bg-[var(--bg-secondary)] rounded-lg p-4">
-                                            <div>
-                                                <label className="block text-[var(--text-secondary)] mb-1">Fixed Toll ($/MW-month)</label>
-                                                <input
-                                                    type="number"
-                                                    value={batteryParams.base_rate_monthly}
-                                                    onChange={(e) => setBatteryParams({ ...batteryParams, base_rate_monthly: parseFloat(e.target.value) || 0 })}
-                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[var(--text-secondary)] mb-1">Guaranteed RTE (%)</label>
-                                                <input
-                                                    type="number"
-                                                    value={(batteryParams.guaranteed_rte * 100).toFixed(0)}
-                                                    onChange={(e) => setBatteryParams({ ...batteryParams, guaranteed_rte: (parseFloat(e.target.value) || 0) / 100 })}
-                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[var(--text-secondary)] mb-1">VOM Rate ($/MWh)</label>
-                                                <input
-                                                    type="number"
-                                                    value={batteryParams.vom_rate}
-                                                    onChange={(e) => setBatteryParams({ ...batteryParams, vom_rate: parseFloat(e.target.value) || 0 })}
-                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label className="block text-[var(--text-secondary)] mb-1">Availability (%)</label>
-                                                <input
-                                                    type="number"
-                                                    value={(batteryParams.guaranteed_availability * 100).toFixed(0)}
-                                                    onChange={(e) => setBatteryParams({ ...batteryParams, guaranteed_availability: (parseFloat(e.target.value) || 0) / 100 })}
-                                                    className="w-full px-2 py-1 rounded border border-[var(--border-color)] bg-[var(--card-bg)]"
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {/* CVTA Results Display */}
-                                        <BatteryFinancials cvtaResult={cvtaResult} />
-                                    </div>
-                                </details>
-                            )}
+                    ) : (
+                        <div className="flex flex-col items-center justify-center py-20 text-[var(--text-tertiary)] border-2 border-dashed border-[var(--border-color)] rounded-xl">
+                            <div className="text-5xl mb-4">📊</div>
+                            <p className="text-lg font-medium">Add Participants to Begin Simulation</p>
+                            <p className="text-sm">Configure load participants above or click "Load Demo" to start.</p>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
-        </div>
+        </main>
     );
 }
 
