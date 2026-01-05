@@ -303,7 +303,7 @@ export default function AggregationPage() {
 
                             {/* Hourly Stack Chart */}
                             <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm h-96">
-                                <h3 className="text-sm font-medium mb-4">Generation vs Load (Sample Week)</h3>
+                                <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year - Daily Averages)</h3>
                                 {result && <GenChart result={result} capacities={capacities} />}
                             </div>
                         </div>
@@ -423,22 +423,31 @@ function LoadChart({ result }: { result: SimulationResult }) {
 }
 
 function GenChart({ result }: { result: SimulationResult, capacities: TechCapacity }) {
-    // Sample week (e.g., Summer Peak: hours 4000-4168)
-    const startHour = 4000;
-    const endHour = 4168;
-    const hours = Array.from({ length: 168 }, (_, i) => i);
+    // Aggregate hourly data to daily averages for full year visualization
+    const aggregateToDaily = (hourlyData: number[]) => {
+        const daily: number[] = [];
+        for (let day = 0; day < 365; day++) {
+            const startHour = day * 24;
+            const endHour = Math.min(startHour + 24, hourlyData.length);
+            const dayTotal = hourlyData.slice(startHour, endHour).reduce((a, b) => a + b, 0);
+            daily.push(dayTotal / (endHour - startHour)); // Average MW for the day
+        }
+        return daily;
+    };
 
-    // Extract hourly data for each technology
-    const solar = result.solar_profile.slice(startHour, endHour);
-    const wind = result.wind_profile.slice(startHour, endHour);
-    const geo = result.geo_profile.slice(startHour, endHour);
-    const nuc = result.nuc_profile.slice(startHour, endHour);
-    const ccs = result.ccs_profile.slice(startHour, endHour);
-    const battery = result.battery_discharge.slice(startHour, endHour);
-    const deficit = result.deficit_profile.slice(startHour, endHour);
+    const days = Array.from({ length: 365 }, (_, i) => i + 1);
+
+    // Aggregate each technology to daily averages
+    const solar = aggregateToDaily(result.solar_profile);
+    const wind = aggregateToDaily(result.wind_profile);
+    const geo = aggregateToDaily(result.geo_profile);
+    const nuc = aggregateToDaily(result.nuc_profile);
+    const ccs = aggregateToDaily(result.ccs_profile);
+    const battery = aggregateToDaily(result.battery_discharge);
+    const deficit = aggregateToDaily(result.deficit_profile);
 
     const data = {
-        labels: hours,
+        labels: days,
         datasets: [
             {
                 label: 'Solar',
@@ -495,7 +504,16 @@ function GenChart({ result }: { result: SimulationResult, capacities: TechCapaci
     return <Chart type='line' data={data} options={{
         responsive: true,
         maintainAspectRatio: false,
-        scales: { y: { stacked: true }, x: { display: false } },
+        scales: {
+            y: {
+                stacked: true,
+                title: { display: true, text: 'Average MW' }
+            },
+            x: {
+                title: { display: true, text: 'Day of Year' },
+                ticks: { maxTicksLimit: 12 }
+            }
+        },
         elements: { line: { borderWidth: 0 } },
         plugins: {
             tooltip: { mode: 'index', intersect: false },
@@ -503,4 +521,5 @@ function GenChart({ result }: { result: SimulationResult, capacities: TechCapaci
         }
     }} />;
 }
+
 
