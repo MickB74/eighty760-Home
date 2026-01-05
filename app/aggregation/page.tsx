@@ -124,8 +124,8 @@ export default function AggregationPage() {
                             key={t}
                             onClick={() => setActiveTab(t as any)}
                             className={`py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === t
-                                    ? 'border-[#285477] text-[#285477]'
-                                    : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
+                                ? 'border-[#285477] text-[#285477]'
+                                : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
                                 }`}
                         >
                             {t === 'load' && '1. Load Setup'}
@@ -424,17 +424,53 @@ function LoadChart({ result }: { result: SimulationResult }) {
 
 function GenChart({ result }: { result: SimulationResult, capacities: TechCapacity }) {
     // Sample week (e.g., Summer Peak: hours 4000-4168)
-    const match = result.matched_profile.slice(4000, 4168);
-    const deficit = result.deficit_profile.slice(4000, 4168);
-    const battery = result.battery_discharge.slice(4000, 4168);
+    const startHour = 4000;
+    const endHour = 4168;
     const hours = Array.from({ length: 168 }, (_, i) => i);
+
+    // Extract hourly data for each technology
+    const solar = result.solar_profile.slice(startHour, endHour);
+    const wind = result.wind_profile.slice(startHour, endHour);
+    const geo = result.geo_profile.slice(startHour, endHour);
+    const nuc = result.nuc_profile.slice(startHour, endHour);
+    const ccs = result.ccs_profile.slice(startHour, endHour);
+    const battery = result.battery_discharge.slice(startHour, endHour);
+    const deficit = result.deficit_profile.slice(startHour, endHour);
 
     const data = {
         labels: hours,
         datasets: [
             {
-                label: 'Matched Clean Energy',
-                data: match,
+                label: 'Solar',
+                data: solar,
+                backgroundColor: '#fbbf24', // Amber/Gold
+                fill: true,
+                pointRadius: 0
+            },
+            {
+                label: 'Wind',
+                data: wind,
+                backgroundColor: '#60a5fa', // Sky Blue
+                fill: true,
+                pointRadius: 0
+            },
+            {
+                label: 'CCS Gas',
+                data: ccs,
+                backgroundColor: '#a78bfa', // Purple
+                fill: true,
+                pointRadius: 0
+            },
+            {
+                label: 'Geothermal',
+                data: geo,
+                backgroundColor: '#f97316', // Orange
+                fill: true,
+                pointRadius: 0
+            },
+            {
+                label: 'Nuclear',
+                data: nuc,
                 backgroundColor: '#22c55e', // Green
                 fill: true,
                 pointRadius: 0
@@ -461,6 +497,10 @@ function GenChart({ result }: { result: SimulationResult, capacities: TechCapaci
         maintainAspectRatio: false,
         scales: { y: { stacked: true }, x: { display: false } },
         elements: { line: { borderWidth: 0 } },
-        plugins: { tooltip: { mode: 'index', intersect: false } }
+        plugins: {
+            tooltip: { mode: 'index', intersect: false },
+            legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+        }
     }} />;
 }
+

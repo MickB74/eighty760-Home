@@ -48,6 +48,13 @@ export interface SimulationResult {
     battery_soc: number[];
     market_price_profile: number[];
 
+    // Individual tech profiles
+    solar_profile: number[];
+    wind_profile: number[];
+    geo_profile: number[];
+    nuc_profile: number[];
+    ccs_profile: number[];
+
     // Metrics
     total_load_mwh: number;
     total_gen_mwh: number;

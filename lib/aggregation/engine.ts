@@ -355,6 +355,13 @@ export function runAggregationSimulation(
         battery_soc: batt.soc,
         market_price_profile: prices,
 
+        // Individual tech profiles
+        solar_profile: solar,
+        wind_profile: wind,
+        geo_profile: geo,
+        nuc_profile: nuc,
+        ccs_profile: ccs,
+
         total_load_mwh,
         total_gen_mwh: total_gen_profile.reduce((a, b) => a + b, 0),
         total_matched_mwh: total_matched,
