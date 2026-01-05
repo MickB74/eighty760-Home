@@ -51,7 +51,7 @@ export default function Navigation() {
                         <div className="hidden sm:flex items-center space-x-8">
                             {[
                                 { name: 'Home', path: '/' },
-                                { name: 'Analysis', path: '/analysis' },
+                                // { name: 'Analysis', path: '/analysis' },
                                 { name: 'Aggregation', path: '/aggregation' },
                                 { name: 'Methodology', path: '/#methodology' },
                             ].map((link) => (
