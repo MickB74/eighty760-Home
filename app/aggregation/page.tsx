@@ -412,7 +412,7 @@ export default function AggregationPage() {
                         <div className="flex flex-col items-center justify-center py-20 text-[var(--text-tertiary)] border-2 border-dashed border-[var(--border-color)] rounded-xl">
                             <div className="text-5xl mb-4">📊</div>
                             <p className="text-lg font-medium">Add Participants to Begin Simulation</p>
-                            <p className="text-sm">Configure load participants above or click "Load Demo" to start.</p>
+                            <p className="text-sm">Configure load participants above or click &quot;Load Demo&quot; to start.</p>
                         </div>
                     )}
                 </div>
