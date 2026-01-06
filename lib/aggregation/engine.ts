@@ -322,16 +322,46 @@ export function runAggregationSimulation(
     }
 
     const settlement_value = total_market_revenue - total_ppa_cost;
-    const rec_cost = total_matched * financials.rec_price;
 
+    let rec_cost_total = 0;
     let market_purchase_cost = 0;
     let market_surplus_revenue = 0;
-
     for (let i = 0; i < HOURS; i++) {
+        // Scarcity Logic for REC Price
+        let currentRecPrice = financials.rec_price;
+        if (financials.use_scarcity) {
+            // Determine month (0-11) and hour (0-23)
+            const hourOfDay = i % 24;
+            // Month approx: i / 730 (8760/12 = 730)
+            const month = Math.floor(i / 730);
+
+            let mult = 1.0;
+            // Cat 6/5 (Winter Peak)
+            if ([0, 1, 11].includes(month)) { // Jan(0), Feb(1), Dec(11) in 0-index approx
+                if ([18, 19, 20].includes(hourOfDay)) mult = 2.0; // Cat 6
+                else if ([6, 7, 8].includes(hourOfDay)) mult = 1.4; // Cat 5
+            }
+
+            if (mult === 1.0) {
+                if ([17, 18, 19, 20, 21].includes(hourOfDay)) mult = 1.2; // Cat 4
+                else if ([7, 8, 9, 15, 16].includes(hourOfDay)) mult = 1.0; // Cat 3
+                else if (month >= 5 && month <= 8 && hourOfDay >= 10 && hourOfDay <= 14) mult = 0.45; // Summer low (Cat 1 approx)
+            }
+
+            // Apply intensity
+            const intensity = financials.scarcity_intensity ?? 0;
+            const finalMult = Math.max(0, 1.0 + (mult - 1.0) * intensity);
+            currentRecPrice = financials.rec_price * finalMult;
+        }
+
         market_purchase_cost += final_deficit[i] * prices[i];
         market_surplus_revenue += final_surplus[i] * prices[i];
+
+        // REC Cost is now dynamic based on matched energy
+        rec_cost_total += matched_profile[i] * currentRecPrice;
     }
 
+    const rec_cost = rec_cost_total;
     const total_cost_net = market_purchase_cost + total_ppa_cost - market_surplus_revenue + rec_cost;
 
     return {

@@ -54,7 +54,8 @@ export default function AggregationPage() {
     // 3. Financial State
     const [financials, setFinancials] = useState<FinancialParams>({
         solar_price: 35, wind_price: 25, geo_price: 75, nuc_price: 90, ccs_price: 85,
-        rec_price: 5, market_price_avg: 35, market_year: 2024
+        rec_price: 5, market_price_avg: 35, market_year: 2024,
+        use_scarcity: false, scarcity_intensity: 1.0
     });
 
     // 4. Price Data State
@@ -97,15 +98,29 @@ export default function AggregationPage() {
     const handleClearParticipants = () => setParticipants([]);
 
     const handleInstantDemo = () => {
-        // Clear and load demo scenario
-        const demoParticipant: Participant = {
-            id: Date.now().toString(),
-            name: 'Hyperscale Graph DC',
-            type: 'Data Center',
-            load_mwh: 250000 // 250 GWh/yr ~ 28.5 MW avg
-        };
+        // Clear and load demo scenario with 3 random participants
+        const locations = ['North Zone', 'South Zone', 'West Zone', 'Houston', 'Coastal', 'Panhandle'];
+        const types: Array<Participant['type']> = ['Data Center', 'Manufacturing', 'Office'];
 
-        setParticipants([demoParticipant]);
+        // Shuffle locations to get 3 unique ones
+        const shuffledLocs = [...locations].sort(() => 0.5 - Math.random()).slice(0, 3);
+
+        const newParticipants: Participant[] = shuffledLocs.map((loc, i) => {
+            const type = types[Math.floor(Math.random() * types.length)];
+            let baseLoad = 50000;
+            if (type === 'Data Center') baseLoad = 150000 + Math.random() * 100000;
+            if (type === 'Manufacturing') baseLoad = 80000 + Math.random() * 50000;
+            if (type === 'Office') baseLoad = 20000 + Math.random() * 20000;
+
+            return {
+                id: Date.now().toString() + i,
+                name: `${loc} ${type}`,
+                type: type,
+                load_mwh: Math.round(baseLoad)
+            };
+        });
+
+        setParticipants(newParticipants);
 
         // Set portfolio for ~95% CFE
         setCapacities({
@@ -250,6 +265,34 @@ export default function AggregationPage() {
                                             onChange={(e) => setFinancials({ ...financials, market_price_avg: parseFloat(e.target.value) })}
                                         />
                                     </div>
+                                </div>
+                                <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
+                                    <div className="flex items-center justify-between mb-2">
+                                        <label className="text-xs font-medium">Scarcity REC Pricing</label>
+                                        <input
+                                            type="checkbox"
+                                            checked={!!financials.use_scarcity}
+                                            onChange={(e) => setFinancials({ ...financials, use_scarcity: e.target.checked })}
+                                            className="accent-[#285477]"
+                                        />
+                                    </div>
+                                    {financials.use_scarcity && (
+                                        <div>
+                                            <div className="flex justify-between text-xs mb-1 text-[var(--text-secondary)]">
+                                                <span>Intensity</span>
+                                                <span>{financials.scarcity_intensity?.toFixed(1)}x</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="5"
+                                                step="0.1"
+                                                value={financials.scarcity_intensity}
+                                                onChange={(e) => setFinancials({ ...financials, scarcity_intensity: parseFloat(e.target.value) })}
+                                                className="w-full accent-[#285477]"
+                                            />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </section>
