@@ -788,7 +788,7 @@ export default function AggregationPage() {
                                                     Market Purchases (Load Bill)
                                                     <InfoTooltip text="Total Load × Hourly Load Hub Price" />
                                                 </td>
-                                                <td className="py-3 text-right font-medium text-gray-900 dark:text-gray-100">
+                                                <td className="py-3 text-right font-medium text-red-500">
                                                     ${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                                                 </td>
                                             </tr>
@@ -820,7 +820,7 @@ export default function AggregationPage() {
                                                     Total Net Portfolio Cost
                                                     <InfoTooltip text="(Total Load × Load Hub Price) - Net Settlement Value + Net REC Costs" />
                                                 </td>
-                                                <td className="py-3 text-right font-bold text-lg text-gray-900 dark:text-gray-100">
+                                                <td className="py-3 text-right font-bold text-lg text-red-500">
                                                     ${result.total_cost_net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
                                             </tr>
