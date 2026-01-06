@@ -16,14 +16,8 @@ export default function ComparisonTable() {
                         <thead>
                             <tr>
                                 <th className="p-4 border-b-2 border-gray-200 dark:border-slate-700 w-1/3"></th>
-                                <th className="p-4 border-b-2 border-brand dark:border-brand-light bg-blue-50/50 dark:bg-slate-800/50 text-brand dark:text-brand-light font-bold text-lg w-1/4">
+                                <th className="p-4 border-b-2 border-brand dark:border-brand-light bg-blue-50/50 dark:bg-slate-800/50 text-brand dark:text-brand-light font-bold text-lg w-2/3">
                                     Eighty760
-                                </th>
-                                <th className="p-4 border-b-2 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-gray-400 font-semibold w-1/4">
-                                    Typical 24/7 Tools
-                                </th>
-                                <th className="p-4 border-b-2 border-gray-200 dark:border-slate-700 text-gray-500 dark:text-gray-400 font-semibold w-1/4">
-                                    Traditional Scope 2
                                 </th>
                             </tr>
                         </thead>
@@ -31,26 +25,18 @@ export default function ComparisonTable() {
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Primary Function</td>
                                 <td className="p-4 bg-blue-50/30 dark:bg-slate-800/30 font-semibold text-brand-dark dark:text-brand-light">Scenario & Portfolio Modeling</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Meter-based Tracking</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Annual RECs</td>
                             </tr>
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Time Horizon</td>
                                 <td className="p-4 bg-blue-50/30 dark:bg-slate-800/30 font-semibold text-brand-dark dark:text-brand-light">Forward-looking (Planning)</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Backward-looking (Reporting)</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Retrospective</td>
                             </tr>
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Key Value</td>
                                 <td className="p-4 bg-blue-50/30 dark:bg-slate-800/30 font-semibold text-brand-dark dark:text-brand-light">Procurement Decision Support</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Performance Verification</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Compliance</td>
                             </tr>
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Granularity</td>
                                 <td className="p-4 bg-blue-50/30 dark:bg-slate-800/30 font-semibold text-brand-dark dark:text-brand-light">Hourly (8760)</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Hourly / 15-min</td>
-                                <td className="p-4 text-gray-600 dark:text-gray-400">Annual / Volumetric</td>
                             </tr>
                         </tbody>
                     </table>

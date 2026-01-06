@@ -35,7 +35,6 @@ export default function Navigation() {
     const navLinks = [
         { name: 'Home', path: '/' },
         { name: 'ERCOT Aggregation', path: '/aggregation' },
-        { name: 'Analysis', path: '/analysis' },
         { name: 'Methodology', path: '/whitepaper' },
     ];
 

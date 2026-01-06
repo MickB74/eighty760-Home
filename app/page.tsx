@@ -28,7 +28,7 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <h2 className="text-3xl font-bold brand-text mb-8">Methodology & Logic</h2>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                         <div className="p-6 rounded-lg hover:shadow-md transition bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl bg-blue-50 dark:bg-slate-800">☀️</div>
                             <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">Generation Modeling</h3>
@@ -42,23 +42,9 @@ export default function Home() {
                             </div>
                         </div>
 
-                        <div className="p-6 rounded-lg hover:shadow-md transition bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
-                            <div className="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl bg-blue-50 dark:bg-slate-800">🌫️</div>
-                            <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">Emissions Analysis</h3>
-                            <p className="text-sm mb-4 text-gray-600 dark:text-gray-300">
-                                Calculates three distinct carbon metrics to ensure true abatement, not just paper offsets.
-                            </p>
-                            <ul className="text-sm space-y-2 text-gray-600 dark:text-gray-300">
-                                <li><strong>Location-Based:</strong> Total Load × Grid Intensity Factor</li>
-                                <li><strong>Market-Based:</strong> Unmatched Load × Grid Intensity Factor</li>
-                                <li><strong>Avoided:</strong> Renewable Gen × Grid Intensity Factor</li>
-                            </ul>
-                            <p className="text-xs mt-3 italic pt-2 text-gray-400 dark:text-gray-500 border-t border-gray-100 dark:border-slate-800">
-                                *The &quot;Grid Intensity Factor&quot; switches between <strong>Hourly Data</strong> and <strong>Annual Averages</strong> depending on the data source selected.
-                            </p>
-                        </div>
 
-                        <div className="p-6 rounded-lg hover:shadow-md transition lg:col-span-1 md:col-span-2 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
+
+                        <div className="p-6 rounded-lg hover:shadow-md transition bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl bg-blue-50 dark:bg-slate-800">💲</div>
                             <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">Scarcity Pricing Model</h3>
                             <p className="text-sm mb-4 text-gray-600 dark:text-gray-300">

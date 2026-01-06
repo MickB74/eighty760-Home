@@ -12,7 +12,7 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 - **24-Hour Generation Profiles**: Visualize hourly generation vs. load with dynamic charts.
 - **CFE Score Calculation**: Instant feedback on Hourly Match %, Grid Deficit, and Overgeneration.
 - **Dark Mode Support**: Fully responsive design with light/dark themes.
-- **Methodology Documentation**: In-depth explanation of generation modeling, emissions analysis, and scarcity pricing.
+- **Methodology Documentation**: In-depth explanation of generation modeling and scarcity pricing.
 
 ## Tech Stack
 

@@ -75,6 +75,7 @@ export default function AggregationPage() {
 
     // 4. Price Data State
     const [selectedYear, setSelectedYear] = useState<number | 'Average'>(2024);
+    const [useTMY, setUseTMY] = useState(false); // New TMY Toggle
     const [loadHub, setLoadHub] = useState<string>('North');
     const [solarHub, setSolarHub] = useState<string>('West');
     const [windHub, setWindHub] = useState<string>('Panhandle');
@@ -238,7 +239,12 @@ export default function AggregationPage() {
                     // ensure simple name "North", "South" etc. (AssetEditor uses these)
 
                     const tech = asset.type;
-                    const url = `/data/profiles/${tech}_${loc}_${selectedYear}.json`;
+
+                    // Determine URL based on TMY toggle
+                    let url = `/data/profiles/${tech}_${loc}_${selectedYear}.json`;
+                    if (useTMY) {
+                        url = `/data/profiles/${tech}_${loc}_TMY.json`;
+                    }
 
                     // Check if already loaded in current state (optimization)
                     // But we are rebuilding 'newProfiles' to be clean.
@@ -263,7 +269,7 @@ export default function AggregationPage() {
         };
 
         loadProfiles();
-    }, [selectedYear, activeAssets]);
+    }, [selectedYear, activeAssets, useTMY]);
 
     const runSimulation = () => {
         setLoading(true);
@@ -434,6 +440,23 @@ export default function AggregationPage() {
                                                     <option key={year} value={year}>{getYearLabel(year)}</option>
                                                 ))}
                                             </select>
+                                        </div>
+                                    </div>
+
+                                    {/* TMY Toggle */}
+                                    <div className="mt-2 flex items-center gap-2">
+                                        <input
+                                            type="checkbox"
+                                            id="useTMY"
+                                            checked={useTMY}
+                                            onChange={(e) => setUseTMY(e.target.checked)}
+                                            className="rounded border-gray-300 text-brand shadow-sm focus:border-brand focus:ring focus:ring-brand focus:ring-opacity-50"
+                                        />
+                                        <div className="flex items-center gap-1">
+                                            <label htmlFor="useTMY" className="text-xs text-gray-700 dark:text-gray-300 font-medium cursor-pointer select-none">
+                                                Use TMY Generation
+                                            </label>
+                                            <InfoTooltip text="Typical Meteorological Year. Uses averaged generation profiles (2020-2025) instead of the specific weather for the selected year." />
                                         </div>
                                     </div>
 
