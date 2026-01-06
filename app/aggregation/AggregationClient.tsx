@@ -876,6 +876,26 @@ export default function AggregationPage() {
                                                 </tr>
                                             ))}
                                         </tbody>
+                                        <tfoot>
+                                            <tr className="border-t-2 border-gray-200 dark:border-slate-600 font-bold bg-gray-50 dark:bg-slate-700/50">
+                                                <td className="py-3 pr-4" colSpan={3}>Total</td>
+                                                <td className="py-3 pr-4 text-right">
+                                                    {result.asset_details.reduce((sum, a) => sum + a.capacity_mw, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MW
+                                                </td>
+                                                <td className="py-3 pr-4 text-right">
+                                                    {result.asset_details.reduce((sum, a) => sum + a.total_gen_mwh, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
+                                                </td>
+                                                <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
+                                                    ${result.asset_details.reduce((sum, a) => sum + a.total_revenue, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                </td>
+                                                <td className="py-3 pr-4 text-right text-red-500">
+                                                    -${result.asset_details.reduce((sum, a) => sum + a.total_cost, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                </td>
+                                                <td className={`py-3 text-right ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                    {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                </td>
+                                            </tr>
+                                        </tfoot>
                                     </table>
                                 </div>
                             )}
