@@ -735,7 +735,7 @@ export default function AggregationPage() {
                                             <tr className="border-b border-[var(--border-color)]">
                                                 <td className="py-3 font-medium flex items-center gap-2">
                                                     Market Purchases (Load Bill)
-                                                    <InfoTooltip text="Cost to purchase Total Load from the grid at Load Hub prices (Volume-Weighted)" />
+                                                    <InfoTooltip text="Total Load × Hourly Load Hub Price" />
                                                 </td>
                                                 <td className="py-3 text-right font-medium text-[var(--text-primary)]">
                                                     ${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
