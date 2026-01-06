@@ -58,6 +58,7 @@ export interface SimulationResult {
     battery_charge: number[];
     battery_soc: number[];
     market_price_profile: number[];
+    rec_price_profile: number[];
 
     // Individual tech profiles
     solar_profile: number[];

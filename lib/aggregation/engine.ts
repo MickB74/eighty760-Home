@@ -466,6 +466,7 @@ export function runAggregationSimulation(
     let rec_income_total = 0;
     let market_purchase_cost = 0;
     let market_surplus_revenue = 0;
+    const rec_price_profile = zeros();
     for (let i = 0; i < HOURS; i++) {
         // Scarcity Logic for REC Price
         let currentRecPrice = financials.rec_price;
@@ -503,6 +504,8 @@ export function runAggregationSimulation(
 
         // Income: Sell RECs for surplus hours (overgeneration)
         rec_income_total += final_surplus[i] * currentRecPrice;
+
+        rec_price_profile[i] = currentRecPrice;
     }
 
     // New: Calculate Gross Load Bill (Physical Load * Load Price)
@@ -537,6 +540,7 @@ export function runAggregationSimulation(
         battery_charge: batt.charge,
         battery_soc: batt.soc,
         market_price_profile: prices,
+        rec_price_profile,
 
         // Individual tech profiles
         solar_profile: solar,

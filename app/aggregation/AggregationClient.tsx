@@ -994,28 +994,7 @@ export default function AggregationPage() {
                                     {/* 2. REC Price Heatmap */}
                                     <HourlyHeatmap
                                         title="REC Price Heatmap ($/MWh)"
-                                        data={aggregateTo12x24(Array.from({ length: 8760 }, (_, i) => {
-                                            // Reproduce Scarcity Logic for Visualization
-                                            let price = financials.rec_price;
-                                            if (financials.use_scarcity) {
-                                                const hourOfDay = i % 24;
-                                                const month = Math.floor(i / 730); // Approx
-                                                let mult = 1.0;
-                                                if ([0, 1, 11].includes(month)) { // Winter
-                                                    if ([18, 19, 20].includes(hourOfDay)) mult = 2.0;
-                                                    else if ([6, 7, 8].includes(hourOfDay)) mult = 1.4;
-                                                }
-                                                if (mult === 1.0) {
-                                                    if ([17, 18, 19, 20, 21].includes(hourOfDay)) mult = 1.2;
-                                                    else if ([7, 8, 9, 15, 16].includes(hourOfDay)) mult = 1.0;
-                                                    else if (month >= 5 && month <= 8 && hourOfDay >= 10 && hourOfDay <= 14) mult = 0.45;
-                                                }
-                                                const intensity = financials.scarcity_intensity ?? 0;
-                                                const finalMult = Math.max(0, 1.0 + (mult - 1.0) * intensity);
-                                                price *= finalMult;
-                                            }
-                                            return price;
-                                        }))}
+                                        data={aggregateTo12x24(result.rec_price_profile || Array(8760).fill(financials.rec_price))}
                                         unit="$"
                                         colorScale={(val, min, max) => {
                                             // Orange Scale for Price (Low=Light, High=Dark Orange/Red)
