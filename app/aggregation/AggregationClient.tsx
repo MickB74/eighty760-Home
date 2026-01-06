@@ -970,7 +970,7 @@ export default function AggregationPage() {
 
                                     {/* 1. Hourly Match Heatmap */}
                                     <HourlyHeatmap
-                                        title="Hourly Match Heatmap (CFE %)"
+                                        title="Average Hourly Match Heatmap (CFE %)"
                                         data={aggregateTo12x24(result.matched_profile.map((m, i) => {
                                             const load = result.load_profile[i];
                                             return load > 0 ? Math.min(1.0, m / load) : 1.0;
@@ -993,7 +993,7 @@ export default function AggregationPage() {
 
                                     {/* 2. REC Price Heatmap */}
                                     <HourlyHeatmap
-                                        title="REC Price Heatmap ($/MWh)"
+                                        title="Average Hourly REC Price Heatmap ($/MWh)"
                                         data={aggregateTo12x24(result.rec_price_profile || Array(8760).fill(financials.rec_price))}
                                         unit="$"
                                         colorScale={(val, min, max) => {
