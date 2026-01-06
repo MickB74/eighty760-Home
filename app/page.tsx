@@ -3,6 +3,10 @@
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
 import Simulator from '@/components/Simulator';
+import ComparisonTable from '@/components/home/ComparisonTable';
+import HowItWorks from '@/components/home/HowItWorks';
+import UseCases from '@/components/home/UseCases';
+import MaturityLadder from '@/components/home/MaturityLadder';
 import Image from 'next/image';
 
 export default function Home() {
@@ -11,46 +15,13 @@ export default function Home() {
             <Navigation />
             <Hero />
 
-            {/* The Problem Section */}
-            <section className="py-12 bg-white dark:bg-slate-900 border-y border-gray-200 dark:border-slate-800 transition-colors duration-300">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                        <div>
-                            <h2 className="text-2xl font-bold brand-text mb-4">The Challenge: Variability</h2>
-                            <p className="mb-4 text-gray-600 dark:text-gray-300">
-                                Renewable energy sources like wind and solar are inherently variable. A solar farm generates
-                                peak energy at midday, often creating a surplus, while failing to address demand during evening
-                                peaks or winter mornings.
-                            </p>
-                            <p className="font-medium text-gray-600 dark:text-gray-300">
-                                Eighty760 functions as a &quot;digital twin,&quot; allowing users to simulate the complex interaction
-                                between load profiles and generation assets.
-                            </p>
-                        </div>
-                        <div className="p-6 rounded-lg bg-gray-100 dark:bg-slate-700 transition-colors duration-300">
-                            <h3 className="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-3">Traditional vs. 24/7 Matching</h3>
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between p-3 rounded bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600">
-                                    <div>
-                                        <div className="font-bold text-gray-900 dark:text-gray-100">Annual Net Zero</div>
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">Offsets fossil use via annual volume</div>
-                                    </div>
-                                    <div className="font-bold text-gray-400 dark:text-gray-500">~100% Volumetric</div>
-                                </div>
-                                <div className="flex items-center justify-between p-3 rounded border-l-4 shadow-sm bg-white dark:bg-slate-800 border-brand dark:border-brand-light">
-                                    <div>
-                                        <div className="font-bold brand-text">24/7 CFE</div>
-                                        <div className="text-xs text-gray-500 dark:text-gray-400">Matches supply & demand hourly</div>
-                                    </div>
-                                    <div className="font-bold brand-text">Hourly Score</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+            <ComparisonTable />
+            <HowItWorks />
 
             <Simulator />
+
+            <UseCases />
+            <MaturityLadder />
 
             {/* Methodology Section */}
             <section id="methodology" className="py-16 bg-gray-50 dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 transition-colors duration-300">
