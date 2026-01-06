@@ -18,7 +18,7 @@ import {
 import { Participant, TechCapacity, FinancialParams, SimulationResult, BatteryFinancialParams } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { recommendPortfolio } from '@/lib/aggregation/optimizer';
-import { loadERCOTPrices, getAvailableYears, getYearLabel } from '@/lib/aggregation/price-loader';
+import { loadERCOTPrices, getAvailableYears, getYearLabel, loadAveragePriceProfile } from '@/lib/aggregation/price-loader';
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
 import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
@@ -60,7 +60,7 @@ export default function AggregationPage() {
     });
 
     // 4. Price Data State
-    const [selectedYear, setSelectedYear] = useState<number | 'Synthetic'>(2024);
+    const [selectedYear, setSelectedYear] = useState<number | 'Average'>('Average');
     const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
 
     // 5. Battery Financial Params (CVTA)
@@ -209,13 +209,26 @@ export default function AggregationPage() {
     // Load historical price data when year changes
     useEffect(() => {
         const loadPrices = async () => {
-            if (selectedYear === 'Synthetic') {
-                setHistoricalPrices(null);
+            if (selectedYear === 'Average') {
+                const prices = await loadAveragePriceProfile([2020, 2021, 2022, 2023, 2024, 2025]);
+                setHistoricalPrices(prices);
+
+                // Calculate and update average price
+                if (prices && prices.length > 0) {
+                    const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+                    setFinancials(prev => ({ ...prev, market_price_avg: parseFloat(avg.toFixed(2)) }));
+                }
                 return;
             }
 
             const prices = await loadERCOTPrices(selectedYear);
             setHistoricalPrices(prices);
+
+            // Calculate and update average price
+            if (prices && prices.length > 0) {
+                const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+                setFinancials(prev => ({ ...prev, market_price_avg: parseFloat(avg.toFixed(2)) }));
+            }
         };
         loadPrices();
     }, [selectedYear]);
@@ -258,10 +271,10 @@ export default function AggregationPage() {
                                     <label className="text-xs text-[var(--text-secondary)] block mb-1">Price Year</label>
                                     <select
                                         value={selectedYear}
-                                        onChange={(e) => setSelectedYear(e.target.value === 'Synthetic' ? 'Synthetic' : parseInt(e.target.value))}
+                                        onChange={(e) => setSelectedYear(e.target.value === 'Average' ? 'Average' : parseInt(e.target.value))}
                                         className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
                                     >
-                                        <option value="Synthetic">{getYearLabel('Synthetic')}</option>
+                                        <option value="Average">{getYearLabel('Average')}</option>
                                         {getAvailableYears().map(year => (
                                             <option key={year} value={year}>{getYearLabel(year)}</option>
                                         ))}
