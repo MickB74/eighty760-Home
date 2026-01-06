@@ -76,10 +76,10 @@ export default function HourlyHeatmap({ title, data, min = 0, max = 1, unit = ''
                 </div>
 
                 {/* Legend (Simple Gradient) */}
-                <div className="ml-4 flex flex-col items-center justify-between py-4 h-[300px]">
-                    <div className="text-xs text-gray-500">{effectiveMax.toFixed(unit === '%' ? 0 : 1)}{unit}</div>
-                    <div className="w-4 flex-1 my-1 rounded bg-gradient-to-b from-[#285477] to-white border border-gray-100"></div>
-                    <div className="text-xs text-gray-500">{effectiveMin.toFixed(unit === '%' ? 0 : 1)}{unit}</div>
+                <div className="ml-4 flex flex-col items-center justify-between py-1 h-[200px]">
+                    <div className="text-[10px] text-gray-500">{effectiveMax.toFixed(unit === '%' ? 0 : 1)}{unit}</div>
+                    <div className="w-3 flex-1 my-1 rounded bg-gradient-to-b from-[#285477] to-white border border-gray-100"></div>
+                    <div className="text-[10px] text-gray-500">{effectiveMin.toFixed(unit === '%' ? 0 : 1)}{unit}</div>
                 </div>
             </div>
         </div>
