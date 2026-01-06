@@ -576,6 +576,33 @@ export default function AggregationPage() {
                                                 onChange={(e) => setFinancials({ ...financials, scarcity_intensity: parseFloat(e.target.value) })}
                                                 className="w-full accent-[#285477]"
                                             />
+
+                                            {/* Effective Price Breakdown */}
+                                            <details className="mt-2 text-xs text-gray-500">
+                                                <summary className="cursor-pointer hover:text-brand dark:hover:text-brand-light transition-colors list-item">
+                                                    Effective Prices (at {financials.scarcity_intensity?.toFixed(1)}x)
+                                                </summary>
+                                                <div className="mt-2 pl-2 space-y-1 bg-gray-100 dark:bg-slate-700/50 p-2 rounded">
+                                                    <div className="flex justify-between">
+                                                        <span>Critical (2.0x base)</span>
+                                                        <span className="font-mono font-medium text-red-500">
+                                                            ${(financials.rec_price * (1 + (2.0 - 1) * financials.scarcity_intensity!)).toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span>Winter Shoulder (1.4x base)</span>
+                                                        <span className="font-mono font-medium text-orange-500">
+                                                            ${(financials.rec_price * (1 + (1.4 - 1) * financials.scarcity_intensity!)).toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between">
+                                                        <span>Regular (1.0x base)</span>
+                                                        <span className="font-mono font-medium text-gray-700 dark:text-gray-300">
+                                                            ${financials.rec_price.toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </details>
                                         </div>
                                     )}
                                 </div>
