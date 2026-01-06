@@ -784,8 +784,50 @@ export default function AggregationPage() {
                                             </tr>
                                         </tbody>
                                     </table>
+
                                 </div>
                             </div>
+
+                            {/* Detailed Asset Breakdown Table */}
+                            {result.asset_details && result.asset_details.length > 0 && (
+                                <div className="bg-[var(--card-bg)] rounded-xl border border-[var(--border-color)] p-6 shadow-sm overflow-x-auto mt-8">
+                                    <h3 className="text-lg font-semibold mb-4">Asset Financial Breakdown</h3>
+                                    <table className="w-full text-sm text-left">
+                                        <thead>
+                                            <tr className="border-b border-[var(--border-color)] text-[var(--text-secondary)]">
+                                                <th className="py-2 pr-4">Asset Name</th>
+                                                <th className="py-2 pr-4">Type</th>
+                                                <th className="py-2 pr-4">Hub</th>
+                                                <th className="py-2 pr-4 text-right">Capacity</th>
+                                                <th className="py-2 pr-4 text-right">Generation</th>
+                                                <th className="py-2 pr-4 text-right">Revenue (Basis)</th>
+                                                <th className="py-2 pr-4 text-right">PPA Cost</th>
+                                                <th className="py-2 text-right">Settlement</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {result.asset_details.map((asset, idx) => (
+                                                <tr key={idx} className="border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--row-hover)]">
+                                                    <td className="py-3 pr-4 font-medium">{asset.name}</td>
+                                                    <td className="py-3 pr-4">{asset.type}</td>
+                                                    <td className="py-3 pr-4 text-[var(--text-secondary)]">{asset.location}</td>
+                                                    <td className="py-3 pr-4 text-right">{asset.capacity_mw} MW</td>
+                                                    <td className="py-3 pr-4 text-right">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
+                                                    <td className="py-3 pr-4 text-right text-[var(--text-primary)]">
+                                                        ${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    </td>
+                                                    <td className="py-3 pr-4 text-right text-red-500">
+                                                        -${asset.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    </td>
+                                                    <td className={`py-3 text-right font-medium ${asset.settlement_value >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                                        {asset.settlement_value >= 0 ? '+' : ''}${asset.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    </td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-[var(--text-tertiary)] border-2 border-dashed border-[var(--border-color)] rounded-xl">
@@ -796,7 +838,7 @@ export default function AggregationPage() {
                     )}
                 </div>
             </div>
-        </main>
+        </main >
     );
 }
 

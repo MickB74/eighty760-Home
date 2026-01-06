@@ -91,6 +91,17 @@ export interface SimulationResult {
         market_value: number;
         settlement: number;
     }>;
+    asset_details: {
+        id: string;
+        name: string;
+        type: string;
+        location: string;
+        capacity_mw: number;
+        total_gen_mwh: number;
+        total_revenue: number; // Market Revenue
+        total_cost: number;    // PPA Cost
+        settlement_value: number; // Rev - Cost
+    }[];
 }
 
 export interface AggregationState {
