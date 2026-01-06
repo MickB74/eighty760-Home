@@ -131,7 +131,7 @@ export default function Home() {
                             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                                 Based on <a href="/whitepaper.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--brand-color)] transition-colors underline decoration-dotted underline-offset-4">Technical Whitepaper Version 1.0</a>
                             </p>
-                            <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>© 2025 Eighty760 Simulation Framework</p>
+                            <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>© 2026 Eighty760 Simulation Framework</p>
                         </div>
                     </div>
                 </div>
