@@ -373,19 +373,6 @@ export default function AggregationPage() {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="w-1/3">
-                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Hub</label>
-                                            <select
-                                                value={selectedHub}
-                                                onChange={(e) => setSelectedHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
-                                                disabled={typeof selectedYear !== 'number'}
-                                            >
-                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h}>{h}</option>
-                                                ))}
-                                            </select>
-                                        </div>
                                     </div>
                                     {typeof selectedYear === 'number' && selectedYear < 2023 && (
                                         <div className="text-[10px] text-amber-500 mt-1">
