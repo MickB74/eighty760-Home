@@ -246,7 +246,8 @@ export function runAggregationSimulation(
     financials: FinancialParams,
     historicalPrices?: number[] | null,
     batteryParams: { mw: number, hours: number } = { mw: 0, hours: 2 },
-    hubPricesMap: Record<string, number[]> = {}
+    hubPricesMap: Record<string, number[]> = {},
+    genProfiles: Record<string, number[]> = {}
 ): SimulationResult {
 
     // 1. Build Aggregate Load
@@ -268,10 +269,23 @@ export function runAggregationSimulation(
     // Iterate through assets instead of aggregate capacities
     for (const asset of activeAssets) {
         // Generate profile for this specific asset
-        // TODO: Pass location to generateGenProfile for location-specific weather/wind (Future)
-        // For now, we use the type and capacity. 
-        // IMPORTANT: We must handle the 'capacity_factor' scaling here if present.
-        const profile = generateGenProfile(asset.capacity_mw, asset.type, asset.capacity_factor);
+        let profile = zeros();
+
+        // Try to load from external profiles if available
+        // Key format: `{Type}_{Location}_{Year}` or simpler ID based?
+        // Since engine doesn't know year, passed genProfiles keys must match what page.tsx provides.
+        // Let's assume keys are `${asset.id}` to be safe and simple.
+        if (genProfiles && genProfiles[asset.id] && genProfiles[asset.id].length >= HOURS) {
+            profile = genProfiles[asset.id].slice(0, HOURS); // Ensure 8760
+
+            // Apply Capacity Scaling (Profile is 0-1 normalized, so multiply by capacity)
+            // Note: generateGenProfile does this internally. External profiles are normalized 0-1.
+            for (let i = 0; i < HOURS; i++) profile[i] = profile[i] * asset.capacity_mw;
+
+        } else {
+            // Fallback to internal generator
+            profile = generateGenProfile(asset.capacity_mw, asset.type, asset.capacity_factor);
+        }
 
         // Add to aggregate totals
         for (let i = 0; i < HOURS; i++) {

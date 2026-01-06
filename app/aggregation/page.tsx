@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Chart } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -182,42 +182,97 @@ export default function AggregationPage() {
         }, 100);
     };
 
-    const runSimulation = () => {
-        setLoading(true);
-        setTimeout(() => {
-            // Filter excluded techs (zero out capacity)
-            const activeCapacities = { ...capacities };
-            excludedTechs.forEach(t => {
-                if (t in activeCapacities) {
-                    (activeCapacities as any)[t] = 0;
-                }
-            });
-
-            // Convert capacities to assets for new engine signature
-            // This is a temporary adapter until we implement the full Asset Editor UI
-            const activeAssets: any[] = [];
+    // Derived state for active assets, considering both simple sliders and advanced editor
+    const activeAssets = useMemo(() => {
+        if (useAdvancedAssets) {
+            return assets;
+        } else {
+            const tempAssets: GenerationAsset[] = [];
             const techs = ['Solar', 'Wind', 'Geothermal', 'Nuclear', 'CCS Gas'];
             techs.forEach(type => {
-                const mw = (activeCapacities as any)[type];
+                const mw = (capacities as any)[type];
                 if (mw > 0) {
-                    activeAssets.push({
+                    tempAssets.push({
                         id: `temp-${type}`,
                         name: `${type} Gen`,
-                        type: type,
+                        type: type as GenerationAsset['type'],
                         location: 'North', // Default for legacy slider mode
                         capacity_mw: mw,
                         capacity_factor: undefined // Use default profile logic
                     });
                 }
             });
+            return tempAssets;
+        }
+    }, [useAdvancedAssets, assets, capacities]);
+
+
+    // UseEffect to load generation profiles (Solar/Wind) based on location and year
+    const [genProfiles, setGenProfiles] = useState<Record<string, number[]>>({});
+
+    useEffect(() => {
+        const loadProfiles = async () => {
+            // Only proceed if we have a valid numeric year (2020-2025)
+            // If Synthetic or Average, we skip loading specific profiles (engine falls back to synthetic)
+            if (typeof selectedYear !== 'number') return;
+
+            const newProfiles: Record<string, number[]> = {};
+            const promises: Promise<void>[] = [];
+
+            // Identify unique profiles needed
+            // Key format in file: `{Tech}_{Location}_{Year}.json` e.g. Solar_North_2023.json
+            // We map this to asset.id in the state so engine can look it up easily.
+
+            activeAssets.forEach(asset => {
+                if (asset.type === 'Solar' || asset.type === 'Wind') {
+                    // normalize location
+                    let loc = asset.location;
+                    // ensure simple name "North", "South" etc. (AssetEditor uses these)
+
+                    const tech = asset.type;
+                    const url = `/data/profiles/${tech}_${loc}_${selectedYear}.json`;
+
+                    // Check if already loaded in current state (optimization)
+                    // But we are rebuilding 'newProfiles' to be clean.
+                    // Actually, let's just fetch everything needed for current state.
+
+                    const p = fetch(url).then(async (res) => {
+                        if (res.ok) {
+                            const data = await res.json();
+                            newProfiles[asset.id] = data;
+                        } else {
+                            // console.warn(`Profile not found: ${url}`);
+                        }
+                    }).catch(e => console.error(e));
+                    promises.push(p);
+                }
+            });
+
+            if (promises.length > 0) {
+                await Promise.all(promises);
+                setGenProfiles(newProfiles);
+            }
+        };
+
+        loadProfiles();
+    }, [selectedYear, activeAssets]);
+
+    const runSimulation = () => {
+        setLoading(true);
+        setTimeout(() => {
+            // Filter excluded techs (zero out capacity) - DISABLED temporarily as we move to AssetEditor
+            // With AssetEditor, we just don't pass the asset if it's inactive/deleted.
+            // But for legacy compatibility with the 'Active' toggles if we add them back:
+            // For now, we assume activeAssets contains what we want to run.
 
             const res = runAggregationSimulation(
                 participants,
                 activeAssets,
                 financials,
                 historicalPrices,
-                { mw: activeCapacities.Battery_MW, hours: activeCapacities.Battery_Hours },
-                allHubPrices // Pass map to engine
+                { mw: capacities.Battery_MW, hours: capacities.Battery_Hours }, // Use base capacities for battery
+                allHubPrices,
+                genProfiles // Pass the loaded profiles
             );
             setResult(res);
 

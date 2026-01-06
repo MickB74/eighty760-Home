@@ -128,8 +128,8 @@ export default function Home() {
                             <Image src="/image.png" alt="Eighty760 Logo" width={240} height={120} className="w-auto object-contain mb-4" style={{ height: '120px' }} />
                         </div>
                         <div className="md:text-right">
-                            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                                Based on <a href="/whitepaper.pdf" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--brand-color)] transition-colors underline decoration-dotted underline-offset-4">Technical Whitepaper Version 1.0</a>
+                            <p className="text-[var(--text-secondary)] text-sm mb-4 md:mb-0">
+                                Based on <a href="/whitepaper" className="hover:text-[var(--brand-color)] transition-colors underline decoration-dotted underline-offset-4">Methodology & Technical Architecture</a>
                             </p>
                             <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>© 2026 Eighty760 Simulation Framework</p>
                         </div>

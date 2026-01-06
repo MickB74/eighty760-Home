@@ -47,23 +47,24 @@ export default function Navigation() {
                             </span>
                         </label>
                     </div>
-                    <div className="flex items-center space-x-8">
-                        <div className="hidden sm:flex items-center space-x-8">
-                            {[
-                                { name: 'Home', path: '/' },
-                                { name: 'Aggregation', path: '/aggregation' },
-                                { name: 'Methodology', path: '/#methodology' },
-                            ].map((link) => (
-                                <Link
-                                    key={link.path}
-                                    href={link.path}
-                                    className={`font-medium transition ${isActive(link.path) ? 'text-[var(--brand-color)]' : 'hover:text-[var(--brand-color)]'}`}
-                                    style={{ color: isActive(link.path) ? 'var(--brand-color)' : 'var(--text-secondary)' }}
-                                >
-                                    {link.name}
-                                </Link>
-                            ))}
-                        </div>
+
+                    <div className="hidden sm:flex items-center space-x-8">
+                        {[
+                            { name: 'Home', path: '/' },
+                            { name: 'Aggregation', path: '/aggregation' },
+                            { name: 'Methodology', path: '/whitepaper' },
+                        ].map((link) => (
+                            <Link
+                                key={link.path}
+                                href={link.path}
+                                className={`font-medium transition hover:text-[var(--brand-color)]`}
+                                style={{
+                                    color: isActive(link.path) ? 'var(--brand-color)' : 'var(--text-secondary)'
+                                }}
+                            >
+                                {link.name}
+                            </Link>
+                        ))}
                     </div>
                 </div>
             </div>
