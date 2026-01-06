@@ -57,23 +57,30 @@ export default function WhitepaperPage() {
                             <div className="bg-[var(--bg-secondary)] p-6 rounded-xl border border-[var(--border-color)]">
                                 <h3 className="text-lg font-bold mb-3 text-[var(--brand-color)]">Market Pricing (ERCOT)</h3>
                                 <p className="text-sm text-[var(--text-secondary)] mb-3">
-                                    We utilize <strong>15-minute Real-Time Market (RTM) Settlement Point Prices (SPPS)</strong> sourced directly from ERCOT via <em>GridStatus.io</em>.
+                                    Pricing data is sourced from <strong>GridStatus.io</strong>, providing 15-minute Real-Time Market (RTM) Settlement Point Prices (SPPs).
                                 </p>
                                 <ul className="text-sm list-disc pl-5 space-y-1 text-[var(--text-secondary)]">
-                                    <li><strong>Frequency:</strong> 15-minute intervals aggregated to hourly.</li>
-                                    <li><strong>Range:</strong> 2020 through 2025.</li>
-                                    <li><strong>Nodes:</strong> Specific Hubs (North, South, West, Houston, Panhandle) to capture basis risk.</li>
+                                    <li><strong>Source:</strong> ERCOT RTM via GridStatus API.</li>
+                                    <li><strong>Nodes & Hubs:</strong> We ingest data for key hubs: <code>HB_NORTH</code>, <code>HB_SOUTH</code>, <code>HB_WEST</code>, <code>HB_HOUSTON</code>, and <code>HB_PAN</code>.</li>
+                                    <li><strong>Granularity:</strong> 15-minute intervals aggregated to hourly averages for the simulation (8,760 hours/year).</li>
+                                    <li><strong>Completeness:</strong> Full historical datasets from 2020 through 2025.</li>
                                 </ul>
                             </div>
                             <div className="bg-[var(--bg-secondary)] p-6 rounded-xl border border-[var(--border-color)]">
-                                <h3 className="text-lg font-bold mb-3 text-[var(--brand-color)]">Weather & Generation</h3>
+                                <h3 className="text-lg font-bold mb-3 text-[var(--brand-color)]">Weather &amp; Engineering Models</h3>
                                 <p className="text-sm text-[var(--text-secondary)] mb-3">
-                                    Generation profiles are built using historical weather reanalysis data from <em>Open-Meteo</em>.
+                                    Weather data is sourced from <strong>Open-Meteo Historic Weather API</strong> (ERA5 Reanalysis).
                                 </p>
                                 <ul className="text-sm list-disc pl-5 space-y-1 text-[var(--text-secondary)]">
-                                    <li><strong>Solar:</strong> Derived from Global Horizontal Irradiance (GHI) and temperature.</li>
-                                    <li><strong>Wind:</strong> Derived from 100m wind speeds using standard IEC Class 2 turbine power curves.</li>
-                                    <li><strong>Correlation:</strong> Weather data is location-specific, ensuring that a West Texas wind farm reflects actual West Texas wind patterns for the selected year.</li>
+                                    <li>
+                                        <strong>Solar Model:</strong> Uses <code>shortwave_radiation</code> (GHI). Assumes Single-Axis Tracking with ~20% AC system efficiency.
+                                    </li>
+                                    <li>
+                                        <strong>Wind Model:</strong> Uses <code>wind_speed_100m</code>. Mapped to a standard <strong>IEC Class 2</strong> onshore turbine power curve.
+                                    </li>
+                                    <li>
+                                        <strong>Battery Specs:</strong> Models a 4-hour Li-Ion BESS with <strong>85% Round-Trip Efficiency (RTE)</strong> and standard VOM costs.
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -86,16 +93,19 @@ export default function WhitepaperPage() {
                             Financial Modeling
                         </h2>
                         <div className="prose prose-invert max-w-none text-[var(--text-secondary)] space-y-4">
-                            <h3 className="text-lg font-semibold text-white mt-4">PPA vs. Market Revenue</h3>
+                            <h3 className="text-lg font-semibold text-white mt-4">Virtual PPA (Fixed-for-Floating)</h3>
                             <p>
-                                The tool models a &quot;Virtual PPA&quot; or Fixed-for-Floating swap structure:
+                                The tool models a &quot;Virtual PPA&quot; or <strong>Fixed-for-Floating Swap</strong> financial structure:
                             </p>
                             <ul className="list-disc pl-5 space-y-2">
                                 <li>
-                                    <strong>Settlement Value:</strong> calculated as <code>(Market_Price - Strike_Price) * Volume</code>.
+                                    <strong>Settlement Logic:</strong> <code>Cash_Flow = (Market_Price_GeneratorNode - Strike_Price) * Generated_MWh</code>.
                                 </li>
                                 <li>
-                                    <strong>Nodal Basis Risk:</strong> Generator revenue is calculated at the <em>Generator&apos;s Hub</em> (e.g., West Hub), while the Load pays based on the <em>Load Hub</em> (e.g., North Hub). The spread between these prices represents real-world basis risk.
+                                    <strong>Nodal Basis Risk:</strong> Generator revenue is calculated at the <em>Generator&apos;s Hub</em> (e.g., HB_WEST), while the Load pays based on the <em>Load Hub</em> (e.g., HB_NORTH). The spread between these prices represents real-world basis risk.
+                                </li>
+                                <li>
+                                    <strong>Negative Prices:</strong> The simulation accurately captures negative pricing events, reducing generator revenue during curtailment or oversupply.
                                 </li>
                             </ul>
 
