@@ -318,7 +318,7 @@ return (
 
         <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
             {/* Sidebar - Configuration */}
-            <div className="w-full lg:w-96 p-6 border-r border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-y-auto h-auto lg:h-[calc(100vh-80px)]">
+            <div className="w-full lg:w-96 p-6 border-r border-[var(--border-color)] bg-[var(--bg-secondary)]">
                 <div className="flex justify-between items-center mb-6">
                     <h2 className="text-xl font-bold brand-text">Configuration</h2>
                     <button
@@ -494,7 +494,7 @@ return (
             </div>
 
             {/* Main Content */}
-            <div className="flex-1 p-6 lg:p-10 overflow-y-auto">
+            <div className="flex-1 p-6 lg:p-10">
 
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
