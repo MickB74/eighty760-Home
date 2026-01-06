@@ -41,7 +41,7 @@ export default function WhitepaperPage() {
                                     <strong>Matching:</strong> If Generation exceeds Load, the surplus is stored in the battery (if available) or sold to the market/curtailed.
                                 </li>
                                 <li>
-                                    <strong>Deficit:</strong> If Load exceeds Generation, the deficit is met by discharging the battery or purchasing "brown power" from the grid.
+                                    <strong>Deficit:</strong> If Load exceeds Generation, the deficit is met by discharging the battery or purchasing &quot;brown power&quot; from the grid.
                                 </li>
                             </ul>
                         </div>
@@ -88,14 +88,14 @@ export default function WhitepaperPage() {
                         <div className="prose prose-invert max-w-none text-[var(--text-secondary)] space-y-4">
                             <h3 className="text-lg font-semibold text-white mt-4">PPA vs. Market Revenue</h3>
                             <p>
-                                The tool models a "Virtual PPA" or Fixed-for-Floating swap structure:
+                                The tool models a &quot;Virtual PPA&quot; or Fixed-for-Floating swap structure:
                             </p>
                             <ul className="list-disc pl-5 space-y-2">
                                 <li>
                                     <strong>Settlement Value:</strong> calculated as <code>(Market_Price - Strike_Price) * Volume</code>.
                                 </li>
                                 <li>
-                                    <strong>Nodal Basis Risk:</strong> Generator revenue is calculated at the <em>Generator's Hub</em> (e.g., West Hub), while the Load pays based on the <em>Load Hub</em> (e.g., North Hub). The spread between these prices represents real-world basis risk.
+                                    <strong>Nodal Basis Risk:</strong> Generator revenue is calculated at the <em>Generator&apos;s Hub</em> (e.g., West Hub), while the Load pays based on the <em>Load Hub</em> (e.g., North Hub). The spread between these prices represents real-world basis risk.
                                 </li>
                             </ul>
 

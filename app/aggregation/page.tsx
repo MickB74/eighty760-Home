@@ -72,7 +72,7 @@ export default function AggregationPage() {
     });
 
     // 4. Price Data State
-    const [selectedYear, setSelectedYear] = useState<number | 'Average'>('Average');
+    const [selectedYear, setSelectedYear] = useState<number | 'Average'>(2024);
     const [selectedHub, setSelectedHub] = useState<string>('North'); // Default Load Hub
     const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
     const [allHubPrices, setAllHubPrices] = useState<Record<string, number[]>>({}); // Cache for assets
@@ -196,7 +196,7 @@ export default function AggregationPage() {
                         id: `temp-${type}`,
                         name: `${type} Gen`,
                         type: type as GenerationAsset['type'],
-                        location: 'North', // Default for legacy slider mode
+                        location: (selectedHub === 'HB_NORTH' ? 'North' : selectedHub) as any, // Use selected hub
                         capacity_mw: mw,
                         capacity_factor: undefined // Use default profile logic
                     });
@@ -204,7 +204,7 @@ export default function AggregationPage() {
             });
             return tempAssets;
         }
-    }, [useAdvancedAssets, assets, capacities]);
+    }, [useAdvancedAssets, assets, capacities, selectedHub]);
 
 
     // UseEffect to load generation profiles (Solar/Wind) based on location and year
@@ -373,7 +373,7 @@ export default function AggregationPage() {
         } else {
             setResult(null);
         }
-    }, [participants, capacities, financials, historicalPrices, excludedTechs]);
+    }, [participants, capacities, financials, historicalPrices, excludedTechs, genProfiles, activeAssets]);
 
     // --- Render ---
 
