@@ -81,6 +81,7 @@ export interface SimulationResult {
     total_cost_net: number;
     avg_cost_per_mwh: number;
     weighted_ppa_price: number;
+    market_purchase_cost: number;
 
     // Breakdown
     tech_details: Record<string, {

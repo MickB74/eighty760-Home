@@ -734,11 +734,20 @@ export default function AggregationPage() {
                                         <tbody>
                                             <tr className="border-b border-[var(--border-color)]">
                                                 <td className="py-3 font-medium flex items-center gap-2">
+                                                    Market Purchases (Load Bill)
+                                                    <InfoTooltip text="Cost to purchase Total Load from the grid at Load Hub prices (Volume-Weighted)" />
+                                                </td>
+                                                <td className="py-3 text-right font-medium text-[var(--text-primary)]">
+                                                    ${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
+                                                </td>
+                                            </tr>
+                                            <tr className="border-b border-[var(--border-color)]">
+                                                <td className="py-3 font-medium flex items-center gap-2">
                                                     Net Settlement Value (PPA vs Market)
                                                     <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
                                                 </td>
                                                 <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                    {result.settlement_value >= 0 ? '+' : ''}${result.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    {result.settlement_value >= 0 ? '-' : '+'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
@@ -746,14 +755,14 @@ export default function AggregationPage() {
                                                     REC Income (Surplus)
                                                     <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
                                                 </td>
-                                                <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="py-3 text-right text-green-600">-${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
                                                 <td className="py-3 text-[var(--text-secondary)] flex items-center gap-2">
                                                     REC Cost (Deficit)
                                                     <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
                                                 </td>
-                                                <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="py-3 text-right text-red-500">+${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
                                                 <td className="py-3 font-medium text-lg flex items-center gap-2">

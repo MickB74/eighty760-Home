@@ -494,9 +494,27 @@ export function runAggregationSimulation(
         rec_income_total += final_surplus[i] * currentRecPrice;
     }
 
+    // New: Calculate Gross Load Bill (Physical Load * Load Price)
+    // This is the baseline cost before any PPA hedging.
+    let gross_load_cost = 0;
+    for (let i = 0; i < HOURS; i++) {
+        gross_load_cost += total_load_profile[i] * prices[i];
+    }
+
     const rec_cost = rec_cost_total;
     const rec_income = rec_income_total;
-    const total_cost_net = market_purchase_cost + total_ppa_cost - market_surplus_revenue + rec_cost - rec_income;
+
+    // Correct Net Cost for Virtual PPA:
+    // Net Cost = Gross Load Bill - (PPA Settlement Revenue) + REC Net Cost
+    // PPA Settlement Revenue = (Asset Gen * Asset Hub Price) - (Asset Gen * Strike Price)
+    // Note: 'settlement_value' is defined as (Revenue - Cost).
+    // So: Net Cost = Gross Load Bill - settlement_value + rec_cost - rec_income.
+
+    // Legacy Physical Calculation (for reference):
+    // const total_cost_physical = market_purchase_cost + total_ppa_cost - market_surplus_revenue + rec_cost - rec_income;
+    // This would be correct IF asset prices == load prices (no basis risk).
+
+    const total_cost_net = gross_load_cost - settlement_value + rec_cost - rec_income;
 
     return {
         load_profile: total_load_profile,
@@ -529,6 +547,7 @@ export function runAggregationSimulation(
         total_cost_net,
         avg_cost_per_mwh: total_load_mwh > 0 ? total_cost_net / total_load_mwh : 0,
         weighted_ppa_price: total_matched > 0 ? total_ppa_cost / total_matched : 0,
+        market_purchase_cost: gross_load_cost, // Return Gross Load Cost for display
 
         tech_details: {
             'Solar': { matched_mwh: 0, total_mwh: 0, total_cost: solar_cost, market_value: 0, settlement: 0 },
