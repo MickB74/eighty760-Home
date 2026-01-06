@@ -15,6 +15,15 @@ export interface TechCapacity {
     Battery_Hours: number;
 }
 
+export interface GenerationAsset {
+    id: string;
+    name: string;
+    type: 'Solar' | 'Wind' | 'Geothermal' | 'Nuclear' | 'CCS Gas';
+    location: 'North' | 'South' | 'West' | 'Houston';
+    capacity_mw: number;
+    capacity_factor?: number; // Optional override to scale profile
+}
+
 export interface FinancialParams {
     solar_price: number;
     wind_price: number;
@@ -85,7 +94,8 @@ export interface SimulationResult {
 
 export interface AggregationState {
     participants: Participant[];
-    capacities: TechCapacity;
+    assets: GenerationAsset[];
+    capacities: TechCapacity; // Kept for backward compat or summary
     financials: FinancialParams;
     battery_financials: BatteryFinancialParams;
 }

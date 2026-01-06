@@ -15,13 +15,14 @@ import {
     Filler,
 } from 'chart.js';
 
-import { Participant, TechCapacity, FinancialParams, SimulationResult, BatteryFinancialParams } from '@/lib/aggregation/types';
+import { Participant, TechCapacity, FinancialParams, SimulationResult, BatteryFinancialParams, GenerationAsset } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { recommendPortfolio } from '@/lib/aggregation/optimizer';
 import { loadERCOTPrices, getAvailableYears, getYearLabel, loadAveragePriceProfile } from '@/lib/aggregation/price-loader';
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
 import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
+import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 
@@ -60,6 +61,8 @@ export default function AggregationPage() {
     const [capacities, setCapacities] = useState<TechCapacity>({
         Solar: 0, Wind: 0, Geothermal: 0, Nuclear: 0, 'CCS Gas': 0, Battery_MW: 0, Battery_Hours: 2
     });
+    const [assets, setAssets] = useState<GenerationAsset[]>([]);
+    const [useAdvancedAssets, setUseAdvancedAssets] = useState(false);
 
     // 3. Financial State
     const [financials, setFinancials] = useState<FinancialParams>({
@@ -188,7 +191,31 @@ export default function AggregationPage() {
                 }
             });
 
-            const res = runAggregationSimulation(participants, activeCapacities, financials, historicalPrices);
+            // Convert capacities to assets for new engine signature
+            // This is a temporary adapter until we implement the full Asset Editor UI
+            const activeAssets: any[] = [];
+            const techs = ['Solar', 'Wind', 'Geothermal', 'Nuclear', 'CCS Gas'];
+            techs.forEach(type => {
+                const mw = (activeCapacities as any)[type];
+                if (mw > 0) {
+                    activeAssets.push({
+                        id: `temp-${type}`,
+                        name: `${type} Gen`,
+                        type: type,
+                        location: 'North', // Default for legacy slider mode
+                        capacity_mw: mw,
+                        capacity_factor: undefined // Use default profile logic
+                    });
+                }
+            });
+
+            const res = runAggregationSimulation(
+                participants,
+                activeAssets,
+                financials,
+                historicalPrices,
+                { mw: activeCapacities.Battery_MW, hours: activeCapacities.Battery_Hours }
+            );
             setResult(res);
 
             // Calculate Battery CVTA if battery exists
@@ -456,6 +483,51 @@ export default function AggregationPage() {
                                     ))}
                                 </div>
                             </details>
+                        </section>
+
+                        <section className="mb-8">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="font-semibold text-[var(--text-primary)]">Generation Portfolio</h3>
+                                <div className="flex items-center gap-2">
+                                    <label className="text-xs text-[var(--text-secondary)]">Advanced Mode</label>
+                                    <input
+                                        type="checkbox"
+                                        checked={useAdvancedAssets}
+                                        onChange={e => setUseAdvancedAssets(e.target.checked)}
+                                        className="toggle"
+                                    />
+                                </div>
+                            </div>
+
+                            {useAdvancedAssets ? (
+                                <div className="mb-4">
+                                    <AssetEditor assets={assets} onUpdate={setAssets} />
+                                    {/* Keep Battery controls visible separately or integrate them? For now keep separate below */}
+                                </div>
+                            ) : (
+                                <div className="space-y-4">
+                                    {['Solar', 'Wind', 'Geothermal', 'Nuclear', 'CCS Gas'].map(tech => (
+                                        <div key={tech} className="space-y-1">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-[var(--text-secondary)]">{tech}</span>
+                                                <span className="font-medium text-[var(--text-primary)]">{(capacities as any)[tech]} MW</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="5000"
+                                                step="10"
+                                                value={(capacities as any)[tech]}
+                                                onChange={(e) => setCapacities(prev => ({ ...prev, [tech]: Number(e.target.value) }))}
+                                                className="w-full h-2 bg-[var(--bg-tertiary)] rounded-lg appearance-none cursor-pointer accent-[var(--brand-color)]"
+                                            />
+                                        </div>
+                                    ))}
+                                    <div className="bg-blue-50/10 p-3 rounded text-xs text-blue-400 mt-2">
+                                        ℹ️ Switch to "Advanced Mode" to specify project locations (North/South/West) and multiple assets per technology.
+                                    </div>
+                                </div>
+                            )}
                         </section>
                     </div>
                 </div>

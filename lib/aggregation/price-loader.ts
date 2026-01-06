@@ -25,6 +25,35 @@ export async function loadERCOTPrices(year: number): Promise<number[] | null> {
     }
 }
 
+
+export async function loadHubPrices(year: number, location: string): Promise<number[] | null> {
+    try {
+        // 1. Try Hub-specific file (2023-2025)
+        const response = await fetch(`/data/prices/ercot_${year}_hubs.json`);
+        if (response.ok) {
+            const data = await response.json();
+            // Map generic location names to Hub names if needed
+            let hubKey = location;
+            if (location === 'North') hubKey = 'HB_NORTH';
+            if (location === 'South') hubKey = 'HB_SOUTH';
+            if (location === 'West') hubKey = 'HB_WEST';
+            if (location === 'Houston') hubKey = 'HB_HOUSTON';
+            if (location === 'Panhandle') hubKey = 'HB_PAN';
+
+            if (data[hubKey]) return data[hubKey];
+        } else {
+            // If file not found (e.g. 2020-2022), fallback to default loader if North
+            if (location === 'North' || location === 'HB_NORTH') {
+                return loadERCOTPrices(year);
+            }
+        }
+        return null;
+    } catch (error) {
+        console.warn(`Error loading hub prices for ${year} ${location}:`, error);
+        return null;
+    }
+}
+
 export function getAvailableYears(): number[] {
     return [2020, 2021, 2022, 2023, 2024, 2025];
 }

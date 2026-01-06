@@ -1,4 +1,4 @@
-import { Participant, TechCapacity, SimulationResult, FinancialParams } from './types';
+import { Participant, TechCapacity, SimulationResult, FinancialParams, GenerationAsset } from './types';
 
 // Constants
 const HOURS = 8760;
@@ -81,7 +81,7 @@ export function generateLoadProfile(annual_mwh: number, type: string): number[] 
  * Generate Dummy Generation Profile
  * Ported from utils.py: generate_dummy_generation_profile for Solar/Wind/etc
  */
-export function generateGenProfile(capacity_mw: number, type: string): number[] {
+export function generateGenProfile(capacity_mw: number, type: string, capacity_factor?: number): number[] {
     if (capacity_mw <= 0) return zeros();
 
     const profile = zeros();
@@ -129,6 +129,19 @@ export function generateGenProfile(capacity_mw: number, type: string): number[] 
             if (type === 'Nuclear') profile[h] = capacity_mw; // Nuclear is strictly flat here
         }
     }
+    // Scaling Logic: If capacity_factor is provided, scale the profile to match it
+    if (capacity_factor !== undefined && capacity_factor > 0) {
+        const currentSum = profile.reduce((a, b) => a + b, 0);
+        const currentCF = currentSum / (HOURS * capacity_mw);
+
+        if (currentCF > 0) {
+            const scaler = capacity_factor / currentCF;
+            for (let i = 0; i < HOURS; i++) {
+                profile[i] = Math.min(capacity_mw, profile[i] * scaler); // Clip at capacity
+            }
+        }
+    }
+
     return profile;
 }
 
@@ -229,9 +242,10 @@ export function simulateBattery(
  */
 export function runAggregationSimulation(
     participants: Participant[],
-    capacities: TechCapacity,
+    activeAssets: GenerationAsset[],
     financials: FinancialParams,
-    historicalPrices?: number[] | null
+    historicalPrices?: number[] | null,
+    batteryParams: { mw: number, hours: number } = { mw: 0, hours: 2 }
 ): SimulationResult {
 
     // 1. Build Aggregate Load
@@ -243,12 +257,30 @@ export function runAggregationSimulation(
 
     const total_load_mwh = total_load_profile.reduce((a, b) => a + b, 0);
 
-    // 2. Build Gen Profiles
-    const solar = generateGenProfile(capacities.Solar, 'Solar');
-    const wind = generateGenProfile(capacities.Wind, 'Wind');
-    const geo = generateGenProfile(capacities.Geothermal, 'Geothermal');
-    const nuc = generateGenProfile(capacities.Nuclear, 'Nuclear');
-    const ccs = generateGenProfile(capacities['CCS Gas'], 'CCS Gas');
+    // 2. Build Gen Profiles (Asset-Based)
+    const solar = zeros();
+    const wind = zeros();
+    const geo = zeros();
+    const nuc = zeros();
+    const ccs = zeros();
+
+    // Iterate through assets instead of aggregate capacities
+    for (const asset of activeAssets) {
+        // Generate profile for this specific asset
+        // TODO: Pass location to generateGenProfile for location-specific weather/wind (Future)
+        // For now, we use the type and capacity. 
+        // IMPORTANT: We must handle the 'capacity_factor' scaling here if present.
+        const profile = generateGenProfile(asset.capacity_mw, asset.type, asset.capacity_factor);
+
+        // Add to aggregate totals
+        for (let i = 0; i < HOURS; i++) {
+            if (asset.type === 'Solar') solar[i] += profile[i];
+            else if (asset.type === 'Wind') wind[i] += profile[i];
+            else if (asset.type === 'Geothermal') geo[i] += profile[i];
+            else if (asset.type === 'Nuclear') nuc[i] += profile[i];
+            else if (asset.type === 'CCS Gas') ccs[i] += profile[i];
+        }
+    }
 
     const total_gen_profile = zeros();
     for (let i = 0; i < HOURS; i++) {
@@ -267,7 +299,7 @@ export function runAggregationSimulation(
         }
     }
 
-    const batt = simulateBattery(surplus_profile, deficit_profile_initial, capacities.Battery_MW, capacities.Battery_Hours);
+    const batt = simulateBattery(surplus_profile, deficit_profile_initial, batteryParams.mw, batteryParams.hours);
 
     // 4. Final Matching and Metrics
     const matched_profile = zeros();
@@ -296,7 +328,7 @@ export function runAggregationSimulation(
     }
 
     const cfe_score = total_load_mwh > 0 ? total_matched / total_load_mwh : 0;
-    const total_cap = Object.values(capacities).reduce((a, b) => a + b, 0) - capacities.Battery_Hours;
+    const total_cap = activeAssets.reduce((sum, a) => sum + a.capacity_mw, 0);
     const productivity = total_cap > 0 ? total_matched / total_cap : 0;
 
     // 5. Financials
