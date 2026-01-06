@@ -324,6 +324,7 @@ export function runAggregationSimulation(
     const settlement_value = total_market_revenue - total_ppa_cost;
 
     let rec_cost_total = 0;
+    let rec_income_total = 0;
     let market_purchase_cost = 0;
     let market_surplus_revenue = 0;
     for (let i = 0; i < HOURS; i++) {
@@ -357,12 +358,17 @@ export function runAggregationSimulation(
         market_purchase_cost += final_deficit[i] * prices[i];
         market_surplus_revenue += final_surplus[i] * prices[i];
 
-        // REC Cost is now dynamic based on matched energy
-        rec_cost_total += matched_profile[i] * currentRecPrice;
+        // REC Logic
+        // Cost: Buy RECs for deficit hours to cover brown power
+        rec_cost_total += final_deficit[i] * currentRecPrice;
+
+        // Income: Sell RECs for surplus hours (overgeneration)
+        rec_income_total += final_surplus[i] * currentRecPrice;
     }
 
     const rec_cost = rec_cost_total;
-    const total_cost_net = market_purchase_cost + total_ppa_cost - market_surplus_revenue + rec_cost;
+    const rec_income = rec_income_total;
+    const total_cost_net = market_purchase_cost + total_ppa_cost - market_surplus_revenue + rec_cost - rec_income;
 
     return {
         load_profile: total_load_profile,
@@ -391,6 +397,7 @@ export function runAggregationSimulation(
 
         settlement_value,
         rec_cost,
+        rec_income,
         total_cost_net,
         avg_cost_per_mwh: total_load_mwh > 0 ? total_cost_net / total_load_mwh : 0,
         weighted_ppa_price: total_matched > 0 ? total_ppa_cost / total_matched : 0,

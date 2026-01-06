@@ -68,6 +68,7 @@ export interface SimulationResult {
     // Financials
     settlement_value: number; // Net PPA Settlement
     rec_cost: number;
+    rec_income: number;
     total_cost_net: number;
     avg_cost_per_mwh: number;
     weighted_ppa_price: number;

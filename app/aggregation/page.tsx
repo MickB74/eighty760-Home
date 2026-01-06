@@ -539,7 +539,11 @@ export default function AggregationPage() {
                                                 </td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
-                                                <td className="py-3">REC Cost (@ ${financials.rec_price})</td>
+                                                <td className="py-3 text-[var(--text-secondary)]">REC Income (Surplus)</td>
+                                                <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                            </tr>
+                                            <tr className="border-b border-[var(--border-color)]">
+                                                <td className="py-3 text-[var(--text-secondary)]">REC Cost (Deficit)</td>
                                                 <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
