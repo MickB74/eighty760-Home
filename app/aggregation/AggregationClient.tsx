@@ -26,6 +26,40 @@ import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
+import HourlyHeatmap from '@/components/aggregation/HourlyHeatmap';
+
+// Helper: Aggregate 8760 to 12x24 (Month x Hour)
+function aggregateTo12x24(data: number[]): number[][] {
+    const grid = Array.from({ length: 12 }, () => Array(24).fill(0));
+    const counts = Array.from({ length: 12 }, () => Array(24).fill(0));
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+    data.forEach((val, i) => {
+        if (i >= 8760) return;
+        const hourOfDay = i % 24;
+        const dayOfYear = Math.floor(i / 24);
+
+        let month = 0;
+        let d = dayOfYear;
+        for (let m = 0; m < 12; m++) {
+            if (d < daysInMonth[m]) {
+                month = m;
+                break;
+            }
+            d -= daysInMonth[m];
+        }
+
+        grid[month][hourOfDay] += val;
+        counts[month][hourOfDay]++;
+    });
+
+    for (let m = 0; m < 12; m++) {
+        for (let h = 0; h < 24; h++) {
+            if (counts[m][h] > 0) grid[m][h] /= counts[m][h];
+        }
+    }
+    return grid;
+}
 
 // Register ChartJS
 ChartJS.register(
@@ -926,6 +960,74 @@ export default function AggregationPage() {
                                     </table>
                                 </div>
                             )}
+                            {/* Heatmaps ("Carrot" Analysis) */}
+                            <details className="mt-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                                <summary className="p-6 font-semibold cursor-pointer text-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex justify-between items-center">
+                                    <span>Detailed Analysis (Heatmaps)</span>
+                                    <span className="text-gray-400">▼</span>
+                                </summary>
+                                <div className="p-6 border-t border-gray-200 dark:border-slate-700 space-y-8 animate-in fade-in slide-in-from-top-1">
+
+                                    {/* 1. Hourly Match Heatmap */}
+                                    <HourlyHeatmap
+                                        title="Hourly Match Heatmap (CFE %)"
+                                        data={aggregateTo12x24(result.matched_profile.map((m, i) => {
+                                            const load = result.load_profile[i];
+                                            return load > 0 ? Math.min(1.0, m / load) : 1.0;
+                                        }))}
+                                        min={0}
+                                        max={1}
+                                        unit="%"
+                                        colorScale={(val) => {
+                                            // Red (0) -> Yellow (0.5) -> Green (1.0) or Grayscale?
+                                            // Screenshot shows Grayscale (1.0=Black/Dark, 0.0=Light)
+                                            // Let's match the screenshot style: 0=Light, 1=Dark (High Match is Dark/Good?) 
+                                            // Actually normally 100% CFE is goal, so maybe Dark Blue/Green.
+                                            // Implementation in HourlyHeatmap default is Blue scale. Let's stick to that.
+                                            // Or Custom grayscale:
+                                            const v = Math.max(0, Math.min(1, val));
+                                            const l = 95 - (v * 75); // 95% (light) to 20% (dark) lightness
+                                            return `hsl(0, 0%, ${l}%)`;
+                                        }}
+                                    />
+
+                                    {/* 2. REC Price Heatmap */}
+                                    <HourlyHeatmap
+                                        title="REC Price Heatmap ($/MWh)"
+                                        data={aggregateTo12x24(Array.from({ length: 8760 }, (_, i) => {
+                                            // Reproduce Scarcity Logic for Visualization
+                                            let price = financials.rec_price;
+                                            if (financials.use_scarcity) {
+                                                const hourOfDay = i % 24;
+                                                const month = Math.floor(i / 730); // Approx
+                                                let mult = 1.0;
+                                                if ([0, 1, 11].includes(month)) { // Winter
+                                                    if ([18, 19, 20].includes(hourOfDay)) mult = 2.0;
+                                                    else if ([6, 7, 8].includes(hourOfDay)) mult = 1.4;
+                                                }
+                                                if (mult === 1.0) {
+                                                    if ([17, 18, 19, 20, 21].includes(hourOfDay)) mult = 1.2;
+                                                    else if ([7, 8, 9, 15, 16].includes(hourOfDay)) mult = 1.0;
+                                                    else if (month >= 5 && month <= 8 && hourOfDay >= 10 && hourOfDay <= 14) mult = 0.45;
+                                                }
+                                                const intensity = financials.scarcity_intensity ?? 0;
+                                                const finalMult = Math.max(0, 1.0 + (mult - 1.0) * intensity);
+                                                price *= finalMult;
+                                            }
+                                            return price;
+                                        }))}
+                                        unit="$"
+                                        colorScale={(val, min, max) => {
+                                            // Orange Scale for Price (Low=Light, High=Dark Orange/Red)
+                                            const ratio = (val - min) / (max - min || 1);
+                                            // hsl(25, 100%, 50%) is Orange.
+                                            // Use lightness 90% -> 40%
+                                            const l = 90 - (ratio * 50);
+                                            return `hsl(30, 90%, ${l}%)`;
+                                        }}
+                                    />
+                                </div>
+                            </details>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-xl">
