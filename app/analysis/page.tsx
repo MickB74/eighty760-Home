@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import Navigation from '@/components/Navigation';
 import { runSimulation } from '@/lib/simulation/engine';
 import { SimulationResult, BuildingPortfolioItem } from '@/lib/simulation/types';
+import InfoTooltip from '@/components/shared/InfoTooltip';
 import Papa from 'papaparse';
 import {
     Chart as ChartJS,
@@ -316,41 +317,49 @@ export default function AnalysisPage() {
                                         label="Clean Energy Generation"
                                         value={`${simResult?.results.total_clean_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
                                         sub=""
+                                        tooltip="Total raw generation from all clean energy sources before battery charging or curtailment."
                                     />
                                     <MetricCard
                                         label="CFE Score (24/7)"
                                         value={`${simResult?.results.cfe_percent.toFixed(1)}%`}
                                         sub=""
+                                        tooltip="Percentage of total load matched with carbon-free energy on an hourly basis."
                                     />
                                     <MetricCard
                                         label="Annual Clean Energy / Annual Load"
                                         value={`${simResult?.results.clean_load_ratio.toFixed(1)}%`}
                                         sub=""
+                                        tooltip="Ratio of total clean generation to total load. >100% means you generated more than you consumed annually."
                                     />
                                     <MetricCard
                                         label="Battery Discharge"
                                         value={`${simResult?.results.battery_discharge.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
                                         sub=""
+                                        tooltip="Total energy discharged from batteries to serve load."
                                     />
                                     <MetricCard
                                         label="MW Match Productivity"
                                         value={`${simResult?.results.mw_match_productivity.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh/MW`}
                                         sub=""
+                                        tooltip="Efficiency metric: MWh matched per MW of installed clean capacity."
                                     />
                                     <MetricCard
                                         label="Loss of Green Hours"
                                         value={`${simResult?.results.loss_of_green_hours.toFixed(1)}%`}
                                         sub=""
+                                        tooltip="Percentage of hours where clean generation + battery storage was insufficient to meet 100% of load."
                                     />
                                     <MetricCard
                                         label="Grid Consumption"
                                         value={`${simResult?.results.grid_consumption.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
                                         sub=""
+                                        tooltip="Total energy imported from the grid when local clean generation was insufficient."
                                     />
                                     <MetricCard
                                         label="Excess Generation"
                                         value={`${simResult?.results.excess_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
                                         sub=""
+                                        tooltip="Clean energy generated but not used by load or batteries (surplus)."
                                     />
                                 </div>
                             </div>
@@ -415,15 +424,18 @@ export default function AnalysisPage() {
                         </div>
                     )}
                 </div>
-            </div>
-        </main>
+            </div >
+        </main >
     );
 }
 
-function MetricCard({ label, value, sub, color }: { label: string, value: string, sub: string, color?: string }) {
+function MetricCard({ label, value, sub, color, tooltip }: { label: string, value: string, sub: string, color?: string, tooltip?: string }) {
     return (
         <div className="bg-[var(--card-bg)] p-4 rounded border border-[var(--border-color)]">
-            <div className="text-xs uppercase text-[var(--text-secondary)] font-semibold">{label}</div>
+            <div className="flex items-center gap-2 mb-1">
+                <div className="text-xs uppercase text-[var(--text-secondary)] font-semibold">{label}</div>
+                {tooltip && <InfoTooltip text={tooltip} size="sm" />}
+            </div>
             <div className={`text-2xl font-mono font-bold my-1 ${color || 'brand-text'}`}>{value}</div>
             <div className="text-xs text-[var(--text-tertiary)]">{sub}</div>
         </div>

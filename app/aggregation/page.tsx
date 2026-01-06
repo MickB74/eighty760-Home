@@ -23,6 +23,7 @@ import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
 import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
 import Navigation from '@/components/Navigation';
+import InfoTooltip from '@/components/shared/InfoTooltip';
 
 // Register ChartJS
 ChartJS.register(
@@ -248,7 +249,10 @@ export default function AggregationPage() {
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">REC Price ($)</label>
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <label className="text-xs text-[var(--text-secondary)]">REC Price ($)</label>
+                                            <InfoTooltip text="Cost to purchase Renewable Energy Certificates for unmatched load." />
+                                        </div>
                                         <input
                                             type="number"
                                             className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
@@ -257,7 +261,10 @@ export default function AggregationPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="text-xs text-[var(--text-secondary)] block mb-1">Avg Market ($)</label>
+                                        <div className="flex items-center gap-1 mb-1">
+                                            <label className="text-xs text-[var(--text-secondary)]">Avg Market ($)</label>
+                                            <InfoTooltip text="Average wholesale electricity price used for settlement calculations (approximate)." />
+                                        </div>
                                         <input
                                             type="number"
                                             className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
@@ -268,7 +275,10 @@ export default function AggregationPage() {
                                 </div>
                                 <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
                                     <div className="flex items-center justify-between mb-2">
-                                        <label className="text-xs font-medium">Scarcity REC Pricing</label>
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-xs font-medium">Scarcity REC Pricing</label>
+                                            <InfoTooltip text="If enabled, REC prices will surge up to 500% during critical winter and summer grid stress hours, simulating scarcity pricing mechanisms." />
+                                        </div>
                                         <input
                                             type="checkbox"
                                             checked={!!financials.use_scarcity}
@@ -278,8 +288,11 @@ export default function AggregationPage() {
                                     </div>
                                     {financials.use_scarcity && (
                                         <div>
-                                            <div className="flex justify-between text-xs mb-1 text-[var(--text-secondary)]">
-                                                <span>Intensity</span>
+                                            <div className="flex justify-between items-center text-xs mb-1 text-[var(--text-secondary)]">
+                                                <div className="flex items-center gap-1">
+                                                    <span>Intensity</span>
+                                                    <InfoTooltip text="Multiplier scalar. 1.0x = Standard Scarcity Logic. Higher values increase the price multiplier during stress events." />
+                                                </div>
                                                 <span>{financials.scarcity_intensity?.toFixed(1)}x</span>
                                             </div>
                                             <input
