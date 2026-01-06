@@ -73,7 +73,9 @@ export default function AggregationPage() {
 
     // 4. Price Data State
     const [selectedYear, setSelectedYear] = useState<number | 'Average'>(2024);
-    const [selectedHub, setSelectedHub] = useState<string>('North'); // Default Load Hub
+    const [loadHub, setLoadHub] = useState<string>('North');
+    const [solarHub, setSolarHub] = useState<string>('West');
+    const [windHub, setWindHub] = useState<string>('Panhandle');
     const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
     const [allHubPrices, setAllHubPrices] = useState<Record<string, number[]>>({}); // Cache for assets
 
@@ -192,11 +194,15 @@ export default function AggregationPage() {
             techs.forEach(type => {
                 const mw = (capacities as any)[type];
                 if (mw > 0) {
+                    let loc: any = loadHub === 'HB_NORTH' ? 'North' : loadHub; // Default for others
+                    if (type === 'Solar') loc = solarHub === 'HB_NORTH' ? 'North' : solarHub;
+                    if (type === 'Wind') loc = windHub === 'HB_NORTH' ? 'North' : windHub;
+
                     tempAssets.push({
                         id: `temp-${type}`,
                         name: `${type} Gen`,
                         type: type as GenerationAsset['type'],
-                        location: (selectedHub === 'HB_NORTH' ? 'North' : selectedHub) as any, // Use selected hub
+                        location: loc, // Use specific hub
                         capacity_mw: mw,
                         capacity_factor: undefined // Use default profile logic
                     });
@@ -204,7 +210,7 @@ export default function AggregationPage() {
             });
             return tempAssets;
         }
-    }, [useAdvancedAssets, assets, capacities, selectedHub]);
+    }, [useAdvancedAssets, assets, capacities, loadHub, solarHub, windHub]);
 
 
     // UseEffect to load generation profiles (Solar/Wind) based on location and year
@@ -332,9 +338,10 @@ export default function AggregationPage() {
             let prices: number[] | null = null;
             // Load specific year and hub
             // 1. Load Global/Load Hub Price
-            prices = await loadHubPrices(selectedYear, selectedHub);
+            prices = await loadHubPrices(selectedYear, loadHub);
 
             // 2. Load ALL Hubs for Assets (for 2023-2025)
+            // We load all hubs so that if user switches Asset Hubs, data is ready in `allHubPrices`
             const hubs = ['North', 'South', 'West', 'Houston', 'Panhandle'];
             const hubMap: Record<string, number[]> = {};
             for (const h of hubs) {
@@ -364,7 +371,7 @@ export default function AggregationPage() {
             }
         };
         loadPrices();
-    }, [selectedYear, selectedHub]);
+    }, [selectedYear, loadHub]);
 
     // Run sim whenever inputs change (debounced slightly?)
     useEffect(() => {
@@ -415,12 +422,42 @@ export default function AggregationPage() {
                                                 ))}
                                             </select>
                                         </div>
-                                        <div className="w-1/3">
-                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Hub</label>
+                                    </div>
+
+                                    {/* Tech Specific Hubs */}
+                                    <div className="grid grid-cols-3 gap-2 mt-2">
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Load Hub</label>
                                             <select
-                                                value={selectedHub}
-                                                onChange={(e) => setSelectedHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
+                                                value={loadHub}
+                                                onChange={(e) => setLoadHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-xs"
+                                                disabled={typeof selectedYear !== 'number'}
+                                            >
+                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                    <option key={h} value={h}>{h}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Solar Hub</label>
+                                            <select
+                                                value={solarHub}
+                                                onChange={(e) => setSolarHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-xs"
+                                                disabled={typeof selectedYear !== 'number'}
+                                            >
+                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                    <option key={h} value={h}>{h}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Wind Hub</label>
+                                            <select
+                                                value={windHub}
+                                                onChange={(e) => setWindHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
