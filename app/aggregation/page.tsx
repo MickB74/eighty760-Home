@@ -374,11 +374,7 @@ export default function AggregationPage() {
                                             </select>
                                         </div>
                                     </div>
-                                    {typeof selectedYear === 'number' && selectedYear < 2023 && (
-                                        <div className="text-[10px] text-amber-500 mt-1">
-                                            * Hub data only available for 2023-2025. Older years use default.
-                                        </div>
-                                    )}
+
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
