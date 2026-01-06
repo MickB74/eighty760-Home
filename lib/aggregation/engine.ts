@@ -301,9 +301,22 @@ export function runAggregationSimulation(
 
     // 5. Financials
     // Use historical prices if provided, otherwise generate synthetic
-    const prices = historicalPrices && historicalPrices.length === HOURS
-        ? historicalPrices
-        : generatePriceProfile(financials.market_price_avg);
+    let prices: number[];
+    if (historicalPrices && historicalPrices.length === HOURS) {
+        // Scale to match the target average price
+        const currentSum = historicalPrices.reduce((a, b) => a + b, 0);
+        const currentAvg = currentSum / HOURS;
+
+        // Avoid division by zero if for some reason the profile is all zeros
+        if (currentAvg > 0.0001) {
+            const scaler = financials.market_price_avg / currentAvg;
+            prices = historicalPrices.map(p => p * scaler);
+        } else {
+            prices = historicalPrices;
+        }
+    } else {
+        prices = generatePriceProfile(financials.market_price_avg);
+    }
 
     // PPA Costs
     const solar_cost = solar.reduce((sum, mw) => sum + mw, 0) * financials.solar_price;
