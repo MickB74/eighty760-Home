@@ -524,7 +524,7 @@ export default function AggregationPage() {
                                         </div>
                                     ))}
                                     <div className="bg-blue-50/10 p-3 rounded text-xs text-blue-400 mt-2">
-                                        ℹ️ Switch to "Advanced Mode" to specify project locations (North/South/West) and multiple assets per technology.
+                                        ℹ️ Switch to &quot;Advanced Mode&quot; to specify project locations (North/South/West) and multiple assets per technology.
                                     </div>
                                 </div>
                             )}
