@@ -789,7 +789,7 @@ export default function AggregationPage() {
                                                     <InfoTooltip text="Total Load × Hourly Load Hub Price" />
                                                 </td>
                                                 <td className="py-3 text-right font-medium text-red-500">
-                                                    ${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
+                                                    -${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                                                 </td>
                                             </tr>
                                             <tr className="border-b border-gray-200 dark:border-slate-700">
@@ -798,7 +798,7 @@ export default function AggregationPage() {
                                                     <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
                                                 </td>
                                                 <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                    {result.settlement_value >= 0 ? '-' : '+'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
                                             </tr>
                                             <tr className="border-b border-gray-200 dark:border-slate-700">
@@ -806,22 +806,22 @@ export default function AggregationPage() {
                                                     REC Income (Surplus)
                                                     <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
                                                 </td>
-                                                <td className="py-3 text-right text-green-600">-${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-gray-200 dark:border-slate-700">
                                                 <td className="py-3 text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                                     REC Cost (Deficit)
                                                     <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
                                                 </td>
-                                                <td className="py-3 text-right text-red-500">+${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-gray-200 dark:border-slate-700">
                                                 <td className="py-3 font-medium text-lg flex items-center gap-2">
                                                     Total Net Portfolio Cost
                                                     <InfoTooltip text="(Total Load × Load Hub Price) - Net Settlement Value + Net REC Costs" />
                                                 </td>
-                                                <td className="py-3 text-right font-bold text-lg text-red-500">
-                                                    ${result.total_cost_net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                <td className={`py-3 text-right font-bold text-lg ${result.total_cost_net > 0 ? 'text-red-500' : 'text-green-600'}`}>
+                                                    {result.total_cost_net > 0 ? '-' : '+'}${Math.abs(result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
                                             </tr>
                                             <tr>
