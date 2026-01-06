@@ -33,30 +33,32 @@ export default function HourlyHeatmap({ title, data, min = 0, max = 1, unit = ''
     };
 
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm">
-            <h3 className="text-lg font-semibold mb-4">{title}</h3>
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm">
+            <h3 className="text-sm font-semibold mb-2">{title}</h3>
 
             <div className="flex">
-                {/* Y-Axis Labels (Months) */}
-                <div className="flex flex-col justify-between pr-2 py-4">
-                    {MONTHS.map(m => (
-                        <span key={m} className="text-xs text-gray-500 text-right h-6 leading-6">{m}</span>
+                {/* Y-Axis Labels (Months) - Aligned with Grid */}
+                <div className="grid grid-rows-12 gap-0 pr-2 items-center text-right mr-1">
+                    {MONTHS.map((m, i) => (
+                        <span key={m} className="text-[10px] text-gray-500 h-4 leading-4 min-w-[24px]">
+                            {i % 2 === 0 ? m : ''}
+                        </span>
                     ))}
                 </div>
 
                 <div className="flex-1 overflow-x-auto">
                     {/* Heatmap Grid */}
-                    <div className="grid grid-rows-12 gap-[1px]">
+                    <div className="grid grid-rows-12 gap-0 border border-gray-100 dark:border-slate-700">
                         {data.map((row, mIdx) => (
-                            <div key={mIdx} className="grid grid-cols-24 gap-[1px]">
+                            <div key={mIdx} className="grid grid-cols-24 gap-0">
                                 {row.map((val, hIdx) => (
                                     <div
                                         key={hIdx}
-                                        className="h-6 w-full min-w-[12px] group relative hover:border hover:border-gray-500 z-0 hover:z-10"
+                                        className="h-4 w-full min-w-[10px] group relative hover:opacity-80 z-0 hover:z-10"
                                         style={{ backgroundColor: getColor(val) }}
                                     >
-                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-gray-900 text-white text-xs p-1 rounded z-20 whitespace-nowrap">
-                                            {MONTHS[mIdx]} {hIdx}:00 - {val.toFixed(2)}{unit}
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 hidden group-hover:block bg-gray-900 text-white text-xs p-1 rounded z-20 whitespace-nowrap shadow-lg">
+                                            Avg {MONTHS[mIdx]} @ {hIdx}:00: {val.toFixed(2)}{unit}
                                         </div>
                                     </div>
                                 ))}
