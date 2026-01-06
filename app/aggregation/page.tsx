@@ -168,7 +168,9 @@ export default function AggregationPage() {
             const totalLoad = participants.reduce((a, b) => a + b.load_mwh, 0);
             if (totalLoad > 0) {
                 // Determine dominant type for optimization profile
-                const rec = recommendPortfolio(totalLoad, 'Data Center', 0.95, capacities);
+                // Pass empty object for existing_capacities to force a fresh recommendation
+                // matching the load, rather than getting stuck in local minima from current slider values.
+                const rec = recommendPortfolio(totalLoad, 'Data Center', 0.95, {});
                 setCapacities(rec);
             }
             setLoading(false);
