@@ -281,9 +281,9 @@ export default function AggregationPage() {
         <main className="min-h-screen bg-[var(--bg-primary)]">
             <Navigation />
 
-            <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
+            <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] overflow-hidden">
                 {/* Sidebar - Configuration */}
-                <div className="w-full lg:w-96 p-6 border-r border-[var(--border-color)] bg-[var(--bg-secondary)]">
+                <div className="w-full lg:w-96 p-6 border-r border-[var(--border-color)] bg-[var(--bg-secondary)] overflow-y-auto h-full">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold brand-text">Configuration</h2>
                         <button
@@ -459,7 +459,7 @@ export default function AggregationPage() {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 p-6 lg:p-10">
+                <div className="flex-1 p-6 lg:p-10 overflow-y-auto h-full">
 
                     {/* Header Section */}
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
