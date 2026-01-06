@@ -95,17 +95,17 @@ export default function WhitepaperPage() {
                         <div className="prose prose-invert max-w-none text-[var(--text-secondary)] space-y-4">
                             <h3 className="text-lg font-semibold text-white mt-4">Virtual PPA (Fixed-for-Floating)</h3>
                             <p>
-                                The tool models a &quot;Virtual PPA&quot; or <strong>Fixed-for-Floating Swap</strong> financial structure:
+                                The tool models a &quot;Virtual PPA&quot; structure where settlement is strictly tied to the <strong>Generation Asset&apos;s Location</strong>:
                             </p>
                             <ul className="list-disc pl-5 space-y-2">
                                 <li>
-                                    <strong>Settlement Logic:</strong> <code>Cash_Flow = (Market_Price_GeneratorNode - Strike_Price) * Generated_MWh</code>.
+                                    <strong>Settlement Logic:</strong> <code>Settlement = (Asset_Hub_Price - Strike_Price) * Generated_MWh</code>.
                                 </li>
                                 <li>
-                                    <strong>Nodal Basis Risk:</strong> Generator revenue is calculated at the <em>Generator&apos;s Hub</em> (e.g., HB_WEST), while the Load pays based on the <em>Load Hub</em> (e.g., HB_NORTH). The spread between these prices represents real-world basis risk.
+                                    <strong>Specific Hubs:</strong> Solar assets settle against the <em>Solar Hub</em> price (e.g., HB_WEST), while Wind assets settle against the <em>Wind Hub</em> price (e.g., HB_PAN).
                                 </li>
                                 <li>
-                                    <strong>Negative Prices:</strong> The simulation accurately captures negative pricing events, reducing generator revenue during curtailment or oversupply.
+                                    <strong>Net Cost Calculation:</strong> The client&apos;s total cost is their <strong>Physical Load Bill</strong> (at Load Hub prices) minus the <strong>PPA Settlement Credits</strong>. This accurately captures the basis differential between where power is consumed versus where it is generated.
                                 </li>
                             </ul>
 
