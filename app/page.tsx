@@ -96,7 +96,7 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="grid md:grid-cols-2 gap-8">
                         <div>
-                            <Image src="/image.png" alt="Eighty760 Logo" width={240} height={120} className="w-auto object-contain mb-4 h-[120px]" />
+                            <Image src="/image.png" alt="Eighty760 Logo" width={720} height={360} className="w-auto object-contain mb-4 h-[360px]" />
                         </div>
                         <div className="md:text-right">
                             <p className="text-sm mb-4 md:mb-0 text-gray-600 dark:text-gray-400">

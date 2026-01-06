@@ -45,7 +45,7 @@ export default function Navigation() {
                 <div className="flex justify-between items-center py-3">
                     <div className="flex flex-row items-center gap-4">
                         <Link href="/" className="flex items-center">
-                            <Image src="/image.png" alt="Eighty760 Logo" width={240} height={120} className="w-auto object-contain h-[40px] md:h-[60px]" priority />
+                            <Image src="/image.png" alt="Eighty760 Logo" width={240} height={120} className="w-auto object-contain h-[120px] md:h-[180px]" priority />
                         </Link>
 
                         {/* Dark Mode Toggle - Visible on all screens, but improved layout */}
