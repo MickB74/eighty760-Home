@@ -733,27 +733,42 @@ export default function AggregationPage() {
                                     <table className="w-full text-sm">
                                         <tbody>
                                             <tr className="border-b border-[var(--border-color)]">
-                                                <td className="py-3 font-medium">Net Settlement Value (PPA vs Market)</td>
+                                                <td className="py-3 font-medium flex items-center gap-2">
+                                                    Net Settlement Value (PPA vs Market)
+                                                    <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
+                                                </td>
                                                 <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                                                     {result.settlement_value >= 0 ? '+' : ''}${result.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
-                                                <td className="py-3 text-[var(--text-secondary)]">REC Income (Surplus)</td>
+                                                <td className="py-3 text-[var(--text-secondary)] flex items-center gap-2">
+                                                    REC Income (Surplus)
+                                                    <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
+                                                </td>
                                                 <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
-                                                <td className="py-3 text-[var(--text-secondary)]">REC Cost (Deficit)</td>
+                                                <td className="py-3 text-[var(--text-secondary)] flex items-center gap-2">
+                                                    REC Cost (Deficit)
+                                                    <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
+                                                </td>
                                                 <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-[var(--border-color)]">
-                                                <td className="py-3 font-medium text-lg">Total Net Portfolio Cost</td>
+                                                <td className="py-3 font-medium text-lg flex items-center gap-2">
+                                                    Total Net Portfolio Cost
+                                                    <InfoTooltip text="(Total Load × Load Hub Price) - Net Settlement Value + Net REC Costs" />
+                                                </td>
                                                 <td className="py-3 text-right font-bold text-lg text-[var(--text-primary)]">
                                                     ${result.total_cost_net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="py-3 text-[var(--text-secondary)]">Levelized Cost to Load ($/MWh)</td>
+                                                <td className="py-3 text-[var(--text-secondary)] flex items-center gap-2">
+                                                    Levelized Cost to Load ($/MWh)
+                                                    <InfoTooltip text="Total Net Portfolio Cost / Total Annual Load" />
+                                                </td>
                                                 <td className="py-3 text-right text-[var(--text-secondary)]">
                                                     ${result.avg_cost_per_mwh.toFixed(2)}
                                                 </td>
