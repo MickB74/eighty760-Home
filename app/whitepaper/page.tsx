@@ -1,19 +1,27 @@
-'use client';
-
 import React from 'react';
 import Navigation from '@/components/Navigation';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+    title: "Methodology & Technical Architecture | Eighty760",
+    description: "Detailed breakdown of the data sources, simulation engine, and financial models powering the Eighty760 Aggregation Platform.",
+    openGraph: {
+        title: "Methodology & Technical Architecture | Eighty760",
+        description: "Detailed breakdown of the data sources, simulation engine, and financial models powering the Eighty760 Aggregation Platform.",
+    }
+};
 
 export default function WhitepaperPage() {
     return (
-        <main className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)] font-sans">
+        <main className="min-h-screen bg-white dark:bg-slate-900 text-gray-900 dark:text-gray-100 font-sans">
             <Navigation />
 
             <div className="max-w-4xl mx-auto px-6 py-12">
-                <header className="mb-12 border-b border-[var(--border-color)] pb-8">
-                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[var(--brand-color)] to-blue-400">
+                <header className="mb-12 border-b border-gray-200 dark:border-slate-700 pb-8">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-brand dark:from-brand-light to-blue-400">
                         Methodology & Technical Architecture
                     </h1>
-                    <p className="text-xl text-[var(--text-secondary)]">
+                    <p className="text-xl text-gray-600 dark:text-gray-300">
                         A detailed breakdown of the data sources, simulation engine, and financial models powering the Eighty760 Aggregation Platform.
                     </p>
                 </header>
@@ -23,17 +31,17 @@ export default function WhitepaperPage() {
                     {/* Section 1: Core Simulation Engine */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-[var(--brand-color)] bg-opacity-20 text-[var(--brand-color)] flex items-center justify-center text-sm font-bold">1</span>
+                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">1</span>
                             Core Simulation Engine
                         </h2>
-                        <div className="prose prose-invert max-w-none text-[var(--text-secondary)] space-y-4">
+                        <div className="prose prose-invert max-w-none text-gray-600 dark:text-gray-300 space-y-4">
                             <p>
                                 The platform runs a deterministic <strong>8,760-hour (hourly) simulation</strong> of the entire year. Unlike simple monthly averages, this captures the volatility and correlation between renewable generation, market prices, and load demand.
                             </p>
                             <p>
                                 For every single hour of the year ($t=1...8760$), the engine performs the following balance check:
                             </p>
-                            <div className="bg-[var(--bg-secondary)] p-4 rounded-lg border border-[var(--border-color)] font-mono text-sm my-4">
+                            <div className="bg-gray-50 dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 font-mono text-sm my-4">
                                 Net_Load(t) = Load(t) - [ Σ Gen_Asset_i(t) + Battery_Discharge(t) - Battery_Charge(t) ]
                             </div>
                             <ul className="list-disc pl-5 space-y-2">
@@ -50,28 +58,28 @@ export default function WhitepaperPage() {
                     {/* Section 2: Data Sources */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-[var(--brand-color)] bg-opacity-20 text-[var(--brand-color)] flex items-center justify-center text-sm font-bold">2</span>
+                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">2</span>
                             Data Sources & Accuracy
                         </h2>
                         <div className="grid md:grid-cols-2 gap-8">
-                            <div className="bg-[var(--bg-secondary)] p-6 rounded-xl border border-[var(--border-color)]">
-                                <h3 className="text-lg font-bold mb-3 text-[var(--brand-color)]">Market Pricing (ERCOT)</h3>
-                                <p className="text-sm text-[var(--text-secondary)] mb-3">
+                            <div className="bg-gray-50 dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
+                                <h3 className="text-lg font-bold mb-3 text-brand dark:text-brand-light">Market Pricing (ERCOT)</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                                     Pricing data is sourced from <strong>GridStatus.io</strong>, providing 15-minute Real-Time Market (RTM) Settlement Point Prices (SPPs).
                                 </p>
-                                <ul className="text-sm list-disc pl-5 space-y-1 text-[var(--text-secondary)]">
+                                <ul className="text-sm list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-300">
                                     <li><strong>Source:</strong> ERCOT RTM via GridStatus API.</li>
                                     <li><strong>Nodes & Hubs:</strong> We ingest data for key hubs: <code>HB_NORTH</code>, <code>HB_SOUTH</code>, <code>HB_WEST</code>, <code>HB_HOUSTON</code>, and <code>HB_PAN</code>.</li>
                                     <li><strong>Granularity:</strong> 15-minute intervals aggregated to hourly averages for the simulation (8,760 hours/year).</li>
                                     <li><strong>Completeness:</strong> Full historical datasets from 2020 through 2025.</li>
                                 </ul>
                             </div>
-                            <div className="bg-[var(--bg-secondary)] p-6 rounded-xl border border-[var(--border-color)]">
-                                <h3 className="text-lg font-bold mb-3 text-[var(--brand-color)]">Weather &amp; Engineering Models</h3>
-                                <p className="text-sm text-[var(--text-secondary)] mb-3">
+                            <div className="bg-gray-50 dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
+                                <h3 className="text-lg font-bold mb-3 text-brand dark:text-brand-light">Weather &amp; Engineering Models</h3>
+                                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                                     Weather data is sourced from <strong>Open-Meteo Historic Weather API</strong> (ERA5 Reanalysis).
                                 </p>
-                                <ul className="text-sm list-disc pl-5 space-y-1 text-[var(--text-secondary)]">
+                                <ul className="text-sm list-disc pl-5 space-y-1 text-gray-600 dark:text-gray-300">
                                     <li>
                                         <strong>Solar Model:</strong> Uses <code>shortwave_radiation</code> (GHI). Assumes Single-Axis Tracking with ~20% AC system efficiency.
                                     </li>
@@ -89,10 +97,10 @@ export default function WhitepaperPage() {
                     {/* Section 3: Financial Modeling */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-[var(--brand-color)] bg-opacity-20 text-[var(--brand-color)] flex items-center justify-center text-sm font-bold">3</span>
+                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">3</span>
                             Financial Modeling
                         </h2>
-                        <div className="prose prose-invert max-w-none text-[var(--text-secondary)] space-y-4">
+                        <div className="prose prose-invert max-w-none text-gray-600 dark:text-gray-300 space-y-4">
                             <h3 className="text-lg font-semibold text-white mt-4">Virtual PPA (Fixed-for-Floating)</h3>
                             <p>
                                 The tool models a &quot;Virtual PPA&quot; structure where settlement is strictly tied to the <strong>Generation Asset&apos;s Location</strong>:
@@ -125,7 +133,7 @@ export default function WhitepaperPage() {
                     {/* Section 4: Operational Metrics */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-[var(--brand-color)] bg-opacity-20 text-[var(--brand-color)] flex items-center justify-center text-sm font-bold">4</span>
+                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">4</span>
                             Key Metrics Defined
                         </h2>
                         <div className="grid gap-4">
@@ -135,9 +143,9 @@ export default function WhitepaperPage() {
                                 { title: "Productivity", desc: "Total matched MWh divided by the total Nameplate Capacity (MW). Indicates asset utilization efficiency." },
                                 { title: "Net Cost / MWh", desc: "The all-in cost of the portfolio (PPA Settlements + Market Purchases - Surplus Sales) divided by Total Load." }
                             ].map((item, i) => (
-                                <div key={i} className="flex flex-col md:flex-row gap-4 p-4 border-b border-[var(--border-color)] last:border-0 hover:bg-[var(--bg-secondary)] transition-colors rounded-lg">
-                                    <span className="font-bold text-[var(--brand-color)] min-w-[200px]">{item.title}</span>
-                                    <span className="text-[var(--text-secondary)]">{item.desc}</span>
+                                <div key={i} className="flex flex-col md:flex-row gap-4 p-4 border-b border-gray-200 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:bg-slate-800 transition-colors rounded-lg">
+                                    <span className="font-bold text-brand dark:text-brand-light min-w-[200px]">{item.title}</span>
+                                    <span className="text-gray-600 dark:text-gray-300">{item.desc}</span>
                                 </div>
                             ))}
                         </div>

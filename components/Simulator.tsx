@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -14,6 +13,8 @@ import {
     Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import { HOURS } from '@/lib/data/simulation-profiles';
+import { useSimulation } from '@/hooks/useSimulation';
 
 ChartJS.register(
     CategoryScale,
@@ -27,96 +28,23 @@ ChartJS.register(
     Filler
 );
 
-// Simulation data
-const HOURS = Array.from({ length: 24 }, (_, i) => i);
-const BASE_LOAD_PROFILE = [
-    10, 10, 10, 10, 15, 25, 45, 65, 80, 85, 85, 80,
-    80, 85, 85, 80, 65, 45, 25, 20, 15, 10, 10, 10
-];
-const SOLAR_PROFILE = HOURS.map(h => {
-    if (h < 6 || h > 18) return 0;
-    return Math.sin(((h - 6) * Math.PI) / 12);
-});
-const WIND_PROFILE = HOURS.map(h => 0.5 + 0.3 * Math.cos(((h - 4) * Math.PI) / 12));
-
 export default function Simulator() {
-    const [solarCap, setSolarCap] = useState(50);
-    const [windCap, setWindCap] = useState(30);
-    const [batteryCap, setBatteryCap] = useState(0);
-    const [metrics, setMetrics] = useState({
-        cfeScore: 0,
-        gridNeeded: 0,
-        overGen: 0,
-    });
-
-    useEffect(() => {
-        runSimulation();
-    }, [solarCap, windCap, batteryCap]);
-
-    const runSimulation = () => {
-        // Calculate generation
-        const solarGen = SOLAR_PROFILE.map(v => v * solarCap);
-        const windGen = WIND_PROFILE.map(v => v * windCap);
-
-        // Battery simulation
-        let currentCharge = batteryCap * 0.5;
-        const BATTERY_EFFICIENCY = 0.85;
-        const batteryDischarge = [];
-
-        for (let i = 0; i < 24; i++) {
-            const totalRenewable = solarGen[i] + windGen[i];
-            const load = BASE_LOAD_PROFILE[i];
-            const net = totalRenewable - load;
-
-            let discharged = 0;
-
-            if (net > 0) {
-                const space = batteryCap - currentCharge;
-                const charged = Math.min(net, space);
-                currentCharge += charged * BATTERY_EFFICIENCY;
-            } else if (net < 0) {
-                const deficit = Math.abs(net);
-                const maxOutput = currentCharge;
-                discharged = Math.min(deficit, maxOutput);
-                currentCharge -= discharged;
-            }
-
-            batteryDischarge.push(discharged);
-        }
-
-        // Calculate KPIs
-        let totalLoad = 0;
-        let totalMatched = 0;
-        let totalOver = 0;
-        let totalGrid = 0;
-
-        for (let i = 0; i < 24; i++) {
-            const load = BASE_LOAD_PROFILE[i];
-            const gen = solarGen[i] + windGen[i] + batteryDischarge[i];
-
-            totalLoad += load;
-            const match = Math.min(gen, load);
-            totalMatched += match;
-
-            if (gen > load) totalOver += (gen - load);
-            if (gen < load) totalGrid += (load - gen);
-        }
-
-        const cfeScore = totalLoad > 0 ? (totalMatched / totalLoad) * 100 : 0;
-
-        setMetrics({
-            cfeScore: Math.round(cfeScore * 10) / 10,
-            gridNeeded: Math.round(totalGrid),
-            overGen: Math.round(totalOver),
-        });
-    };
+    const {
+        solarCap, setSolarCap,
+        windCap, setWindCap,
+        batteryCap, setBatteryCap,
+        metrics,
+        solarGen,
+        windGen,
+        baseLoad
+    } = useSimulation();
 
     const chartData = {
         labels: HOURS.map(h => `${h}:00`),
         datasets: [
             {
                 label: 'Load (MW)',
-                data: BASE_LOAD_PROFILE,
+                data: baseLoad,
                 borderColor: '#333333',
                 borderWidth: 2,
                 borderDash: [5, 5],
@@ -126,7 +54,7 @@ export default function Simulator() {
             },
             {
                 label: 'Solar Gen',
-                data: SOLAR_PROFILE.map(v => v * solarCap),
+                data: solarGen,
                 backgroundColor: 'rgba(245, 158, 11, 0.85)',
                 borderColor: '#F59E0B',
                 borderWidth: 0,
@@ -136,7 +64,7 @@ export default function Simulator() {
             },
             {
                 label: 'Wind Gen',
-                data: WIND_PROFILE.map(v => v * windCap),
+                data: windGen,
                 backgroundColor: 'rgba(102, 153, 204, 0.85)',
                 borderColor: '#6699CC',
                 borderWidth: 0,
@@ -166,17 +94,18 @@ export default function Simulator() {
                 beginAtZero: true,
                 stacked: true,
                 title: { display: true, text: 'Megawatts (MW)' },
+                grid: { color: 'rgba(0,0,0,0.05)' }
             },
             x: { grid: { display: false } },
         },
     };
 
     return (
-        <section id="simulator" className="py-16" style={{ backgroundColor: 'var(--bg-primary)' }}>
+        <section id="simulator" className="py-16 bg-white dark:bg-slate-900 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="mb-10 text-center">
                     <h2 className="text-3xl font-bold brand-text">Interactive Portfolio Simulator</h2>
-                    <p className="mt-2 max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+                    <p className="mt-2 max-w-2xl mx-auto text-gray-600 dark:text-gray-300">
                         Experience the <strong>Methodology</strong> described in the whitepaper. Adjust the generation
                         capacities below to see how they stack up against a typical Office building load profile.
                     </p>
@@ -184,136 +113,110 @@ export default function Simulator() {
 
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Controls */}
-                    <div className="p-6 rounded-lg lg:col-span-1" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                    <div className="p-6 rounded-lg lg:col-span-1 bg-gray-100 dark:bg-slate-800 transition-colors duration-300">
                         <h3 className="text-lg font-bold brand-text mb-6 flex items-center gap-2">
                             <span>🎛️</span> Portfolio Inputs
                         </h3>
 
                         <div className="space-y-8">
-                            <div>
-                                <div className="flex justify-between mb-2">
-                                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                        Solar Capacity
-                                    </label>
-                                    <span
-                                        className="text-sm font-mono px-2 py-1 rounded"
-                                        style={{ color: 'var(--brand-color)', backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}
-                                    >
-                                        {solarCap} MW
-                                    </span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="200"
-                                    value={solarCap}
-                                    onChange={(e) => setSolarCap(parseInt(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-
-                            <div>
-                                <div className="flex justify-between mb-2">
-                                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                        Wind Capacity
-                                    </label>
-                                    <span
-                                        className="text-sm font-mono px-2 py-1 rounded"
-                                        style={{ color: 'var(--brand-color)', backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}
-                                    >
-                                        {windCap} MW
-                                    </span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="200"
-                                    value={windCap}
-                                    onChange={(e) => setWindCap(parseInt(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
-
-                            <div>
-                                <div className="flex justify-between mb-2">
-                                    <label className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                                        Battery Storage
-                                    </label>
-                                    <span
-                                        className="text-sm font-mono px-2 py-1 rounded"
-                                        style={{ color: 'var(--brand-color)', backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}
-                                    >
-                                        {batteryCap} MWh
-                                    </span>
-                                </div>
-                                <input
-                                    type="range"
-                                    min="0"
-                                    max="500"
-                                    step="10"
-                                    value={batteryCap}
-                                    onChange={(e) => setBatteryCap(parseInt(e.target.value))}
-                                    className="w-full"
-                                />
-                            </div>
+                            <ControlInput
+                                label="Solar Capacity"
+                                value={solarCap}
+                                setValue={setSolarCap}
+                                max={200}
+                                unit="MW"
+                            />
+                            <ControlInput
+                                label="Wind Capacity"
+                                value={windCap}
+                                setValue={setWindCap}
+                                max={200}
+                                unit="MW"
+                            />
+                            <ControlInput
+                                label="Battery Storage"
+                                value={batteryCap}
+                                setValue={setBatteryCap}
+                                max={500}
+                                step={10}
+                                unit="MWh"
+                            />
                         </div>
                     </div>
 
                     {/* Visualization */}
-                    <div
-                        className="p-6 rounded-lg lg:col-span-2 flex flex-col shadow-sm"
-                        style={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)' }}
-                    >
+                    <div className="p-6 rounded-lg lg:col-span-2 flex flex-col shadow-sm bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 transition-colors duration-300">
                         <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                            <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                                 24-Hour Generation Profile
                             </h3>
-                            <div className="flex gap-4 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-3 h-3 bg-gray-800 rounded-full"></div> Load
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#F59E0B' }}></div> Solar
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#6699CC' }}></div> Wind
-                                </div>
+                            <div className="flex gap-4 text-xs text-gray-600 dark:text-gray-400">
+                                <LegendItem color="bg-gray-800" label="Load" />
+                                <LegendItem color="bg-amber-500" label="Solar" />
+                                <LegendItem color="bg-[#6699CC]" label="Wind" />
                             </div>
                         </div>
 
-                        <div className="flex-grow flex items-center justify-center rounded-lg p-2" style={{ backgroundColor: 'var(--card-bg)' }}>
-                            <div className="chart-container">
+                        <div className="flex-grow flex items-center justify-center rounded-lg p-2 bg-white dark:bg-slate-800">
+                            <div className="chart-container w-full h-[300px]">
                                 <Line data={chartData} options={chartOptions} />
                             </div>
                         </div>
 
                         {/* KPIs */}
                         <div className="grid grid-cols-3 gap-4 mt-6">
-                            <div className="stMetric text-center">
-                                <div className="stMetricLabel mb-1">CFE Score</div>
-                                <div className="stMetricValue">{metrics.cfeScore}%</div>
-                                <div className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
-                                    Hourly Match
-                                </div>
-                            </div>
-                            <div className="stMetric text-center">
-                                <div className="stMetricLabel mb-1">Grid Needed</div>
-                                <div className="stMetricValue">{metrics.gridNeeded.toLocaleString()}</div>
-                                <div className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
-                                    MWh Deficit
-                                </div>
-                            </div>
-                            <div className="stMetric text-center">
-                                <div className="stMetricLabel mb-1">Overgeneration</div>
-                                <div className="stMetricValue">{metrics.overGen.toLocaleString()}</div>
-                                <div className="text-xs mt-1" style={{ color: 'var(--text-tertiary)' }}>
-                                    MWh Surplus
-                                </div>
-                            </div>
+                            <KpiCard label="CFE Score" value={`${metrics.cfeScore}%`} sub="Hourly Match" />
+                            <KpiCard label="Grid Needed" value={metrics.gridNeeded.toLocaleString()} sub="MWh Deficit" />
+                            <KpiCard label="Overgeneration" value={metrics.overGen.toLocaleString()} sub="MWh Surplus" />
                         </div>
                     </div>
                 </div>
             </div>
         </section>
+    );
+}
+
+// Sub-components for cleaner code
+function ControlInput({ label, value, setValue, max, step = 1, unit }: { label: string, value: number, setValue: (v: number) => void, max: number, step?: number, unit: string }) {
+    return (
+        <div>
+            <div className="flex justify-between mb-2">
+                <label className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                    {label}
+                </label>
+                <span className="text-sm font-mono px-2 py-1 rounded text-brand dark:text-brand-light bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
+                    {value} {unit}
+                </span>
+            </div>
+            <input
+                type="range"
+                min="0"
+                max={max}
+                step={step}
+                value={value}
+                onChange={(e) => setValue(parseInt(e.target.value))}
+                className="w-full"
+            />
+        </div>
+    );
+}
+
+function LegendItem({ color, label }: { color: string, label: string }) {
+    return (
+        <div className="flex items-center gap-1">
+            <div className={`w-3 h-3 rounded-full ${color}`}></div> {label}
+        </div>
+    );
+}
+
+function KpiCard({ label, value, sub }: { label: string, value: string, sub: string }) {
+    return (
+        <div className="text-center p-4 rounded-lg bg-gray-50 dark:bg-slate-700 transition-colors duration-300">
+            <div className="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">{label}</div>
+            <div className="font-mono text-2xl font-bold text-brand dark:text-brand-light">{value}</div>
+            <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">
+                {sub}
+            </div>
+        </div>
     );
 }

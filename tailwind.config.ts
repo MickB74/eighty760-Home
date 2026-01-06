@@ -6,18 +6,19 @@ const config: Config = {
         "./components/**/*.{js,ts,jsx,tsx,mdx}",
         "./app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
-    darkMode: ['class'],
+    darkMode: 'class',
     theme: {
         extend: {
             colors: {
                 brand: {
-                    light: '#60A5FA',
-                    DEFAULT: '#285477',
+                    light: '#60A5FA', // Blue-400
+                    DEFAULT: '#285477', // Custom Deep Blue
+                    dark: '#1E3A8A', // Blue-900 (Optional, for darker needed)
                 },
             },
             fontFamily: {
-                sans: ['Inter', 'sans-serif'],
-                mono: ['IBM Plex Mono', 'monospace'],
+                sans: ['var(--font-inter)', 'sans-serif'],
+                mono: ['var(--font-ibm-plex-mono)', 'monospace'],
             },
         },
     },

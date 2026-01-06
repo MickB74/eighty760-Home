@@ -1,72 +1,82 @@
 # Eighty760 - 24/7 CFE Simulation Framework
 
-A web-based simulation framework for understanding how 24/7 Carbon-Free Energy affects your portfolio.
+A powerful, web-based simulation framework for modeling, analyzing, and optimizing 24/7 Carbon-Free Energy (CFE) portfolios.
 
 ## Project Overview
 
-Eighty760 models, analyzes, and optimizes clean energy portfolios against the rigorous standard of meeting demand with carbon-free energy every hour of the day.
+Eighty760 acts as a "digital twin" for energy portfolios, allowing users to verify how renewable assets (Solar, Wind, Battery Storage) perform against real-world load profiles. The goal is to move beyond simple "annual net zero" offsets and achieve true hourly matching of supply and demand.
 
 ## Features
 
-- **Interactive Portfolio Simulator**: Adjust solar, wind, and battery storage capacities to see real-time impacts
-- **24-Hour Generation Profiles**: Visualize how different renewable resources stack up against load profiles
-- **CFE Score Calculation**: Understand hourly matching efficiency
-- **Dark Mode Support**: Toggle between light and dark themes
-- **Methodology Documentation**: Learn about generation modeling, emissions analysis, and scarcity pricing
+- **Interactive Portfolio Simulator**: Adjust solar, wind, and battery capacities in real-time.
+- **24-Hour Generation Profiles**: Visualize hourly generation vs. load with dynamic charts.
+- **CFE Score Calculation**: Instant feedback on Hourly Match %, Grid Deficit, and Overgeneration.
+- **Dark Mode Support**: Fully responsive design with light/dark themes.
+- **Methodology Documentation**: In-depth explanation of generation modeling, emissions analysis, and scarcity pricing.
 
-## Deployment
+## Tech Stack
 
-### Deploy to Vercel
+- **Framework**: [Next.js 14](https://nextjs.org/) (App Router)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/) & CSS Variables
+- **Visualization**: [Chart.js](https://www.chartjs.org/) via `react-chartjs-2`
+- **Data Processing**: Python (for historical price/weather data scripts)
 
-1. **Install Vercel CLI** (if not already installed):
+## Getting Started
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**:
    ```bash
-   npm install -g vercel
+   git clone https://github.com/MickB74/eighty760-Home.git
+   cd eighty760-Home
    ```
 
-2. **Deploy from the project directory**:
+2. **Install dependencies**:
    ```bash
-   vercel
+   npm install
    ```
 
-3. **For production deployment**:
+3. **Run the development server**:
    ```bash
-   vercel --prod
+   npm run dev
    ```
 
-### Manual Deployment via Vercel Dashboard
-
-1. Visit [vercel.com](https://vercel.com)
-2. Sign in with your GitHub account
-3. Click "Add New Project"
-4. Import this repository
-5. Vercel will automatically detect it as a static site
-6. Click "Deploy"
-
-## Local Development
-
-Simply open `Whitepaper.html` or `simulator.html` in your browser. No build process required.
+4. **Open your browser**:
+   Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## Project Structure
 
-```
+```bash
 eighty760-Home/
-├── Whitepaper.html    # Main landing page with methodology
-├── simulator.html     # Interactive simulator page
-├── style.css          # Shared styles with light/dark mode
-├── image.png          # Eighty760 logo
-├── index.html         # Entry point (redirects to Whitepaper.html)
-├── vercel.json        # Vercel configuration
-└── README.md          # This file
+├── app/
+│   ├── layout.tsx      # Root layout (Metadata, Fonts, Global providers)
+│   ├── page.tsx        # Home page (Hero, Simulator wrapper, Methodology)
+│   ├── aggregation/    # Aggregation tool route
+│   └── whitepaper/     # Methodology documentation route
+├── components/
+│   ├── Simulator.tsx   # Core simulation logic and UI
+│   ├── Navigation.tsx  # Responsive nav bar with dark mode toggle
+│   └── Hero.tsx        # Hero section component
+├── scripts/            # Python utilities for data fetching/processing
+├── public/             # Static assets (images, icons)
+├── tailwind.config.ts  # Tailwind configuration
+└── globals.css         # Global CSS variables and base styles
 ```
 
-## Technologies Used
+## Deployment
 
-- **HTML5**: Structure
-- **TailwindCSS**: Utility-first CSS framework (via CDN)
-- **Vanilla CSS**: Custom theming and components
-- **Chart.js**: Interactive visualizations
-- **JavaScript**: Simulation logic and interactivity
+The application is optimized for deployment on [Vercel](https://vercel.com/).
+
+1. Push your code to a GitHub repository.
+2. Import the project into Vercel.
+3. Vercel will automatically detect Next.js and deploy.
 
 ## License
 
-© 2025 Eighty760 Simulation Framework
+© 2026 Eighty760 Simulation Framework
