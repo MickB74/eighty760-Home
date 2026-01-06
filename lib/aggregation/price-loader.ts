@@ -61,7 +61,7 @@ export function getAvailableYears(): number[] {
 export function getYearLabel(year: number | 'Synthetic' | 'Average'): string {
     if (year === 'Synthetic') return 'Synthetic (Duck Curve)';
     if (year === 'Average') return 'Average (2020-2025)';
-    return `${year} (HB_NORTH)`;
+    return `${year}`;
 }
 
 export async function loadAveragePriceProfile(years: number[]): Promise<number[] | null> {

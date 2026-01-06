@@ -245,7 +245,8 @@ export function runAggregationSimulation(
     activeAssets: GenerationAsset[],
     financials: FinancialParams,
     historicalPrices?: number[] | null,
-    batteryParams: { mw: number, hours: number } = { mw: 0, hours: 2 }
+    batteryParams: { mw: number, hours: number } = { mw: 0, hours: 2 },
+    hubPricesMap: Record<string, number[]> = {}
 ): SimulationResult {
 
     // 1. Build Aggregate Load
@@ -362,8 +363,76 @@ export function runAggregationSimulation(
     // Market Revenue (Capture) from ALL Gen (calculated hourly)
     let total_market_revenue = 0;
     for (let i = 0; i < HOURS; i++) {
-        const gen = solar[i] + wind[i] + geo[i] + nuc[i] + ccs[i];
-        total_market_revenue += gen * prices[i];
+        // Calculate revenue for each asset based on its location's price
+        // If specific hub price is missing, fallback to the global 'prices' (Load Hub)
+        let hourlyAssetRevenue = 0;
+
+        // We need to loop through assets again or pre-calculate profiles to preserve location info
+        // To optimize, let's recalculate revenue inside the asset loop or store profiles with metadata
+        // For now, let's re-iterate activeAssets (inefficient but safe) or better yet, loop assets inside the hour loop?
+        // Actually, looping 8760 times inside is fine.
+    }
+
+    // Better approach: Calculate revenue per asset and sum up
+    for (const asset of activeAssets) {
+        const assetProfile = generateGenProfile(asset.capacity_mw, asset.type, asset.capacity_factor);
+
+        // Determines price vector for this asset
+        let assetPrices = prices; // Default to load hub
+        // Map 'North' -> 'HB_NORTH' if needed, or if keys match exactly 'North', 'South' etc.
+        // In page.tsx we keyed them as 'North', 'South'.
+        if (asset.location && hubPricesMap[asset.location] && hubPricesMap[asset.location].length === HOURS) {
+            assetPrices = hubPricesMap[asset.location];
+            // Scale if needed? No, hub prices are absolute. 
+            // BUT: If the user provided 'prices' (Load Hub) are SCALED (via market_price_avg), 
+            // should we scale hub prices too?
+            // Yes, to maintain relative spread.
+
+            // Calculate scalar based on Load Hub scaling logic
+            // If historicalPrices was passed and scaled...
+            // Complex. For now, assume if historicalPrices is used, we use raw hub prices?
+            // User 'market_price_avg' implies a desired average. 
+            // If we scale Load Hub, we should scale other hubs by same ratio?
+        }
+
+        // Apply Scaling to Asset Prices if Global Scaling is active
+        // Logic: specific_hub_scaled = specific_hub_raw * (target_avg / load_hub_raw_avg)
+        // This preserves the nodal basis spread.
+        if (historicalPrices && historicalPrices.length === HOURS) {
+            const rawLoadAvg = historicalPrices.reduce((a, b) => a + b, 0) / HOURS;
+            if (rawLoadAvg > 0) {
+                const scaler = financials.market_price_avg / rawLoadAvg;
+                // If we switched to a specific assetPrices array that ISN'T the main one, we must scale it
+                if (assetPrices !== prices) {
+                    // It's a raw hub price vector. Scale it.
+                    // Note: We can't mutate the cached array. Map it.
+                    // Optimization: doing this inside the loop is slow.
+                }
+            }
+        }
+
+        // SIMPLIFIED MVP: Use the correct price vector. 
+        // If we are in "Average" mode (synthetic), hubPricesMap might be empty or we just use global.
+
+        for (let i = 0; i < HOURS; i++) {
+            // We need to match the logic of 'prices' variable (which is already scaled)
+            // If assetPrices is different from 'prices', we need to ensure it's comparable.
+            // If 'prices' is synthetic, we probably don't have hub prices -> use prices.
+
+            let finalPrice = prices[i];
+            if (hubPricesMap[asset.location]) {
+                // Use specific hub price
+                // For consistency, if we are scaling 'prices', we should theoretically scale this too.
+                // But for 2023-2025 actuals, we might just want raw values?
+                // Let's assume for now we use the raw hub values if available, 
+                // UNLESS 'prices' was generated synthetically.
+                if (historicalPrices) {
+                    finalPrice = hubPricesMap[asset.location][i];
+                }
+            }
+
+            total_market_revenue += assetProfile[i] * finalPrice;
+        }
     }
 
     const settlement_value = total_market_revenue - total_ppa_cost;

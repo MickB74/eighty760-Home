@@ -18,7 +18,7 @@ import {
 import { Participant, TechCapacity, FinancialParams, SimulationResult, BatteryFinancialParams, GenerationAsset } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { recommendPortfolio } from '@/lib/aggregation/optimizer';
-import { loadERCOTPrices, getAvailableYears, getYearLabel, loadAveragePriceProfile } from '@/lib/aggregation/price-loader';
+import { loadERCOTPrices, getAvailableYears, getYearLabel, loadAveragePriceProfile, loadHubPrices } from '@/lib/aggregation/price-loader';
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
 import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
@@ -73,7 +73,9 @@ export default function AggregationPage() {
 
     // 4. Price Data State
     const [selectedYear, setSelectedYear] = useState<number | 'Average'>('Average');
+    const [selectedHub, setSelectedHub] = useState<string>('North'); // Default Load Hub
     const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
+    const [allHubPrices, setAllHubPrices] = useState<Record<string, number[]>>({}); // Cache for assets
 
     // 5. Battery Financial Params (CVTA)
     const [batteryParams, setBatteryParams] = useState<BatteryFinancialParams>({
@@ -214,7 +216,8 @@ export default function AggregationPage() {
                 activeAssets,
                 financials,
                 historicalPrices,
-                { mw: activeCapacities.Battery_MW, hours: activeCapacities.Battery_Hours }
+                { mw: activeCapacities.Battery_MW, hours: activeCapacities.Battery_Hours },
+                allHubPrices // Pass map to engine
             );
             setResult(res);
 
@@ -271,7 +274,20 @@ export default function AggregationPage() {
                 return;
             }
 
-            const prices = await loadERCOTPrices(selectedYear);
+            let prices: number[] | null = null;
+            // Load specific year and hub
+            // 1. Load Global/Load Hub Price
+            prices = await loadHubPrices(selectedYear, selectedHub);
+
+            // 2. Load ALL Hubs for Assets (for 2023-2025)
+            const hubs = ['North', 'South', 'West', 'Houston', 'Panhandle'];
+            const hubMap: Record<string, number[]> = {};
+            for (const h of hubs) {
+                const hubP = await loadHubPrices(selectedYear, h);
+                if (hubP) hubMap[h] = hubP;
+            }
+            setAllHubPrices(hubMap);
+
             setHistoricalPrices(prices);
 
             // Determine REC price
@@ -293,7 +309,7 @@ export default function AggregationPage() {
             }
         };
         loadPrices();
-    }, [selectedYear]);
+    }, [selectedYear, selectedHub]);
 
     // Run sim whenever inputs change (debounced slightly?)
     useEffect(() => {
@@ -330,17 +346,52 @@ export default function AggregationPage() {
                             <h3 className="font-semibold mb-3 border-b border-[var(--border-color)] pb-1">1. Market Settings</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="text-xs text-[var(--text-secondary)] block mb-1">Price Year</label>
-                                    <select
-                                        value={selectedYear}
-                                        onChange={(e) => setSelectedYear(e.target.value === 'Average' ? 'Average' : parseInt(e.target.value))}
-                                        className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
-                                    >
-                                        <option value="Average">{getYearLabel('Average')}</option>
-                                        {getAvailableYears().map(year => (
-                                            <option key={year} value={year}>{getYearLabel(year)}</option>
-                                        ))}
-                                    </select>
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Price Year</label>
+                                            <select
+                                                value={selectedYear}
+                                                onChange={(e) => setSelectedYear(e.target.value === 'Average' ? 'Average' : parseInt(e.target.value))}
+                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
+                                            >
+                                                <option value="Average">{getYearLabel('Average')}</option>
+                                                {getAvailableYears().map(year => (
+                                                    <option key={year} value={year}>{getYearLabel(year)}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Hub</label>
+                                            <select
+                                                value={selectedHub}
+                                                onChange={(e) => setSelectedHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
+                                                disabled={typeof selectedYear !== 'number'}
+                                            >
+                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                    <option key={h} value={h}>{h}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div className="w-1/3">
+                                            <label className="text-xs text-[var(--text-secondary)] block mb-1">Hub</label>
+                                            <select
+                                                value={selectedHub}
+                                                onChange={(e) => setSelectedHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
+                                                disabled={typeof selectedYear !== 'number'}
+                                            >
+                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                    <option key={h} value={h}>{h}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {typeof selectedYear === 'number' && selectedYear < 2023 && (
+                                        <div className="text-[10px] text-amber-500 mt-1">
+                                            * Hub data only available for 2023-2025. Older years use default.
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
