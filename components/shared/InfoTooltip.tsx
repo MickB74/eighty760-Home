@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useRef } from 'react';
 
 interface InfoTooltipProps {
     text: string;
@@ -7,37 +9,48 @@ interface InfoTooltipProps {
 }
 
 export default function InfoTooltip({ text, size = 'sm', className = '' }: InfoTooltipProps) {
+    const [isVisible, setIsVisible] = useState(false);
+    const [position, setPosition] = useState({ top: 0, left: 0 });
+    const triggerRef = useRef<HTMLDivElement>(null);
+
     const sizeClasses = {
         sm: 'w-4 h-4 text-xs',
         md: 'w-5 h-5 text-sm',
         lg: 'w-6 h-6 text-base'
     };
 
+    const handleMouseEnter = () => {
+        if (triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            setPosition({
+                top: rect.top - 8, // 8px spacing above
+                left: rect.left + rect.width / 2
+            });
+            setIsVisible(true);
+        }
+    };
+
     return (
-        <div className={`relative inline-flex items-center group ${className}`}>
-            <div className={`
-                ${sizeClasses[size]} 
-                flex items-center justify-center 
-                rounded-full 
-                border border-[var(--text-tertiary)] text-[var(--text-tertiary)]
-                group-hover:border-[var(--brand-color)] group-hover:text-[var(--brand-color)]
-                cursor-help transition-colors
-            `}>
+        <>
+            <div
+                ref={triggerRef}
+                className={`inline-flex items-center justify-center rounded-full border border-[var(--text-tertiary)] text-[var(--text-tertiary)] hover:border-[var(--brand-color)] hover:text-[var(--brand-color)] cursor-help transition-colors ${sizeClasses[size]} ${className}`}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={() => setIsVisible(false)}
+            >
                 <span className="font-serif italic font-bold">i</span>
             </div>
 
-            {/* Tooltip Bubble */}
-            <div className="
-                absolute z-50 bottom-full mb-2 left-1/2 -translate-x-1/2 
-                hidden group-hover:block 
-                w-64 p-2 
-                bg-gray-800 text-white text-xs rounded shadow-lg
-                pointer-events-none animate-in fade-in zoom-in-95 duration-200
-            ">
-                {text}
-                {/* Arrow */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
-            </div>
-        </div>
+            {isVisible && text && (
+                <div
+                    className="fixed z-[9999] px-3 py-2 bg-gray-800 text-white text-xs rounded shadow-lg max-w-xs pointer-events-none transform -translate-x-1/2 -translate-y-full"
+                    style={{ top: position.top, left: position.left }}
+                >
+                    {text}
+                    {/* Arrow */}
+                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
+                </div>
+            )}
+        </>
     );
 }

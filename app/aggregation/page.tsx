@@ -74,6 +74,18 @@ export default function AggregationPage() {
         ancillary_input: 50000          // $50k/month default
     });
 
+    // 6. Technology Exclusion
+    const [excludedTechs, setExcludedTechs] = useState<Set<string>>(new Set());
+
+    const toggleTechExclusion = (tech: string) => {
+        setExcludedTechs(prev => {
+            const next = new Set(prev);
+            if (next.has(tech)) next.delete(tech);
+            else next.add(tech);
+            return next;
+        });
+    };
+
     const [cvtaResult, setCvtaResult] = useState<BatteryCVTAResult | null>(null);
 
     // Results
@@ -154,7 +166,15 @@ export default function AggregationPage() {
     const runSimulation = () => {
         setLoading(true);
         setTimeout(() => {
-            const res = runAggregationSimulation(participants, capacities, financials, historicalPrices);
+            // Filter excluded techs (zero out capacity)
+            const activeCapacities = { ...capacities };
+            excludedTechs.forEach(t => {
+                if (t in activeCapacities) {
+                    (activeCapacities as any)[t] = 0;
+                }
+            });
+
+            const res = runAggregationSimulation(participants, activeCapacities, financials, historicalPrices);
             setResult(res);
 
             // Calculate Battery CVTA if battery exists
@@ -207,7 +227,7 @@ export default function AggregationPage() {
         } else {
             setResult(null);
         }
-    }, [participants, capacities, financials, historicalPrices]);
+    }, [participants, capacities, financials, historicalPrices, excludedTechs]);
 
     // --- Render ---
 
@@ -315,10 +335,20 @@ export default function AggregationPage() {
                             <h3 className="font-semibold mb-3 border-b border-[var(--border-color)] pb-1">2. Portfolio Mix (MW)</h3>
                             <div className="space-y-4">
                                 {(['Solar', 'Wind', 'CCS Gas', 'Geothermal', 'Nuclear'] as const).map(tech => (
-                                    <div key={tech}>
-                                        <div className="flex justify-between text-xs mb-1">
-                                            <span>{tech}</span>
-                                            <span className="font-medium text-[var(--text-primary)]">{capacities[tech].toLocaleString(undefined, { maximumFractionDigits: 0 })} MW</span>
+                                    <div key={tech} className={excludedTechs.has(tech) ? 'opacity-50' : ''}>
+                                        <div className="flex justify-between items-center text-xs mb-1">
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!excludedTechs.has(tech)}
+                                                    onChange={() => toggleTechExclusion(tech)}
+                                                    className="accent-[#285477] w-3 h-3"
+                                                />
+                                                <span>{tech}</span>
+                                            </div>
+                                            <span className="font-medium text-[var(--text-primary)]">
+                                                {excludedTechs.has(tech) ? 'Excluded' : `${capacities[tech].toLocaleString(undefined, { maximumFractionDigits: 0 })} MW`}
+                                            </span>
                                         </div>
                                         <input
                                             type="range"
@@ -328,6 +358,7 @@ export default function AggregationPage() {
                                             value={capacities[tech]}
                                             onChange={(e) => setCapacities({ ...capacities, [tech]: parseFloat(e.target.value) })}
                                             className="w-full accent-[#285477]"
+                                            disabled={excludedTechs.has(tech)}
                                         />
                                     </div>
                                 ))}
