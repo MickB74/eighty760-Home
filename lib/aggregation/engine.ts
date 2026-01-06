@@ -399,7 +399,8 @@ export function runAggregationSimulation(
         let assetPrices = prices; // Default to Load Hub (already scaled if needed)
 
         // Use specific Hub Prices if available
-        if (asset.location && hubPricesMap[asset.location] && hubPricesMap[asset.location].length === HOURS) {
+        // Relax check to >= HOURS to support Leap Years (8784)
+        if (asset.location && hubPricesMap[asset.location] && hubPricesMap[asset.location].length >= HOURS) {
             // Check if we need to scale these raw hub prices
             // Logic: If 'prices' is scaled from historicalPrices, we should scale hub prices similarly
             // to preserve the basis spread relative to the 'target_avg'.
@@ -407,8 +408,8 @@ export function runAggregationSimulation(
 
             // If historicalPrices is present, 'prices' is (historicalPrices * scaler).
             // We should apply the same scaler to the hub prices.
-            if (historicalPrices && historicalPrices.length === HOURS) {
-                const currentSum = historicalPrices.reduce((a, b) => a + b, 0);
+            if (historicalPrices && historicalPrices.length >= HOURS) {
+                const currentSum = historicalPrices.slice(0, HOURS).reduce((a, b) => a + b, 0);
                 const currentAvg = currentSum / HOURS;
                 // Avoid div by zero
                 if (currentAvg > 0.0001) {
