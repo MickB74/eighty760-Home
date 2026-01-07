@@ -79,8 +79,8 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`font-medium transition duration-200 ${isActive(link.path)
-                                        ? 'text-electric-cyan'
-                                        : 'text-slate-300 hover:text-electric-cyan'
+                                        ? 'text-energy-green'
+                                        : 'text-slate-300 hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}
@@ -90,7 +90,7 @@ export default function Navigation() {
                         {/* High-contrast CTA */}
                         <a
                             href="mailto:contact@eighty760.com"
-                            className="px-6 py-2 bg-electric-cyan text-navy-950 font-bold rounded-lg hover:bg-electric-cyan/90 transition-all hover:scale-105"
+                            className="px-6 py-2 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-all hover:scale-105"
                         >
                             Request Demo
                         </a>
@@ -100,7 +100,7 @@ export default function Navigation() {
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-slate-300 hover:text-electric-cyan focus:outline-none p-2"
+                            className="text-slate-300 hover:text-energy-green focus:outline-none p-2"
                             aria-label="Toggle mobile menu"
                         >
                             {isMobileMenuOpen ? (
@@ -131,8 +131,8 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`block px-4 py-3 rounded-lg text-base font-medium transition duration-200 ${isActive(link.path)
-                                        ? 'bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/20'
-                                        : 'text-slate-300 hover:bg-white/5 hover:text-electric-cyan'
+                                        ? 'bg-energy-green/10 text-energy-green border border-energy-green/20'
+                                        : 'text-slate-300 hover:bg-white/5 hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}
@@ -140,7 +140,7 @@ export default function Navigation() {
                         ))}
                         <a
                             href="mailto:contact@eighty760.com"
-                            className="block px-4 py-3 mt-4 bg-electric-cyan text-navy-950 font-bold rounded-lg text-center hover:bg-electric-cyan/90 transition"
+                            className="block px-4 py-3 mt-4 bg-energy-green text-navy-950 font-bold rounded-lg text-center hover:bg-energy-green/90 transition"
                         >
                             Request Demo
                         </a>

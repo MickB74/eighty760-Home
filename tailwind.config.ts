@@ -18,7 +18,7 @@ const config: Config = {
                 navy: {
                     950: '#0a0a0b', // Deep dark for command center aesthetic
                 },
-                'electric-cyan': '#00ffcc', // High-tech accent color
+                'energy-green': '#00ff88', // Cohesive bright green for clean energy theme
             },
             fontFamily: {
                 sans: ['Inter', 'var(--font-inter)', 'sans-serif'],

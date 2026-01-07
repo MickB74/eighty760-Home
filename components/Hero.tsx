@@ -21,14 +21,14 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
                     >
-                        <div className="inline-block px-4 py-2 mb-6 text-sm font-semibold tracking-wider text-electric-cyan uppercase bg-electric-cyan/10 border border-electric-cyan/20 rounded-full backdrop-blur-sm">
+                        <div className="inline-block px-4 py-2 mb-6 text-sm font-semibold tracking-wider text-energy-green uppercase bg-energy-green/10 border border-energy-green/20 rounded-full backdrop-blur-sm">
                             Granular Carbon Accounting
                         </div>
 
                         <h1 className="text-5xl sm:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
                             24/7 CFE
                             <br />
-                            <span className="text-electric-cyan">Intelligence</span>
+                            <span className="text-energy-green">Intelligence</span>
                         </h1>
 
                         <p className="text-xl mb-8 leading-relaxed text-slate-300">
@@ -40,7 +40,7 @@ export default function Hero() {
                         <div className="flex flex-col sm:flex-row gap-4">
                             <button
                                 onClick={scrollToSimulator}
-                                className="px-8 py-4 text-lg font-bold bg-electric-cyan text-navy-950 rounded-lg shadow-lg transition hover:bg-electric-cyan/90 hover:scale-105 transform"
+                                className="px-8 py-4 text-lg font-bold bg-energy-green text-navy-950 rounded-lg shadow-lg transition hover:bg-energy-green/90 hover:scale-105 transform"
                             >
                                 Run Interactive Model
                             </button>

@@ -134,7 +134,7 @@ export default function CarbonHeatmap({ className = '' }: CarbonHeatmapProps) {
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
             >
-                <div className="bg-electric-cyan text-navy-950 px-3 py-1 rounded-full text-xs font-bold font-mono shadow-lg">
+                <div className="bg-energy-green text-navy-950 px-3 py-1 rounded-full text-xs font-bold font-mono shadow-lg">
                     {currentHour}:00
                 </div>
             </motion.div>
