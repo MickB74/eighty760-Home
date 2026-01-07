@@ -63,13 +63,13 @@ export default function Navigation() {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center py-4">
                     <div className="flex flex-row items-center gap-4">
-                        <Link href="/" className="flex items-center gap-3">
+                        <Link href="/" className="flex items-center">
                             <Image
                                 src="/logo.png"
                                 alt="Eighty760 Logo"
-                                width={140}
-                                height={40}
-                                className="h-10 w-auto"
+                                width={240}
+                                height={120}
+                                className="w-auto object-contain h-[80px] md:h-[100px]"
                                 priority
                             />
                         </Link>
