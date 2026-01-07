@@ -44,14 +44,17 @@ export default function Navigation() {
     const navLinks = [
         { name: 'Home', path: '/' },
         { name: 'ERCOT Aggregation', path: '/aggregation' },
+        { name: 'Analysis', path: '/analysis' },
+        { name: 'Resources', path: '/blog' },
+        { name: 'About', path: '/about' },
         { name: 'Methodology', path: '/whitepaper' },
     ];
 
     return (
         <motion.nav
             className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-                    ? 'backdrop-blur-md bg-navy-950/80 border-b border-white/10 shadow-lg'
-                    : 'bg-transparent border-b border-transparent'
+                ? 'backdrop-blur-md bg-navy-950/80 border-b border-white/10 shadow-lg'
+                : 'bg-transparent border-b border-transparent'
                 }`}
             initial={{ y: -100 }}
             animate={{ y: 0 }}
@@ -79,8 +82,8 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`font-medium transition duration-200 ${isActive(link.path)
-                                        ? 'text-energy-green'
-                                        : 'text-slate-300 hover:text-energy-green'
+                                    ? 'text-energy-green'
+                                    : 'text-slate-300 hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}
@@ -131,8 +134,8 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`block px-4 py-3 rounded-lg text-base font-medium transition duration-200 ${isActive(link.path)
-                                        ? 'bg-energy-green/10 text-energy-green border border-energy-green/20'
-                                        : 'text-slate-300 hover:bg-white/5 hover:text-energy-green'
+                                    ? 'bg-energy-green/10 text-energy-green border border-energy-green/20'
+                                    : 'text-slate-300 hover:bg-white/5 hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}
