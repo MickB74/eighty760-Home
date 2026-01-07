@@ -1050,11 +1050,43 @@ export default function AggregationPage() {
                                                 <td className={`py-3 text-right ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                                                     {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
-                                            </tr>
                                         </tfoot>
                                     </table>
                                 </div>
                             )}
+
+                            {/* Hourly Data Heatmaps */}
+                            <div className="space-y-6 mt-8">
+                                <ResultsHeatmap
+                                    data={result.load_profile.map((load, i) => {
+                                        const gen = result.matched_profile[i] || 0;
+                                        return load > 0 ? (gen / load) * 100 : 0;
+                                    })}
+                                    title="Hourly Matching Rate"
+                                    min={0}
+                                    max={100}
+                                    unit="%"
+                                />
+
+                                <ResultsHeatmap
+                                    data={result.load_profile.map((load, i) => {
+                                        const matched = result.matched_profile[i] || 0;
+                                        return load - matched;
+                                    })}
+                                    title="Grid Deficit (Hourly)"
+                                    min={0}
+                                    unit="MWh"
+                                />
+
+                                {result.rec_price_profile && (
+                                    <ResultsHeatmap
+                                        data={result.rec_price_profile}
+                                        title="REC Price (Hourly)"
+                                        min={0}
+                                        unit="$/MWh"
+                                    />
+                                )}
+                            </div>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-white/10 rounded-xl">
