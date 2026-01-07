@@ -26,6 +26,7 @@ import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
+import HourlyHeatmap from '@/components/aggregation/HourlyHeatmap';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
 function aggregateTo12x24(data: number[]): number[][] {
@@ -959,6 +960,38 @@ export default function AggregationPage() {
                                     </table>
                                 </div>
                             )}
+
+                            {/* Heatmaps Section */}
+                            <details className="mt-8 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm">
+                                <summary className="p-6 font-semibold cursor-pointer text-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors flex justify-between items-center">
+                                    <span>Hourly Analysis Heatmaps</span>
+                                    <span className="text-gray-400">▼</span>
+                                </summary>
+                                <div className="p-6 border-t border-gray-200 dark:border-slate-700 space-y-8">
+                                    {/* Hourly Match Heatmap */}
+                                    <HourlyHeatmap
+                                        title="Hourly Match Heatmap"
+                                        data={aggregateTo12x24(result.matched_profile.map((m, i) => {
+                                            const load = result.load_profile[i];
+                                            return load > 0 ? Math.min(1.0, m / load) : 1.0;
+                                        }))}
+                                        min={0}
+                                        max={1.0}
+                                        unit="CFE %"
+                                        colorScale="grayscale"
+                                    />
+
+                                    {/* REC Price Heatmap */}
+                                    <HourlyHeatmap
+                                        title="REC Price Heatmap"
+                                        data={aggregateTo12x24(result.rec_price_profile || Array(8760).fill(financials.rec_price))}
+                                        min={0}
+                                        max={Math.max(...(result.rec_price_profile || [financials.rec_price]))}
+                                        unit="$/MWh"
+                                        colorScale="orange"
+                                    />
+                                </div>
+                            </details>
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-xl">
