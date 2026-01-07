@@ -447,8 +447,7 @@ export default function AggregationPage() {
                         <h2 className="text-xl font-bold brand-text">Configuration</h2>
                         <button
                             onClick={handleSmartFill}
-                            disabled={loading}
-                            className="text-xs bg-gray-100 dark:bg-slate-700 text-energy-green px-2 py-1 rounded border border-white/10 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
+                            className="text-xs bg-energy-green text-navy-950 px-2 py-1 rounded border border-energy-green/20 hover:bg-energy-green/90 transition-colors font-medium"
                         >
                             ✨ Smart Fill
                         </button>
