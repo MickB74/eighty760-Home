@@ -88,7 +88,7 @@ export default function ParticipantEditor({ participants, onChange }: Participan
                 </div>
                 <button
                     onClick={handleAdd}
-                    className="px-3 py-1.5 bg-[#285477] text-white text-sm rounded-md hover:bg-[#1d3f5a] transition"
+                    className="w-full py-3 bg-energy-green text-navy-950 rounded-lg hover:bg-energy-green/90 transition font-medium"
                 >
                     + Add Participant
                 </button>
@@ -148,7 +148,7 @@ export default function ParticipantEditor({ participants, onChange }: Participan
                         </button>
                         <button
                             onClick={handleSave}
-                            className="px-4 py-2 bg-[#285477] text-white text-sm rounded-md hover:bg-[#1d3f5a]"
+                            className="px-4 py-2 bg-energy-green text-navy-950 text-sm rounded-md hover:bg-energy-green/90 font-medium"
                         >
                             {editingId ? 'Save Changes' : 'Add Participant'}
                         </button>
