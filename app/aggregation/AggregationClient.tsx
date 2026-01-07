@@ -903,7 +903,91 @@ export default function AggregationPage() {
                             {/* Detailed Asset Breakdown Table */}
                             {result.asset_details && result.asset_details.length > 0 && (
                                 <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm overflow-x-auto mt-8">
-                                    <h3 className="text-lg font-semibold mb-4">Asset Financial Breakdown</h3>
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-lg font-semibold">Asset Financial Breakdown</h3>
+                                        <button
+                                            onClick={() => {
+                                                // Generate CSV with hourly interval data
+                                                const csvRows: string[] = [];
+
+                                                // Header
+                                                csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($)');
+
+                                                // For each hour
+                                                for (let h = 0; h < 8760; h++) {
+                                                    const timestamp = `Hour ${h + 1}`;
+
+                                                    // For each asset
+                                                    result.asset_details.forEach(asset => {
+                                                        // Get the hourly generation based on asset type
+                                                        let hourlyGen = 0;
+                                                        const techMap: Record<string, number[]> = {
+                                                            'Solar': result.solar_profile,
+                                                            'Wind': result.wind_profile,
+                                                            'Geothermal': result.geo_profile,
+                                                            'Nuclear': result.nuc_profile,
+                                                            'CCS Gas': result.ccs_profile
+                                                        };
+
+                                                        const profile = techMap[asset.type];
+                                                        if (profile && profile[h] !== undefined) {
+                                                            // Calculate this asset's share of the total tech generation
+                                                            const totalTechGen = profile[h];
+                                                            const assetShare = asset.capacity_mw / result.asset_details
+                                                                .filter(a => a.type === asset.type)
+                                                                .reduce((sum, a) => sum + a.capacity_mw, 0);
+                                                            hourlyGen = totalTechGen * assetShare;
+                                                        }
+
+                                                        const marketPrice = result.market_price_profile[h] || 0;
+                                                        const hourlyRevenue = hourlyGen * marketPrice;
+
+                                                        // Get PPA strike price
+                                                        const ppaPriceMap: Record<string, number> = {
+                                                            'Solar': financials.solar_price,
+                                                            'Wind': financials.wind_price,
+                                                            'Geothermal': financials.geo_price,
+                                                            'Nuclear': financials.nuc_price,
+                                                            'CCS Gas': financials.ccs_price
+                                                        };
+                                                        const ppaStrike = ppaPriceMap[asset.type] || 0;
+                                                        const hourlyCost = hourlyGen * ppaStrike;
+                                                        const hourlySettlement = hourlyRevenue - hourlyCost;
+
+                                                        csvRows.push([
+                                                            timestamp,
+                                                            h.toString(),
+                                                            asset.name,
+                                                            asset.type,
+                                                            asset.location,
+                                                            asset.capacity_mw.toFixed(2),
+                                                            hourlyGen.toFixed(4),
+                                                            marketPrice.toFixed(2),
+                                                            hourlyRevenue.toFixed(2),
+                                                            ppaStrike.toFixed(2),
+                                                            hourlyCost.toFixed(2),
+                                                            hourlySettlement.toFixed(2)
+                                                        ].join(','));
+                                                    });
+                                                }
+
+                                                // Download CSV
+                                                const csvContent = csvRows.join('\n');
+                                                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                                const link = document.createElement('a');
+                                                const url = URL.createObjectURL(blob);
+                                                link.setAttribute('href', url);
+                                                link.setAttribute('download', `asset_financial_breakdown_${selectedYear}_hourly.csv`);
+                                                link.style.visibility = 'hidden';
+                                                document.body.appendChild(link);
+                                                link.click();
+                                                document.body.removeChild(link);
+                                            }}
+                                            className="px-4 py-2 bg-brand dark:bg-brand-light text-white text-sm rounded-md hover:opacity-90 transition-opacity"
+                                        >
+                                            📥 Download CSV (Hourly Data)
+                                        </button>
+                                    </div>
                                     <table className="w-full text-sm text-left">
                                         <thead>
                                             <tr className="border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300">
