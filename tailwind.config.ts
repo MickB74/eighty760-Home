@@ -22,8 +22,7 @@ const config: Config = {
             },
             fontFamily: {
                 sans: ['Inter', 'var(--font-inter)', 'sans-serif'],
-                mono: ['JetBrains Mono', 'var(--font-ibm-plex-mono)', 'monospace'],
-                data: ['JetBrains Mono', 'monospace'], // Specific for numbers/data
+                // Use Inter for everything - differentiate with font weights
             },
             backdropBlur: {
                 xs: '2px',
