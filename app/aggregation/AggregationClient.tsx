@@ -781,7 +781,7 @@ export default function AggregationPage() {
                         <div className="flex gap-2">
                             <button
                                 onClick={handleInstantDemo}
-                                className="px-4 py-2 bg-energy-green text-white rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
+                                className="px-4 py-2 bg-energy-green text-navy-950 rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
                             >
                                 ⚡ Load Demo
                             </button>
@@ -982,7 +982,7 @@ export default function AggregationPage() {
                                                 link.click();
                                                 document.body.removeChild(link);
                                             }}
-                                            className="px-4 py-2 bg-energy-green text-white text-sm rounded-md hover:opacity-90 transition-opacity"
+                                            className="px-4 py-2 bg-energy-green text-navy-950 text-sm rounded-md hover:opacity-90 transition-opacity"
                                         >
                                             📥 Download CSV (Hourly Data)
                                         </button>

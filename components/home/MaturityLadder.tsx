@@ -30,7 +30,7 @@ export default function MaturityLadder() {
                                             : 'bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700 text-gray-500 scale-95 opacity-70'
                                         }`}
                                 >
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mr-6 flex-shrink-0 ${isFocus ? 'bg-energy-green text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-500'
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mr-6 flex-shrink-0 ${isFocus ? 'bg-energy-green text-navy-950' : 'bg-gray-200 dark:bg-slate-700 text-gray-500'
                                         }`}>
                                         {lvl.level}
                                     </div>

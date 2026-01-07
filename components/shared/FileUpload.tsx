@@ -90,7 +90,7 @@ export default function FileUpload({
             <button
                 onClick={handleButtonClick}
                 disabled={loading}
-                className="w-full px-4 py-2 bg-[#285477] text-white rounded-md hover:bg-[#1d3f5a] disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+                className="w-full px-4 py-2 bg-[#285477] text-navy-950 rounded-md hover:bg-[#1d3f5a] disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
             >
                 {loading ? (
                     <>

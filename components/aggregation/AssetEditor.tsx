@@ -197,7 +197,7 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                             </button>
                             <button
                                 onClick={handleAdd}
-                                className="px-3 py-1 text-xs bg-[var(--brand-color)] text-white rounded hover:opacity-90"
+                                className="px-3 py-1 text-xs bg-[var(--brand-color)] text-navy-950 rounded hover:opacity-90"
                             >
                                 Add Project
                             </button>

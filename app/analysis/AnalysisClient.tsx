@@ -292,7 +292,7 @@ export default function AnalysisPage() {
                         <button
                             onClick={handleRun}
                             disabled={loading || csvLoading}
-                            className="w-full py-3 bg-energy-green text-white rounded font-bold hover:opacity-90 disabled:opacity-50"
+                            className="w-full py-3 bg-energy-green text-navy-950 rounded font-bold hover:opacity-90 disabled:opacity-50"
                         >
                             {loading ? "Calculating..." : "Generate Analysis"}
                         </button>
