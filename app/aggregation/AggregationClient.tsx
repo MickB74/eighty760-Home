@@ -908,12 +908,15 @@ export default function AggregationPage() {
                                                 // Generate CSV with hourly interval data
                                                 const csvRows: string[] = [];
 
-                                                // Header with REC columns
-                                                csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($),REC Price ($/MWh),REC Revenue ($)');
+                                                // Header with REC and Load columns
+                                                csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Hourly Load (MWh),Matched Gen (MWh),Grid Deficit (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($),REC Price ($/MWh),REC Revenue ($)');
 
                                                 // For each hour
                                                 for (let h = 0; h < 8760; h++) {
                                                     const timestamp = `Hour ${h + 1}`;
+                                                    const hourlyLoad = result.load_profile[h] || 0;
+                                                    const hourlyMatched = result.matched_profile[h] || 0;
+                                                    const hourlyDeficit = hourlyLoad - hourlyMatched;
 
                                                     // For each asset
                                                     result.asset_details.forEach(asset => {
@@ -964,6 +967,9 @@ export default function AggregationPage() {
                                                             asset.location,
                                                             asset.capacity_mw.toFixed(2),
                                                             hourlyGen.toFixed(4),
+                                                            hourlyLoad.toFixed(4),
+                                                            hourlyMatched.toFixed(4),
+                                                            hourlyDeficit.toFixed(4),
                                                             marketPrice.toFixed(2),
                                                             hourlyRevenue.toFixed(2),
                                                             ppaStrike.toFixed(2),
