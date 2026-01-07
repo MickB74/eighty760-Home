@@ -79,6 +79,55 @@ export default function AboutPage() {
                         </div>
                     </div>
 
+                    <h2 className="text-2xl font-bold text-white mb-6">Who Built This</h2>
+                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 mb-12">
+                        <p className="text-slate-300 mb-4">
+                            <strong className="text-white">Michael Barry</strong> is the creator of Eighty760 and founder of{' '}
+                            <a href="https://www.sustain74.com" target="_blank" rel="noopener noreferrer" className="text-energy-green hover:underline">
+                                Sustain74
+                            </a>
+                            , an ESG strategy consultancy helping organizations navigate clean energy procurement and carbon accounting.
+                        </p>
+
+                        <p className="text-slate-300 mb-4">
+                            With over 15 years of experience in clean energy and sustainability, Michael has worked with Fortune 500
+                            companies on net-zero strategies, renewable energy procurement, and ESG program development. This hands-on
+                            experience revealed a critical gap: <strong className="text-white">annual renewable energy matching creates
+                                accounting fiction that masks real emissions.</strong>
+                        </p>
+
+                        <p className="text-slate-300 mb-4">
+                            Eighty760 was built to address this problem directly. After seeing countless "100% renewable" claims that
+                            ignored the hourly reality of grid carbon intensity, Michael developed this platform to provide transparent,
+                            hourly-granular tools that show the true carbon impact of energy portfolios.
+                        </p>
+
+                        <p className="text-slate-300 mb-6">
+                            The platform combines deep expertise in energy modeling, carbon accounting, and real-world grid operations
+                            to make sophisticated 24/7 CFE analysis accessible to sustainability professionals, energy managers, and
+                            climate strategists.
+                        </p>
+
+                        <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
+                            <a
+                                href="https://www.sustain74.com"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-sm text-slate-300 transition"
+                            >
+                                Sustain74 →
+                            </a>
+                            <a
+                                href="https://www.linkedin.com/in/michael-barry-74"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-sm text-slate-300 transition"
+                            >
+                                LinkedIn →
+                            </a>
+                        </div>
+                    </div>
+
                     <h2 className="text-2xl font-bold text-white mb-6">Get Involved</h2>
                     <p className="text-slate-300 mb-6">
                         Eighty760 is a community-driven project. Whether you're an energy professional, data scientist,
