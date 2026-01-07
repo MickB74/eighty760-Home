@@ -13,7 +13,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
     title: "Eighty760 | 24/7 Carbon-Free Energy Simulation",
     description: "Model, analyze, and optimize clean energy portfolios with 24/7 Carbon-Free Energy matching. Interactive simulator for solar, wind, and battery storage.",
-    keywords: ["carbon-free energy", "CFE", "renewable energy", "solar power", "wind power", "battery storage", "energy simulation", "clean energy portfolio"],
+    keywords: ["carbon-free energy", "CFE", "renewable energy", "solar power", "wind power", "battery storage", "energy simulation", "clean energy portfolio", "hourly carbon accounting", "8760 simulation"],
     authors: [{ name: "Eighty760" }],
     openGraph: {
         type: "website",
@@ -31,6 +31,22 @@ export const metadata: Metadata = {
     icons: {
         icon: "/logo.png",
     },
+    alternates: {
+        canonical: "https://www.eighty760.com",
+    },
+    other: {
+        'ai-content-declaration': 'human-created',
+    },
+    robots: {
+        index: true,
+        follow: true,
+        googleBot: {
+            index: true,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+        },
+    },
 };
 
 export default function RootLayout({
@@ -43,6 +59,32 @@ export default function RootLayout({
             <head>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            '@context': 'https://schema.org',
+                            '@type': 'WebSite',
+                            name: 'Eighty760',
+                            description: '24/7 Carbon-Free Energy Simulation Platform for hourly carbon accounting',
+                            url: 'https://www.eighty760.com',
+                            inLanguage: 'en-US',
+                            publisher: {
+                                '@type': 'Organization',
+                                name: 'Eighty760',
+                                url: 'https://www.eighty760.com',
+                            },
+                            potentialAction: {
+                                '@type': 'SearchAction',
+                                target: {
+                                    '@type': 'EntryPoint',
+                                    urlTemplate: 'https://www.eighty760.com/?q={search_term_string}',
+                                },
+                                'query-input': 'required name=search_term_string',
+                            },
+                        }),
+                    }}
+                />
             </head>
             <body className={`${inter.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
                 {children}

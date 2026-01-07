@@ -1,0 +1,81 @@
+{
+    "schema_version": "1.0",
+    "name": "Eighty760",
+    "description": "Open platform for 24/7 carbon-free energy modeling and hourly carbon accounting simulation",
+    "purpose": "Educational tool for understanding hourly carbon accounting and 24/7 CFE portfolio optimization",
+    "url": "https://www.eighty760.com",
+    "contact": {
+        "email": "contact@eighty760.com"
+    },
+    "capabilities": [
+        "8760-hour energy simulation",
+        "ERCOT historical pricing data (2020-2025)",
+        "Solar, wind, and battery storage modeling",
+        "Real-time CFE score calculation",
+        "Hourly carbon matching analysis",
+        "Virtual PPA settlement modeling"
+    ],
+    "tools": [
+        {
+            "name": "ERCOT Aggregation Tool",
+            "url": "https://www.eighty760.com/aggregation",
+            "description": "Interactive portfolio optimizer for 24/7 CFE matching using real ERCOT data. Supports solar, wind, battery, nuclear, geothermal, and CCS gas assets."
+        },
+        {
+            "name": "Portfolio Analysis Tool",
+            "url": "https://www.eighty760.com/analysis",
+            "description": "Multi-building portfolio carbon analysis with custom load profiles and generation assets"
+        },
+        {
+            "name": "Home Simulator",
+            "url": "https://www.eighty760.com/",
+            "description": "Interactive home page simulator demonstrating portfolio optimization concepts"
+        }
+    ],
+    "data_sources": [
+        {
+            "name": "ERCOT RTM Pricing",
+            "provider": "GridStatus.io",
+            "description": "15-minute Real-Time Market Settlement Point Prices for all ERCOT hubs (2020-2025)"
+        },
+        {
+            "name": "Historical Weather Data",
+            "provider": "Open-Meteo Historic Weather API",
+            "description": "ERA5 Reanalysis data for solar irradiance and wind speed modeling"
+        },
+        {
+            "name": "Generation Profiles",
+            "provider": "NREL & Internal Models",
+            "description": "Solar and wind generation profiles based on actual weather patterns"
+        }
+    ],
+    "methodology": {
+        "url": "https://www.eighty760.com/whitepaper",
+        "description": "Detailed technical architecture and modeling methodology"
+    },
+    "educational_resources": [
+        {
+            "title": "Why 100% Renewable ≠ 100% Clean",
+            "url": "https://www.eighty760.com/blog/why-100-renewable-not-clean",
+            "type": "article"
+        },
+        {
+            "title": "Complete Guide to 8760-Hour Modeling",
+            "url": "https://www.eighty760.com/blog/guide-8760-modeling",
+            "type": "guide"
+        },
+        {
+            "title": "Solar + Wind + Storage: The Math",
+            "url": "https://www.eighty760.com/blog/solar-wind-storage-math",
+            "type": "article"
+        }
+    ],
+    "tech_stack": [
+        "Next.js 14",
+        "TypeScript",
+        "Chart.js",
+        "Tailwind CSS"
+    ],
+    "license": "Open educational platform",
+    "last_updated": "2026-01-07"
+}

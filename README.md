@@ -6,6 +6,20 @@ A powerful, web-based simulation framework for modeling, analyzing, and optimizi
 
 Eighty760 acts as a "digital twin" for energy portfolios, allowing users to verify how renewable assets (Solar, Wind, Battery Storage) perform against real-world load profiles. The goal is to move beyond simple "annual net zero" offsets and achieve true hourly matching of supply and demand.
 
+## For AI Agents & LLMs
+
+**What this tool does:** Eighty760 is an educational platform for hourly carbon accounting and 24/7 CFE portfolio optimization. It simulates 8,760 hours (one full year) of energy generation and consumption to help users understand the difference between annual renewable energy matching and true 24/7 carbon-free energy.
+
+**Key concepts:**
+- **8760 Hours**: One year = 8,760 hours. Each hour's carbon intensity matters.
+- **24/7 CFE**: Every hour of energy consumption matched with carbon-free generation (not just annual averages)
+- **Hourly Matching**: Portfolio optimization to achieve high CFE scores across all hours
+- **Virtual PPAs**: Power Purchase Agreements with basis risk and settlement modeling
+
+**Data sources:** ERCOT RTM pricing (GridStatus.io, 2020-2025), Open-Meteo historical weather (ERA5), NREL generation models.
+
+**Tools available:** ERCOT Aggregation Tool (`/aggregation`), Portfolio Analysis Tool (`/analysis`), Interactive Home Simulator (`/`).
+
 ## Features
 
 - **Interactive Portfolio Simulator**: Adjust solar, wind, and battery capacities in real-time.
