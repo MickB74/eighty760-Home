@@ -908,8 +908,8 @@ export default function AggregationPage() {
                                                 // Generate CSV with hourly interval data
                                                 const csvRows: string[] = [];
 
-                                                // Header
-                                                csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($)');
+                                                // Header with REC columns
+                                                csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($),REC Price ($/MWh),REC Revenue ($)');
 
                                                 // For each hour
                                                 for (let h = 0; h < 8760; h++) {
@@ -952,6 +952,10 @@ export default function AggregationPage() {
                                                         const hourlyCost = hourlyGen * ppaStrike;
                                                         const hourlySettlement = hourlyRevenue - hourlyCost;
 
+                                                        // Calculate REC price and revenue
+                                                        const recPrice = result.rec_price_profile ? result.rec_price_profile[h] || 0 : 0;
+                                                        const recRevenue = hourlyGen * recPrice;
+
                                                         csvRows.push([
                                                             timestamp,
                                                             h.toString(),
@@ -964,7 +968,9 @@ export default function AggregationPage() {
                                                             hourlyRevenue.toFixed(2),
                                                             ppaStrike.toFixed(2),
                                                             hourlyCost.toFixed(2),
-                                                            hourlySettlement.toFixed(2)
+                                                            hourlySettlement.toFixed(2),
+                                                            recPrice.toFixed(2),
+                                                            recRevenue.toFixed(2)
                                                         ].join(','));
                                                     });
                                                 }
