@@ -18,7 +18,7 @@ const articles = [
     {
         slug: 'guide-8760-modeling',
         title: 'The Complete Guide to 8760-Hour Energy Modeling',
-        description: 'Everything you need to know about hourly energy analysis and why it's becoming the industry standard.',
+        description: 'Everything you need to know about hourly energy analysis and why it\'s becoming the industry standard.',
         category: 'Guide',
         readTime: '12 min read',
         date: 'January 2025'
