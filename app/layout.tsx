@@ -20,16 +20,16 @@ export const metadata: Metadata = {
         url: "https://www.eighty760.com/",
         title: "Eighty760 | 24/7 Carbon-Free Energy Simulation",
         description: "Interactive framework for modeling clean energy portfolios with hourly carbon-free energy matching",
-        images: [{ url: "https://www.eighty760.com/image.png" }],
+        images: [{ url: "https://www.eighty760.com/logo.png" }],
     },
     twitter: {
         card: "summary_large_image",
         title: "Eighty760 | 24/7 Carbon-Free Energy Simulation",
         description: "Interactive framework for modeling clean energy portfolios with hourly carbon-free energy matching",
-        images: ["https://www.eighty760.com/image.png"],
+        images: ["https://www.eighty760.com/logo.png"],
     },
     icons: {
-        icon: "/image.png",
+        icon: "/logo.png",
     },
 };
 
