@@ -166,7 +166,7 @@ export default function ScenarioManager({
 
                                 <button
                                     onClick={() => handleLoad(scenario)}
-                                    className="px-3 py-1 text-xs bg-blue-50 text-blue-700 rounded hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-300 transition"
+                                    className="px-3 py-1 text-xs bg-energy-green/10 text-energy-green rounded hover:bg-energy-green/100 dark:bg-energy-green/100 dark:text-energy-green transition"
                                 >
                                     Load
                                 </button>

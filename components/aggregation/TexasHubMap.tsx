@@ -48,7 +48,7 @@ export default function TexasHubMap({ className = "", selectedHub, onHubSelect }
                     fill="currentColor"
                     strokeWidth="2"
                     strokeLinejoin="round"
-                    className="text-blue-400 dark:text-blue-600 stroke-white dark:stroke-slate-800 hover:opacity-80 transition-opacity"
+                    className="text-energy-green dark:text-energy-green stroke-white dark:stroke-slate-800 hover:opacity-80 transition-opacity"
                 />
 
                 {/* South (Amber/Yellow) */}

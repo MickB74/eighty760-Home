@@ -47,7 +47,7 @@ export default function MaturityLadder() {
                                     {lvl.level === 3 && (
                                         <div className="absolute -right-4 md:-right-12 translate-x-full hidden md:flex items-center">
                                             <span className="text-energy-green text-2xl mr-2">←</span>
-                                            <span className="text-sm font-bold text-energy-green bg-blue-50 dark:bg-slate-800 px-3 py-1 rounded-full whitespace-nowrap">
+                                            <span className="text-sm font-bold text-energy-green bg-energy-green/10 backdrop-blur-sm px-3 py-1 rounded-full whitespace-nowrap">
                                                 Eighty760 Sweet Spot
                                             </span>
                                         </div>
