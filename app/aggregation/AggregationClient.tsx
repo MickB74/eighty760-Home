@@ -1062,9 +1062,9 @@ export default function AggregationPage() {
 function KPICard({ label, value, sub }: { label: string, value: string, sub: string }) {
     return (
         <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-4 shadow-sm">
-            <div className="text-gray-600 dark:text-gray-300 text-xs font-medium uppercase tracking-wider mb-1">{label}</div>
-            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{value}</div>
-            <div className="text-xs text-gray-600 dark:text-gray-300">{sub}</div>
+            <div className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">{label}</div>
+            <div className="text-2xl font-bold text-energy-green mb-1">{value}</div>
+            <div className="text-xs text-slate-400">{sub}</div>
         </div>
     );
 }
