@@ -21,6 +21,7 @@ import { recommendPortfolio } from '@/lib/aggregation/optimizer';
 import { loadERCOTPrices, getAvailableYears, getYearLabel, loadAveragePriceProfile, loadHubPrices } from '@/lib/aggregation/price-loader';
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
+import ResultsHeatmap from '@/components/aggregation/ResultsHeatmap';
 import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
 import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
