@@ -22,6 +22,8 @@ import { loadERCOTPrices, getAvailableYears, getYearLabel, loadAveragePriceProfi
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
 import ResultsHeatmap from '@/components/aggregation/ResultsHeatmap';
+import Timeline8760 from '@/components/aggregation/Timeline8760';
+import EnergyFlowDiagram from '@/components/aggregation/EnergyFlowDiagram';
 import { calculateBatteryCVTA, BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
 import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
@@ -829,6 +831,23 @@ export default function AggregationPage() {
                                 <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
                                 <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
                                 <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
+                            </div>
+
+                            {/* Interactive Visualizations */}
+                            <div className="grid lg:grid-cols-2 gap-6 mb-8">
+                                <Timeline8760
+                                    loadProfile={result.load_profile}
+                                    matchedProfile={result.matched_profile}
+                                />
+                                <EnergyFlowDiagram
+                                    hour={4380}
+                                    solar={0}
+                                    wind={0}
+                                    nuclear={0}
+                                    battery={0}
+                                    load={result.load_profile[4380] || 0}
+                                    gridDeficit={Math.max(0, (result.load_profile[4380] || 0) - (result.matched_profile[4380] || 0))}
+                                />
                             </div>
 
                             {/* Chart */}
