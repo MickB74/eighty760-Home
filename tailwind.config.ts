@@ -15,10 +15,18 @@ const config: Config = {
                     DEFAULT: '#285477', // Custom Deep Blue
                     dark: '#1E3A8A', // Blue-900 (Optional, for darker needed)
                 },
+                navy: {
+                    950: '#0a0a0b', // Deep dark for command center aesthetic
+                },
+                'electric-cyan': '#00ffcc', // High-tech accent color
             },
             fontFamily: {
-                sans: ['var(--font-inter)', 'sans-serif'],
-                mono: ['var(--font-ibm-plex-mono)', 'monospace'],
+                sans: ['Inter', 'var(--font-inter)', 'sans-serif'],
+                mono: ['JetBrains Mono', 'var(--font-ibm-plex-mono)', 'monospace'],
+                data: ['JetBrains Mono', 'monospace'], // Specific for numbers/data
+            },
+            backdropBlur: {
+                xs: '2px',
             },
         },
     },

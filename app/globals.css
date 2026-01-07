@@ -1,14 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-    @apply bg-white text-gray-900 transition-colors duration-300;
+/* Dark Mode as Default */
+:root {
+    color-scheme: dark;
 }
 
-/* Dark mode body override */
-.dark body {
-    @apply bg-slate-900 text-slate-100;
+body {
+    @apply bg-navy-950 text-slate-100 transition-colors duration-300;
+}
+
+/* Light mode override (if user toggles) */
+body.light {
+    @apply bg-white text-gray-900;
+}
+
+/* Gradient Mesh Background for Hero Sections */
+.gradient-mesh {
+    background:
+        radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 97% 21%, hsla(180, 100%, 50%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 52% 99%, hsla(204, 98%, 61%, 0.15) 0px, transparent 50%),
+        radial-gradient(at 10% 29%, hsla(256, 96%, 67%, 0.1) 0px, transparent 50%),
+        radial-gradient(at 97% 96%, hsla(38, 60%, 74%, 0.1) 0px, transparent 50%),
+        radial-gradient(at 33% 50%, hsla(222, 67%, 73%, 0.1) 0px, transparent 50%),
+        radial-gradient(at 79% 53%, hsla(343, 68%, 79%, 0.1) 0px, transparent 50%);
 }
 
 /* Utility Class for Brand Text */
