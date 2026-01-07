@@ -26,11 +26,11 @@ export default function MaturityLadder() {
                                 <div
                                     key={lvl.level}
                                     className={`relative flex items-center p-4 rounded-lg border transition-all duration-300 ${isFocus
-                                            ? 'bg-white dark:bg-slate-900 border-brand dark:border-brand-light shadow-md scale-105 z-10'
+                                            ? 'bg-white dark:bg-slate-900 border-energy-green shadow-md scale-105 z-10'
                                             : 'bg-white/50 dark:bg-slate-900/50 border-gray-200 dark:border-slate-700 text-gray-500 scale-95 opacity-70'
                                         }`}
                                 >
-                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mr-6 flex-shrink-0 ${isFocus ? 'bg-brand dark:bg-brand-light text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-500'
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mr-6 flex-shrink-0 ${isFocus ? 'bg-energy-green text-white' : 'bg-gray-200 dark:bg-slate-700 text-gray-500'
                                         }`}>
                                         {lvl.level}
                                     </div>
@@ -46,8 +46,8 @@ export default function MaturityLadder() {
                                     {/* Annotations for the bridge */}
                                     {lvl.level === 3 && (
                                         <div className="absolute -right-4 md:-right-12 translate-x-full hidden md:flex items-center">
-                                            <span className="text-brand dark:text-brand-light text-2xl mr-2">←</span>
-                                            <span className="text-sm font-bold text-brand dark:text-brand-light bg-blue-50 dark:bg-slate-800 px-3 py-1 rounded-full whitespace-nowrap">
+                                            <span className="text-energy-green text-2xl mr-2">←</span>
+                                            <span className="text-sm font-bold text-energy-green bg-blue-50 dark:bg-slate-800 px-3 py-1 rounded-full whitespace-nowrap">
                                                 Eighty760 Sweet Spot
                                             </span>
                                         </div>

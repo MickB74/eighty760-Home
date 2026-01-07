@@ -31,7 +31,7 @@ export default function WhitepaperPage() {
                     {/* Section 1: Core Simulation Engine */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">1</span>
+                            <span className="w-8 h-8 rounded-full bg-energy-green bg-opacity-20 text-energy-green flex items-center justify-center text-sm font-bold">1</span>
                             Core Simulation Engine
                         </h2>
                         <div className="prose prose-invert max-w-none text-gray-600 dark:text-gray-300 space-y-4">
@@ -58,12 +58,12 @@ export default function WhitepaperPage() {
                     {/* Section 2: Data Sources */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">2</span>
+                            <span className="w-8 h-8 rounded-full bg-energy-green bg-opacity-20 text-energy-green flex items-center justify-center text-sm font-bold">2</span>
                             Data Sources & Accuracy
                         </h2>
                         <div className="grid md:grid-cols-2 gap-8">
                             <div className="bg-gray-50 dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
-                                <h3 className="text-lg font-bold mb-3 text-brand dark:text-brand-light">Market Pricing (ERCOT)</h3>
+                                <h3 className="text-lg font-bold mb-3 text-energy-green">Market Pricing (ERCOT)</h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                                     Pricing data is sourced from <strong>GridStatus.io</strong>, providing 15-minute Real-Time Market (RTM) Settlement Point Prices (SPPs).
                                 </p>
@@ -75,7 +75,7 @@ export default function WhitepaperPage() {
                                 </ul>
                             </div>
                             <div className="bg-gray-50 dark:bg-slate-800 p-6 rounded-xl border border-gray-200 dark:border-slate-700">
-                                <h3 className="text-lg font-bold mb-3 text-brand dark:text-brand-light">Weather &amp; Engineering Models</h3>
+                                <h3 className="text-lg font-bold mb-3 text-energy-green">Weather &amp; Engineering Models</h3>
                                 <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                                     Weather data is sourced from <strong>Open-Meteo Historic Weather API</strong> (ERA5 Reanalysis).
                                 </p>
@@ -97,7 +97,7 @@ export default function WhitepaperPage() {
                     {/* Section 3: Financial Modeling */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">3</span>
+                            <span className="w-8 h-8 rounded-full bg-energy-green bg-opacity-20 text-energy-green flex items-center justify-center text-sm font-bold">3</span>
                             Financial Modeling
                         </h2>
                         <div className="prose prose-invert max-w-none text-gray-600 dark:text-gray-300 space-y-4">
@@ -133,7 +133,7 @@ export default function WhitepaperPage() {
                     {/* Section 4: Operational Metrics */}
                     <section>
                         <h2 className="text-2xl font-semibold mb-6 flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-brand dark:bg-brand-light bg-opacity-20 text-brand dark:text-brand-light flex items-center justify-center text-sm font-bold">4</span>
+                            <span className="w-8 h-8 rounded-full bg-energy-green bg-opacity-20 text-energy-green flex items-center justify-center text-sm font-bold">4</span>
                             Key Metrics Defined
                         </h2>
                         <div className="grid gap-4">
@@ -144,7 +144,7 @@ export default function WhitepaperPage() {
                                 { title: "Net Cost / MWh", desc: "The all-in cost of the portfolio (PPA Settlements + Market Purchases - Surplus Sales) divided by Total Load." }
                             ].map((item, i) => (
                                 <div key={i} className="flex flex-col md:flex-row gap-4 p-4 border-b border-gray-200 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:bg-slate-800 transition-colors rounded-lg">
-                                    <span className="font-bold text-brand dark:text-brand-light min-w-[200px]">{item.title}</span>
+                                    <span className="font-bold text-energy-green min-w-[200px]">{item.title}</span>
                                     <span className="text-gray-600 dark:text-gray-300">{item.desc}</span>
                                 </div>
                             ))}

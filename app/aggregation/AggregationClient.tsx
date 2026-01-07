@@ -756,7 +756,7 @@ export default function AggregationPage() {
                                                 step="10"
                                                 value={(capacities as any)[tech]}
                                                 onChange={(e) => setCapacities(prev => ({ ...prev, [tech]: Number(e.target.value) }))}
-                                                className="w-full h-2 bg-gray-100 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-brand dark:accent-brand-light"
+                                                className="w-full h-2 bg-gray-100 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-energy-green"
                                             />
                                         </div>
                                     ))}
@@ -781,7 +781,7 @@ export default function AggregationPage() {
                         <div className="flex gap-2">
                             <button
                                 onClick={handleInstantDemo}
-                                className="px-4 py-2 bg-brand dark:bg-brand-light text-white rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
+                                className="px-4 py-2 bg-energy-green text-white rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
                             >
                                 ⚡ Load Demo
                             </button>
@@ -982,7 +982,7 @@ export default function AggregationPage() {
                                                 link.click();
                                                 document.body.removeChild(link);
                                             }}
-                                            className="px-4 py-2 bg-brand dark:bg-brand-light text-white text-sm rounded-md hover:opacity-90 transition-opacity"
+                                            className="px-4 py-2 bg-energy-green text-white text-sm rounded-md hover:opacity-90 transition-opacity"
                                         >
                                             📥 Download CSV (Hourly Data)
                                         </button>

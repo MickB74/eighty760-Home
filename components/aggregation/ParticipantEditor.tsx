@@ -185,7 +185,7 @@ export default function ParticipantEditor({ participants, onChange }: Participan
                                     <td className="py-3 px-2 text-right space-x-2">
                                         <button
                                             onClick={() => handleEdit(participant)}
-                                            className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                                            className="text-energy-green hover:text-energy-green/80"
                                         >
                                             Edit
                                         </button>

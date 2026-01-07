@@ -184,7 +184,7 @@ function ControlInput({ label, value, setValue, max, step = 1, unit }: { label: 
                 <label className="text-sm font-semibold text-gray-900 dark:text-gray-100">
                     {label}
                 </label>
-                <span className="text-sm font-mono px-2 py-1 rounded text-brand dark:text-brand-light bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
+                <span className="text-sm font-mono px-2 py-1 rounded text-energy-green bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
                     {value} {unit}
                 </span>
             </div>
@@ -213,7 +213,7 @@ function KpiCard({ label, value, sub }: { label: string, value: string, sub: str
     return (
         <div className="text-center p-4 rounded-lg bg-gray-50 dark:bg-slate-700 transition-colors duration-300">
             <div className="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">{label}</div>
-            <div className="font-mono text-2xl font-bold text-brand dark:text-brand-light">{value}</div>
+            <div className="font-mono text-2xl font-bold text-energy-green">{value}</div>
             <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">
                 {sub}
             </div>

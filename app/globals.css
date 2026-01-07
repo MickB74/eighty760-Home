@@ -32,7 +32,7 @@ body.light {
 
 /* Utility Class for Brand Text */
 .brand-text {
-    @apply text-brand dark:text-brand-light;
+    @apply text-energy-green;
 }
 
 /* Chart Container */

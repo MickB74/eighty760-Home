@@ -48,7 +48,7 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
 
             {/* Buyer's P&L (Trading House) */}
             <div className="bg-[var(--card-bg)] rounded-lg p-4 border border-[var(--border-color)]">
-                <h4 className="font-medium mb-3 text-blue-600 dark:text-blue-400">🏢 Buyer&apos;s P&L (Trading House)</h4>
+                <h4 className="font-medium mb-3 text-energy-green">🏢 Buyer&apos;s P&L (Trading House)</h4>
                 <div className="space-y-2 text-sm">
                     {/* Revenue */}
                     <div className="flex justify-between py-1">
