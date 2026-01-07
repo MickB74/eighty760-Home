@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import Navigation from '@/components/Navigation';
 
 export const metadata: Metadata = {
     title: 'About Eighty760 | 24/7 Carbon-Free Energy Platform',
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
     return (
         <main className="min-h-screen bg-navy-950">
+            <Navigation />
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 <header className="mb-12 text-center">
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">

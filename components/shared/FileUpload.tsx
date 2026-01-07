@@ -1,19 +1,22 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import Papa from 'papaparse';
 
 interface FileUploadProps {
     onFileLoaded: (data: any[]) => void;
     accept?: string;
     label?: string;
     description?: string;
+    maxFileSizeMB?: number;
 }
 
 export default function FileUpload({
     onFileLoaded,
     accept = '.csv',
     label = 'Upload CSV',
-    description = 'Upload a CSV file with hourly data'
+    description = 'Upload a CSV file with hourly data',
+    maxFileSizeMB = 10
 }: FileUploadProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -24,49 +27,45 @@ export default function FileUpload({
         const file = e.target.files?.[0];
         if (!file) return;
 
+        // Validate file size
+        const maxSizeBytes = maxFileSizeMB * 1024 * 1024;
+        if (file.size > maxSizeBytes) {
+            setError(`File size exceeds ${maxFileSizeMB}MB limit`);
+            return;
+        }
+
         setLoading(true);
         setError(null);
         setFileName(file.name);
 
         try {
-            const reader = new FileReader();
-
-            reader.onload = (event) => {
-                const text = event.target?.result as string;
-                const lines = text.split('\n').filter(l => l.trim());
-
-                if (lines.length < 2) {
-                    throw new Error('CSV file is empty or has no data rows');
-                }
-
-                // Parse header
-                const headers = lines[0].split(',').map(h => h.trim());
-
-                // Parse data
-                const data: any[] = [];
-                for (let i = 1; i < lines.length; i++) {
-                    const values = lines[i].split(',');
-                    const row: any = {};
-
-                    for (let j = 0; j < headers.length; j++) {
-                        const val = values[j]?.trim();
-                        const num = parseFloat(val);
-                        row[headers[j]] = isNaN(num) ? val : num;
+            // Use PapaParse for robust CSV parsing
+            Papa.parse(file, {
+                header: true,
+                dynamicTyping: true, // Automatically convert numbers
+                skipEmptyLines: true,
+                complete: (results) => {
+                    if (results.errors.length > 0) {
+                        const errorMsg = results.errors[0].message;
+                        setError(`CSV parsing error: ${errorMsg}`);
+                        setLoading(false);
+                        return;
                     }
 
-                    data.push(row);
+                    if (!results.data || results.data.length === 0) {
+                        setError('CSV file is empty or has no data rows');
+                        setLoading(false);
+                        return;
+                    }
+
+                    onFileLoaded(results.data);
+                    setLoading(false);
+                },
+                error: (error) => {
+                    setError(`Failed to parse file: ${error.message}`);
+                    setLoading(false);
                 }
-
-                onFileLoaded(data);
-                setLoading(false);
-            };
-
-            reader.onerror = () => {
-                setError('Failed to read file');
-                setLoading(false);
-            };
-
-            reader.readAsText(file);
+            });
         } catch (err: any) {
             setError(err.message || 'Failed to parse file');
             setLoading(false);

@@ -153,7 +153,7 @@ export default function AggregationPage() {
 
     const handleAddParticipant = () => {
         // Demo Logic: Add a random participant
-        const id = Math.random().toString(36).substr(2, 9);
+        const id = Math.random().toString(36).substring(2, 11);
         const types: any[] = ['Data Center', 'Manufacturing', 'Office'];
         const type = types[Math.floor(Math.random() * types.length)];
         const load = type === 'Data Center' ? 250000 : (type === 'Manufacturing' ? 100000 : 50000);
@@ -417,14 +417,19 @@ export default function AggregationPage() {
         loadPrices();
     }, [selectedYear, loadHub]);
 
-    // Run sim whenever inputs change (debounced slightly?)
+    // Run sim when key inputs change (debounced to avoid excessive re-renders)
     useEffect(() => {
-        if (participants.length > 0) {
-            runSimulation();
-        } else {
+        if (participants.length === 0) {
             setResult(null);
+            return;
         }
-    }, [participants, capacities, financials, historicalPrices, excludedTechs, genProfiles, activeAssets]);
+
+        const timeoutId = setTimeout(() => {
+            runSimulation();
+        }, 300); // 300ms debounce
+
+        return () => clearTimeout(timeoutId);
+    }, [participants.length, JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location }))), capacities.Battery_MW, capacities.Battery_Hours]);
 
     // --- Render ---
 
@@ -762,7 +767,7 @@ export default function AggregationPage() {
                                             />
                                         </div>
                                     ))}
-                                    <div className="bg-energy-green/10/10 p-3 rounded text-xs text-energy-green mt-2">
+                                    <div className="bg-energy-green/10 p-3 rounded text-xs text-energy-green mt-2">
                                         ℹ️ Switch to &quot;Advanced Mode&quot; to specify project locations (North/South/West) and multiple assets per technology.
                                     </div>
                                 </div>

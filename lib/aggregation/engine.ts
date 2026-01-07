@@ -3,6 +3,24 @@ import { Participant, TechCapacity, SimulationResult, FinancialParams, Generatio
 // Constants
 const HOURS = 8760;
 
+// Scarcity Pricing Constants
+const WINTER_MONTHS = [0, 1, 11]; // January, February, December
+const WINTER_PEAK_HOURS = [18, 19, 20]; // Evening peak
+const WINTER_SHOULDER_HOURS = [6, 7, 8]; // Morning hours
+const EVENING_PEAK_HOURS = [17, 18, 19, 20, 21];
+const SHOULDER_HOURS = [7, 8, 9, 15, 16];
+const SUMMER_LOW_MONTHS_START = 5; // June
+const SUMMER_LOW_MONTHS_END = 8; // September
+const SUMMER_LOW_HOURS_START = 10;
+const SUMMER_LOW_HOURS_END = 14;
+
+// Scarcity multipliers
+const SCARCITY_MULT_CRITICAL = 2.0; // Winter peak (Cat 6)
+const SCARCITY_MULT_HIGH = 1.4; // Winter shoulder (Cat 5)
+const SCARCITY_MULT_ELEVATED = 1.2; // Evening peak (Cat 4)
+const SCARCITY_MULT_NORMAL = 1.0; // Standard (Cat 3)
+const SCARCITY_MULT_LOW = 0.45; // Summer solar surplus (Cat 1)
+
 /**
  * Generates an array of 8760 zeros
  */
@@ -471,25 +489,35 @@ export function runAggregationSimulation(
         // Scarcity Logic for REC Price
         let currentRecPrice = financials.rec_price;
         if (financials.use_scarcity) {
-            // Determine month (0-11) and hour (0-23)
             const hourOfDay = i % 24;
-            // Month approx: i / 730 (8760/12 = 730)
-            const month = Math.floor(i / 730);
+            const month = Math.floor(i / 730); // Approx month (8760/12 = 730)
 
-            let mult = 1.0;
-            // Cat 6/5 (Winter Peak)
-            if ([0, 1, 11].includes(month)) { // Jan(0), Feb(1), Dec(11) in 0-index approx
-                if ([18, 19, 20].includes(hourOfDay)) mult = 2.0; // Cat 6
-                else if ([6, 7, 8].includes(hourOfDay)) mult = 1.4; // Cat 5
+            let mult = SCARCITY_MULT_NORMAL;
+
+            // Winter Critical Hours
+            if (WINTER_MONTHS.includes(month)) {
+                if (WINTER_PEAK_HOURS.includes(hourOfDay)) {
+                    mult = SCARCITY_MULT_CRITICAL;
+                } else if (WINTER_SHOULDER_HOURS.includes(hourOfDay)) {
+                    mult = SCARCITY_MULT_HIGH;
+                }
             }
 
-            if (mult === 1.0) {
-                if ([17, 18, 19, 20, 21].includes(hourOfDay)) mult = 1.2; // Cat 4
-                else if ([7, 8, 9, 15, 16].includes(hourOfDay)) mult = 1.0; // Cat 3
-                else if (month >= 5 && month <= 8 && hourOfDay >= 10 && hourOfDay <= 14) mult = 0.45; // Summer low (Cat 1 approx)
+            // Default categorization if not already set by winter logic
+            if (mult === SCARCITY_MULT_NORMAL) {
+                if (EVENING_PEAK_HOURS.includes(hourOfDay)) {
+                    mult = SCARCITY_MULT_ELEVATED;
+                } else if (SHOULDER_HOURS.includes(hourOfDay)) {
+                    mult = SCARCITY_MULT_NORMAL;
+                } else if (month >= SUMMER_LOW_MONTHS_START &&
+                    month <= SUMMER_LOW_MONTHS_END &&
+                    hourOfDay >= SUMMER_LOW_HOURS_START &&
+                    hourOfDay <= SUMMER_LOW_HOURS_END) {
+                    mult = SCARCITY_MULT_LOW;
+                }
             }
 
-            // Apply intensity
+            // Apply intensity scaler
             const intensity = financials.scarcity_intensity ?? 0;
             const finalMult = Math.max(0, 1.0 + (mult - 1.0) * intensity);
             currentRecPrice = financials.rec_price * finalMult;
@@ -499,10 +527,7 @@ export function runAggregationSimulation(
         market_surplus_revenue += final_surplus[i] * prices[i];
 
         // REC Logic
-        // Cost: Buy RECs for deficit hours to cover brown power
         rec_cost_total += final_deficit[i] * currentRecPrice;
-
-        // Income: Sell RECs for surplus hours (overgeneration)
         rec_income_total += final_surplus[i] * currentRecPrice;
 
         rec_price_profile[i] = currentRecPrice;
@@ -518,15 +543,8 @@ export function runAggregationSimulation(
     const rec_cost = rec_cost_total;
     const rec_income = rec_income_total;
 
-    // Correct Net Cost for Virtual PPA:
-    // Net Cost = Gross Load Bill - (PPA Settlement Revenue) + REC Net Cost
-    // PPA Settlement Revenue = (Asset Gen * Asset Hub Price) - (Asset Gen * Strike Price)
-    // Note: 'settlement_value' is defined as (Revenue - Cost).
-    // So: Net Cost = Gross Load Bill - settlement_value + rec_cost - rec_income.
-
-    // const total_cost_physical = market_purchase_cost + total_ppa_cost - market_surplus_revenue + rec_cost - rec_income;
-    // This would be correct IF asset prices == load prices (no basis risk).
-
+    // Net Cost Calculation for Virtual PPA:
+    // Net Cost = Gross Load Bill - PPA Settlement + REC Net Cost
     const settlement_value = total_market_revenue - total_ppa_cost;
     const total_cost_net = gross_load_cost - settlement_value + rec_cost - rec_income;
 

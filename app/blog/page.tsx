@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import Navigation from '@/components/Navigation';
 
 export const metadata: Metadata = {
     title: 'Resources & Insights | Eighty760',
@@ -52,6 +53,7 @@ const articles = [
 export default function BlogPage() {
     return (
         <main className="min-h-screen bg-navy-950">
+            <Navigation />
             {/* Hero Section */}
             <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto text-center">

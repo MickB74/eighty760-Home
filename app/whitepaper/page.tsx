@@ -75,7 +75,7 @@ export default function WhitepaperPage() {
                                 </ul>
                             </div>
                             <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
-                                <h3 className="text-lg font-bold mb-3 text-energy-green">Weather &amp; Engineering Models</h3>
+                                <h3 className="text-lg font-bold mb-3 text-energy-green">Weather & Engineering Models</h3>
                                 <p className="text-sm text-slate-300 mb-3">
                                     Weather data is sourced from <strong className="text-white">Open-Meteo Historic Weather API</strong> (ERA5 Reanalysis).
                                 </p>

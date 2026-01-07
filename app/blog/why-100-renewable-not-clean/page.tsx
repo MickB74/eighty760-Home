@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
+import Navigation from '@/components/Navigation';
 
 export const metadata: Metadata = {
     title: 'Why 100% Renewable ≠ 100% Clean | Eighty760',
@@ -9,6 +10,7 @@ export const metadata: Metadata = {
 export default function Article() {
     return (
         <main className="min-h-screen bg-navy-950">
+            <Navigation />
             <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
                 {/* Breadcrumb */}
                 <nav className="mb-8">

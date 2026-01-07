@@ -23,11 +23,19 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
     });
 
     const handleAdd = () => {
+        // Validate types before creating asset
+        if (!newAsset.type || !TECH_TYPES.includes(newAsset.type as any)) {
+            return;
+        }
+        if (!newAsset.location || !LOCATIONS.includes(newAsset.location as any)) {
+            return;
+        }
+
         const asset: GenerationAsset = {
             id: Date.now().toString(),
             name: newAsset.name || 'Untitled Project',
-            type: newAsset.type as any,
-            location: newAsset.location as any,
+            type: newAsset.type as GenerationAsset['type'],
+            location: newAsset.location as GenerationAsset['location'],
             capacity_mw: Number(newAsset.capacity_mw),
             capacity_factor: newAsset.capacity_factor ? Number(newAsset.capacity_factor) : undefined
         };
@@ -156,6 +164,7 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                     className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
                                     value={newAsset.name}
                                     onChange={e => setNewAsset({ ...newAsset, name: e.target.value })}
+                                    placeholder="Project name"
                                 />
                             </div>
                             <div>
@@ -163,7 +172,7 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                 <select
                                     className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
                                     value={newAsset.type}
-                                    onChange={e => setNewAsset({ ...newAsset, type: e.target.value as any })}
+                                    onChange={e => setNewAsset({ ...newAsset, type: e.target.value as GenerationAsset['type'] })}
                                 >
                                     {TECH_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                 </select>
@@ -173,7 +182,7 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                 <select
                                     className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
                                     value={newAsset.location}
-                                    onChange={e => setNewAsset({ ...newAsset, location: e.target.value as any })}
+                                    onChange={e => setNewAsset({ ...newAsset, location: e.target.value as GenerationAsset['location'] })}
                                 >
                                     {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
                                 </select>
@@ -182,9 +191,14 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                 <label className="block text-xs text-[var(--text-secondary)] mb-1">Capacity (MW)</label>
                                 <input
                                     type="number"
+                                    min="0"
+                                    step="1"
                                     className="w-full p-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] text-sm"
                                     value={newAsset.capacity_mw}
-                                    onChange={e => setNewAsset({ ...newAsset, capacity_mw: Number(e.target.value) })}
+                                    onChange={e => {
+                                        const val = Number(e.target.value);
+                                        if (val >= 0) setNewAsset({ ...newAsset, capacity_mw: val });
+                                    }}
                                 />
                             </div>
                         </div>
