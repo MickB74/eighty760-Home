@@ -219,12 +219,12 @@ export default function AnalysisPage() {
     }, [simResult]);
 
     return (
-        <main className="min-h-screen bg-white dark:bg-slate-900">
+        <main className="min-h-screen bg-navy-950">
             <Navigation />
 
             <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
                 {/* Mobile Sidebar Toggle */}
-                <div className="lg:hidden p-4 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex justify-between items-center">
+                <div className="lg:hidden p-4 border-b border-white/10 bg-navy-950 flex justify-between items-center">
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Configuration</span>
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -235,7 +235,7 @@ export default function AnalysisPage() {
                 </div>
 
                 {/* Sidebar */}
-                <div className={`w-full lg:w-80 p-6 border-r border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 overflow-y-auto h-auto lg:h-[calc(100vh-80px)] ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
+                <div className={`w-full lg:w-80 p-6 border-r border-white/10 bg-navy-950/50 backdrop-blur-sm overflow-y-auto h-auto lg:h-[calc(100vh-80px)] ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
                     <h2 className="text-xl font-bold brand-text mb-6">Configuration</h2>
 
                     <div className="space-y-8">
@@ -245,7 +245,7 @@ export default function AnalysisPage() {
                             <select
                                 value={region}
                                 onChange={(e) => setRegion(e.target.value)}
-                                className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                                className="w-full p-2 rounded border border-white/10 bg-navy-950"
                             >
                                 {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
                             </select>
@@ -253,7 +253,7 @@ export default function AnalysisPage() {
 
                         {/* Load */}
                         <section>
-                            <h3 className="font-semibold mb-3 border-b border-gray-200 dark:border-slate-700 pb-1">1. Load Profile</h3>
+                            <h3 className="font-semibold mb-3 border-b border-white/10 pb-1">1. Load Profile</h3>
                             <div className="space-y-3">
                                 {BUILDING_TYPES.map(type => (
                                     <div key={type}>
@@ -262,7 +262,7 @@ export default function AnalysisPage() {
                                             type="number"
                                             value={loadInputs[type]}
                                             onChange={(e) => setLoadInputs({ ...loadInputs, [type]: parseFloat(e.target.value) || 0 })}
-                                            className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900"
+                                            className="w-full p-2 rounded border border-white/10 bg-navy-950"
                                         />
                                     </div>
                                 ))}
@@ -271,19 +271,19 @@ export default function AnalysisPage() {
 
                         {/* Renewables */}
                         <section>
-                            <h3 className="font-semibold mb-3 border-b border-gray-200 dark:border-slate-700 pb-1">2. Renewables (MW)</h3>
+                            <h3 className="font-semibold mb-3 border-b border-white/10 pb-1">2. Renewables (MW)</h3>
                             <div className="space-y-3">
                                 <div>
                                     <label className="text-xs text-gray-600 dark:text-gray-300">Solar Capacity</label>
-                                    <input type="number" value={caps.solar} onChange={e => setCaps({ ...caps, solar: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-white dark:bg-slate-900" />
+                                    <input type="number" value={caps.solar} onChange={e => setCaps({ ...caps, solar: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-navy-950" />
                                 </div>
                                 <div>
                                     <label className="text-xs text-gray-600 dark:text-gray-300">Wind Capacity</label>
-                                    <input type="number" value={caps.wind} onChange={e => setCaps({ ...caps, wind: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-white dark:bg-slate-900" />
+                                    <input type="number" value={caps.wind} onChange={e => setCaps({ ...caps, wind: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-navy-950" />
                                 </div>
                                 <div>
                                     <label className="text-xs text-gray-600 dark:text-gray-300">Battery (MWh)</label>
-                                    <input type="number" value={caps.battery} onChange={e => setCaps({ ...caps, battery: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-white dark:bg-slate-900" />
+                                    <input type="number" value={caps.battery} onChange={e => setCaps({ ...caps, battery: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-navy-950" />
                                 </div>
                             </div>
                         </section>
@@ -400,7 +400,7 @@ export default function AnalysisPage() {
                             </div>
 
                             {/* Chart */}
-                            <div className="bg-white dark:bg-slate-800 p-4 rounded-lg border border-gray-200 dark:border-slate-700 h-[400px]">
+                            <div className="bg-white/5 backdrop-blur-md p-4 rounded-lg border border-white/10 h-[400px]">
                                 <h3 className="text-lg font-bold mb-4">Summer Week Profile (Sample)</h3>
                                 <div className="relative h-[320px] w-full">
                                     {chartData && <Line data={chartData} options={{
@@ -443,7 +443,7 @@ export default function AnalysisPage() {
 
 function MetricCard({ label, value, sub, color, tooltip }: { label: string, value: string, sub: string, color?: string, tooltip?: string }) {
     return (
-        <div className="bg-white dark:bg-slate-800 p-4 rounded border border-gray-200 dark:border-slate-700">
+        <div className="bg-white/5 backdrop-blur-md p-4 rounded border border-white/10">
             <div className="flex items-center gap-2 mb-1">
                 <div className="text-xs uppercase text-gray-600 dark:text-gray-300 font-semibold">{label}</div>
                 {tooltip && <InfoTooltip text={tooltip} size="sm" />}

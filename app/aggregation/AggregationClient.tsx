@@ -426,12 +426,12 @@ export default function AggregationPage() {
     // --- Render ---
 
     return (
-        <main className="min-h-screen bg-white dark:bg-slate-900">
+        <main className="min-h-screen bg-navy-950">
             <Navigation />
 
             <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] overflow-hidden">
                 {/* Mobile Sidebar Toggle */}
-                <div className="lg:hidden p-4 border-b border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 flex justify-between items-center shrink-0">
+                <div className="lg:hidden p-4 border-b border-white/10 bg-navy-950 flex justify-between items-center shrink-0">
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Configuration</span>
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -442,13 +442,13 @@ export default function AggregationPage() {
                 </div>
 
                 {/* Sidebar - Configuration */}
-                <div className={`w-full lg:w-96 p-6 border-r border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 overflow-y-auto h-full ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
+                <div className={`w-full lg:w-96 p-6 border-r border-white/10 bg-navy-950/50 backdrop-blur-sm overflow-y-auto h-full ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold brand-text">Configuration</h2>
                         <button
                             onClick={handleSmartFill}
                             disabled={loading}
-                            className="text-xs bg-gray-100 dark:bg-slate-700 text-brand dark:text-brand-light px-2 py-1 rounded border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
+                            className="text-xs bg-gray-100 dark:bg-slate-700 text-electric-cyan px-2 py-1 rounded border border-white/10 hover:bg-gray-50 dark:hover:bg-slate-700 disabled:opacity-50"
                         >
                             ✨ Smart Fill
                         </button>
@@ -457,7 +457,7 @@ export default function AggregationPage() {
                     <div className="space-y-8">
                         {/* 1. Market & Financials */}
                         <section>
-                            <h3 className="font-semibold mb-3 border-b border-gray-200 dark:border-slate-700 pb-1">1. Market Settings</h3>
+                            <h3 className="font-semibold mb-3 border-b border-white/10 pb-1">1. Market Settings</h3>
                             <div className="space-y-3">
                                 <div>
                                     <div className="flex gap-2">
@@ -466,7 +466,7 @@ export default function AggregationPage() {
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e) => setSelectedYear(e.target.value === 'Average' ? 'Average' : parseInt(e.target.value))}
-                                                className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm"
+                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-sm"
                                             >
                                                 <option value="Average">{getYearLabel('Average')}</option>
                                                 {getAvailableYears().map(year => (
@@ -515,7 +515,7 @@ export default function AggregationPage() {
                                             <select
                                                 value={loadHub}
                                                 onChange={(e) => setLoadHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
@@ -528,7 +528,7 @@ export default function AggregationPage() {
                                             <select
                                                 value={solarHub}
                                                 onChange={(e) => setSolarHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
@@ -541,7 +541,7 @@ export default function AggregationPage() {
                                             <select
                                                 value={windHub}
                                                 onChange={(e) => setWindHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs"
+                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
@@ -560,7 +560,7 @@ export default function AggregationPage() {
                                         </div>
                                         <input
                                             type="number"
-                                            className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm"
+                                            className="w-full p-2 rounded border border-white/10 bg-navy-950 text-sm"
                                             value={financials.rec_price}
                                             onChange={(e) => setFinancials({ ...financials, rec_price: parseFloat(e.target.value) })}
                                         />
@@ -572,13 +572,13 @@ export default function AggregationPage() {
                                         </div>
                                         <input
                                             type="number"
-                                            className="w-full p-2 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm"
+                                            className="w-full p-2 rounded border border-white/10 bg-navy-950 text-sm"
                                             value={financials.market_price_avg}
                                             onChange={(e) => setFinancials({ ...financials, market_price_avg: parseFloat(e.target.value) })}
                                         />
                                     </div>
                                 </div>
-                                <div className="mt-3 pt-3 border-t border-gray-200 dark:border-slate-700">
+                                <div className="mt-3 pt-3 border-t border-white/10">
                                     <div className="flex items-center justify-between mb-2">
                                         <div className="flex items-center gap-2">
                                             <label className="text-xs font-medium">Scarcity REC Pricing</label>
@@ -644,7 +644,7 @@ export default function AggregationPage() {
 
                         {/* 2. Portfolio Mix */}
                         <section>
-                            <h3 className="font-semibold mb-3 border-b border-gray-200 dark:border-slate-700 pb-1">2. Portfolio Mix (MW)</h3>
+                            <h3 className="font-semibold mb-3 border-b border-white/10 pb-1">2. Portfolio Mix (MW)</h3>
                             <div className="space-y-4">
                                 {(['Solar', 'Wind', 'CCS Gas', 'Geothermal', 'Nuclear'] as const).map(tech => (
                                     <div key={tech} className={excludedTechs.has(tech) ? 'opacity-50' : ''}>
@@ -675,7 +675,7 @@ export default function AggregationPage() {
                                     </div>
                                 ))}
 
-                                <div className="pt-2 border-t border-gray-200 dark:border-slate-700">
+                                <div className="pt-2 border-t border-white/10">
                                     <div className="flex justify-between text-xs mb-1">
                                         <span>Battery Power</span>
                                         <span className="font-medium text-gray-900 dark:text-gray-100">{capacities.Battery_MW.toLocaleString(undefined, { maximumFractionDigits: 0 })} MW</span>
@@ -712,7 +712,7 @@ export default function AggregationPage() {
                                             <label className="capitalize">{tech} PPA</label>
                                             <input
                                                 type="number"
-                                                className="w-16 px-1 py-0.5 rounded border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-right"
+                                                className="w-16 px-1 py-0.5 rounded border border-white/10 bg-navy-950 text-right"
                                                 value={(financials as any)[`${tech}_price`]}
                                                 onChange={(e) => setFinancials({ ...financials, [`${tech}_price`]: parseFloat(e.target.value) })}
                                             />
@@ -789,7 +789,7 @@ export default function AggregationPage() {
                     </div>
 
                     {/* Participant Editor (Collapsible or Card) */}
-                    <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm mb-8">
+                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm mb-8">
                         <div className="flex justify-between items-center mb-4">
                             <div className="flex items-center gap-2">
                                 <button
@@ -832,18 +832,18 @@ export default function AggregationPage() {
                             </div>
 
                             {/* Chart */}
-                            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm h-[500px]">
+                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm h-[500px]">
                                 <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year)</h3>
                                 <GenChart result={result} capacities={capacities} />
                             </div>
 
                             {/* Financial Summary Table */}
-                            <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm">
+                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
                                 <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm">
                                         <tbody>
-                                            <tr className="border-b border-gray-200 dark:border-slate-700">
+                                            <tr className="border-b border-white/10">
                                                 <td className="py-3 font-medium flex items-center gap-2">
                                                     Market Purchases (Load Bill)
                                                     <InfoTooltip text="Total Load × Hourly Load Hub Price" />
@@ -852,7 +852,7 @@ export default function AggregationPage() {
                                                     -${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
                                                 </td>
                                             </tr>
-                                            <tr className="border-b border-gray-200 dark:border-slate-700">
+                                            <tr className="border-b border-white/10">
                                                 <td className="py-3 font-medium flex items-center gap-2">
                                                     Net Settlement Value (PPA vs Market)
                                                     <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
@@ -861,21 +861,21 @@ export default function AggregationPage() {
                                                     {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
                                             </tr>
-                                            <tr className="border-b border-gray-200 dark:border-slate-700">
+                                            <tr className="border-b border-white/10">
                                                 <td className="py-3 text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                                     REC Income (Surplus)
                                                     <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
                                                 </td>
                                                 <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
-                                            <tr className="border-b border-gray-200 dark:border-slate-700">
+                                            <tr className="border-b border-white/10">
                                                 <td className="py-3 text-gray-600 dark:text-gray-300 flex items-center gap-2">
                                                     REC Cost (Deficit)
                                                     <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
                                                 </td>
                                                 <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
-                                            <tr className="border-b border-gray-200 dark:border-slate-700">
+                                            <tr className="border-b border-white/10">
                                                 <td className="py-3 font-medium text-lg flex items-center gap-2">
                                                     Total Net Portfolio Cost
                                                     <InfoTooltip text="(Total Load × Load Hub Price) - Net Settlement Value + Net REC Costs" />
@@ -901,7 +901,7 @@ export default function AggregationPage() {
 
                             {/* Detailed Asset Breakdown Table */}
                             {result.asset_details && result.asset_details.length > 0 && (
-                                <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-6 shadow-sm overflow-x-auto mt-8">
+                                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm overflow-x-auto mt-8">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-lg font-semibold">Asset Financial Breakdown</h3>
                                         <button
@@ -989,7 +989,7 @@ export default function AggregationPage() {
                                     </div>
                                     <table className="w-full text-sm text-left">
                                         <thead>
-                                            <tr className="border-b border-gray-200 dark:border-slate-700 text-gray-600 dark:text-gray-300">
+                                            <tr className="border-b border-white/10 text-gray-600 dark:text-gray-300">
                                                 <th className="py-2 pr-4">Asset Name</th>
                                                 <th className="py-2 pr-4">Type</th>
                                                 <th className="py-2 pr-4">Hub</th>
@@ -1002,7 +1002,7 @@ export default function AggregationPage() {
                                         </thead>
                                         <tbody>
                                             {result.asset_details.map((asset, idx) => (
-                                                <tr key={idx} className="border-b border-gray-200 dark:border-slate-700 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
+                                                <tr key={idx} className="border-b border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
                                                     <td className="py-3 pr-4 font-medium">{asset.name}</td>
                                                     <td className="py-3 pr-4">{asset.type}</td>
                                                     <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">{asset.location}</td>
@@ -1045,7 +1045,7 @@ export default function AggregationPage() {
                             )}
                         </div>
                     ) : (
-                        <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-xl">
+                        <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-white/10 rounded-xl">
                             <div className="text-5xl mb-4">📊</div>
                             <p className="text-lg font-medium">Add Participants to Begin Simulation</p>
                             <p className="text-sm">Configure load participants above or click &quot;Load Demo&quot; to start.</p>
@@ -1061,7 +1061,7 @@ export default function AggregationPage() {
 
 function KPICard({ label, value, sub }: { label: string, value: string, sub: string }) {
     return (
-        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 p-4 shadow-sm">
+        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-4 shadow-sm">
             <div className="text-gray-600 dark:text-gray-300 text-xs font-medium uppercase tracking-wider mb-1">{label}</div>
             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-1">{value}</div>
             <div className="text-xs text-gray-600 dark:text-gray-300">{sub}</div>
