@@ -1050,6 +1050,7 @@ export default function AggregationPage() {
                                                 <td className={`py-3 text-right ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
                                                     {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
+                                            </tr>
                                         </tfoot>
                                     </table>
                                 </div>
