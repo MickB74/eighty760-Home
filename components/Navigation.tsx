@@ -4,17 +4,26 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 
 export default function Navigation() {
     const [darkMode, setDarkMode] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
 
     useEffect(() => {
-        // Load saved theme
-        const savedTheme = localStorage.getItem('theme') || 'light';
+        // Load saved theme - but default to dark
+        const savedTheme = localStorage.getItem('theme') || 'dark';
         setDarkMode(savedTheme === 'dark');
         document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+
+        // Handle scroll for backdrop blur effect
+        const handleScroll = () => {
+            setScrolled(window.scrollY > 20);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     // Close mobile menu when route changes
@@ -39,29 +48,28 @@ export default function Navigation() {
     ];
 
     return (
-        <nav className="sticky top-0 z-50 backdrop-blur-sm bg-white/90 dark:bg-slate-900/90 border-b border-gray-200 dark:border-slate-800 transition-colors duration-300">
+        <motion.nav
+            className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+                    ? 'backdrop-blur-md bg-navy-950/80 border-b border-white/10 shadow-lg'
+                    : 'bg-transparent border-b border-transparent'
+                }`}
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center py-3">
+                <div className="flex justify-between items-center py-4">
                     <div className="flex flex-row items-center gap-4">
                         <Link href="/" className="flex items-center">
-                            <Image src="/image.png" alt="Eighty760 Logo" width={240} height={120} className="w-auto object-contain h-[120px] md:h-[180px]" priority />
-                        </Link>
-
-                        {/* Dark Mode Toggle - Visible on all screens, but improved layout */}
-                        <label className="theme-switch flex items-center gap-2 cursor-pointer ml-2">
-                            <input
-                                type="checkbox"
-                                checked={darkMode}
-                                onChange={toggleTheme}
-                                className="sr-only"
+                            <Image
+                                src="/image.png"
+                                alt="Eighty760 Logo"
+                                width={240}
+                                height={120}
+                                className="w-auto object-contain h-[80px] md:h-[100px]"
+                                priority
                             />
-                            <div className="w-10 h-5 bg-gray-300 dark:bg-slate-600 rounded-full relative transition-colors duration-200">
-                                <div className={`absolute left-1 top-1 w-3 h-3 bg-white rounded-full transition-transform duration-200 ${darkMode ? 'translate-x-5' : ''}`}></div>
-                            </div>
-                            <span className="hidden md:inline text-sm font-medium text-gray-700 dark:text-gray-300 select-none">
-                                {darkMode ? 'Dark' : 'Light'}
-                            </span>
-                        </label>
+                        </Link>
                     </div>
 
                     {/* Desktop Navigation */}
@@ -71,20 +79,28 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`font-medium transition duration-200 ${isActive(link.path)
-                                    ? 'text-brand dark:text-brand-light'
-                                    : 'text-gray-600 dark:text-gray-400 hover:text-brand dark:hover:text-brand-light'
+                                        ? 'text-electric-cyan'
+                                        : 'text-slate-300 hover:text-electric-cyan'
                                     }`}
                             >
                                 {link.name}
                             </Link>
                         ))}
+
+                        {/* High-contrast CTA */}
+                        <a
+                            href="mailto:contact@eighty760.com"
+                            className="px-6 py-2 bg-electric-cyan text-navy-950 font-bold rounded-lg hover:bg-electric-cyan/90 transition-all hover:scale-105"
+                        >
+                            Request Demo
+                        </a>
                     </div>
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-gray-600 dark:text-gray-300 hover:text-brand dark:hover:text-brand-light focus:outline-none p-2"
+                            className="text-slate-300 hover:text-electric-cyan focus:outline-none p-2"
                             aria-label="Toggle mobile menu"
                         >
                             {isMobileMenuOpen ? (
@@ -101,26 +117,36 @@ export default function Navigation() {
                 </div>
             </div>
 
-            {/* Mobile Navigation Menu */}
+            {/* Mobile Navigation Menu with Glassmorphism */}
             {isMobileMenuOpen && (
-                <div className="md:hidden border-t border-gray-200 dark:border-slate-800 bg-white dark:bg-slate-900 absolute w-full left-0 z-40 shadow-lg">
+                <motion.div
+                    className="md:hidden bg-navy-950/95 backdrop-blur-lg border-t border-white/10 absolute w-full left-0 z-40 shadow-xl"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                >
                     <div className="px-4 pt-2 pb-6 space-y-2">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.path}
                                 href={link.path}
-                                className={`block px-3 py-3 rounded-md text-base font-medium transition duration-200 ${isActive(link.path)
-                                    ? 'bg-blue-50 dark:bg-slate-800 text-brand dark:text-brand-light'
-                                    : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-800 hover:text-brand dark:hover:text-brand-light'
+                                className={`block px-4 py-3 rounded-lg text-base font-medium transition duration-200 ${isActive(link.path)
+                                        ? 'bg-electric-cyan/10 text-electric-cyan border border-electric-cyan/20'
+                                        : 'text-slate-300 hover:bg-white/5 hover:text-electric-cyan'
                                     }`}
                             >
                                 {link.name}
                             </Link>
                         ))}
+                        <a
+                            href="mailto:contact@eighty760.com"
+                            className="block px-4 py-3 mt-4 bg-electric-cyan text-navy-950 font-bold rounded-lg text-center hover:bg-electric-cyan/90 transition"
+                        >
+                            Request Demo
+                        </a>
                     </div>
-                </div>
+                </motion.div>
             )}
-        </nav>
+        </motion.nav>
     );
 }
-
