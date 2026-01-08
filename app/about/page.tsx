@@ -56,59 +56,7 @@ export default function AboutPage() {
                         </div>
                     </section>
 
-                    {/* Bio Section */}
-                    <section>
-                        <h2 className="text-2xl font-bold text-navy-950 dark:text-white mb-6">Who Built This</h2>
-                        <div className="bg-white dark:bg-white/5 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl p-8 mb-12 shadow-sm dark:shadow-none">
-                            <p className="text-gray-600 dark:text-slate-300 mb-4">
-                                <strong className="text-navy-950 dark:text-white">Michael Barry</strong> is the founder of{' '}
-                                <a href="https://www.sustain74.com" target="_blank" rel="noopener noreferrer" className="brand-text hover:underline">
-                                    Sustain74
-                                </a>
-                                , where he helps organizations build ESG fluency and navigate the shift from compliance-focused renewable energy
-                                programs to strategic, impact-driven approaches.
-                            </p>
 
-                            <p className="text-gray-600 dark:text-slate-300 mb-4">
-                                After years leading ESG strategy inside complex organizations and consulting with Fortune 500 companies,
-                                Michael saw a persistent challenge: teams were investing in renewable energy programs based on incomplete
-                                or misleading metrics. Annual REC matching created accounting fiction—allowing companies to claim "100%
-                                renewable" while their operations continued to drive emissions during peak carbon hours.
-                            </p>
-
-                            <p className="text-gray-600 dark:text-slate-300 mb-4">
-                                <strong className="text-navy-950 dark:text-white">Eighty760 was built to solve this problem.</strong> The platform gives
-                                ESG professionals, energy managers, and sustainability teams the tools to see the full picture—moving beyond
-                                annual averages to understand hourly carbon matching, basis risk, and the true impact of their renewable
-                                portfolios.
-                            </p>
-
-                            <p className="text-gray-600 dark:text-slate-300 mb-6">
-                                Whether you're evaluating a virtual PPA, building a business case for battery storage, or trying to articulate
-                                why 24/7 CFE matters to your executives, Eighty760 provides the transparent, data-driven insights you need
-                                to lead the conversation and drive measurable results.
-                            </p>
-
-                            <div className="flex flex-wrap gap-3 pt-4 border-t border-slate-200 dark:border-white/10">
-                                <a
-                                    href="https://www.sustain74.com"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-4 py-2 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-white/20 rounded-lg text-sm text-gray-700 dark:text-slate-300 transition"
-                                >
-                                    Sustain74 →
-                                </a>
-                                <a
-                                    href="https://www.linkedin.com/in/michael-barry-74"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="px-4 py-2 bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 border border-slate-200 dark:border-white/20 rounded-lg text-sm text-gray-700 dark:text-slate-300 transition"
-                                >
-                                    LinkedIn →
-                                </a>
-                            </div>
-                        </div>
-                    </section>
 
                     {/* Get Involved */}
                     <section>
