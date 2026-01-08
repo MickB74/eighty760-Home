@@ -7,6 +7,8 @@ import ComparisonTable from '@/components/home/ComparisonTable';
 import HowItWorks from '@/components/home/HowItWorks';
 import UseCases from '@/components/home/UseCases';
 import MaturityLadder from '@/components/home/MaturityLadder';
+import MetricsBar from '@/components/home/MetricsBar';
+import DataSources from '@/components/home/DataSources';
 import Image from 'next/image';
 
 export default function Home() {
@@ -14,6 +16,8 @@ export default function Home() {
         <main>
             <Navigation />
             <Hero />
+
+            <MetricsBar />
 
             <ComparisonTable />
             <HowItWorks />
@@ -76,6 +80,8 @@ export default function Home() {
                     </div>
                 </div>
             </section>
+
+            <DataSources />
 
             {/* Footer */}
             <footer className="py-12 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 text-gray-600 dark:text-gray-400 transition-colors duration-300">
