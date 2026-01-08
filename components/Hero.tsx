@@ -21,20 +21,14 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
                     >
-                        <div className="inline-block px-4 py-2 mb-6 text-sm font-semibold tracking-wider brand-text uppercase bg-energy-green/10 border border-energy-green/20 rounded-full backdrop-blur-sm">
-                            Granular Carbon Accounting
-                        </div>
-
                         <h1 className="text-5xl sm:text-7xl font-extrabold text-navy-950 dark:text-white mb-6 leading-tight tracking-tight">
-                            24/7 CFE
+                            24/7 Carbon Matching
                             <br />
-                            <span className="brand-text">Intelligence</span>
+                            <span className="brand-text">Without the Guesswork</span>
                         </h1>
 
                         <p className="text-xl mb-8 leading-relaxed text-gray-600 dark:text-slate-300">
-                            The source of truth for 8,760-hour energy procurement.
-                            Model, stress-test, and validate carbon-free electricity strategies
-                            with granular, time-matched analysis.
+                            See exactly how solar, wind, storage, and clean firm power match your load—hour by hour, all year long. <strong>Get the full picture before you sign a PPA.</strong>
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4">
@@ -42,24 +36,41 @@ export default function Hero() {
                                 onClick={scrollToSimulator}
                                 className="px-8 py-4 text-lg font-bold bg-energy-green text-navy-950 rounded-lg shadow-lg transition hover:bg-energy-green/90 hover:scale-105 transform"
                             >
-                                Run Interactive Model
+                                Explore Live Demo →
                             </button>
                             <button
                                 onClick={() => document.getElementById('methodology')?.scrollIntoView({ behavior: 'smooth' })}
                                 className="px-8 py-4 text-lg font-semibold text-navy-950 dark:text-white bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md rounded-lg hover:bg-white/60 dark:hover:bg-white/10 transition"
                             >
-                                View Methodology
+                                How It Works
                             </button>
                         </div>
 
-                        {/* Trust signals */}
+                        {/* Quantitative Trust Signals */}
                         <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/10">
-                            <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">Aligned with industry standards:</p>
-                            <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-slate-500 font-mono">
-                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">EnergyTag</span>
-                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">GHG Protocol</span>
-                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">RE100</span>
-                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">TCFD</span>
+                            <div className="grid grid-cols-3 gap-8">
+                                <div>
+                                    <p className="text-3xl font-bold brand-text">8,760</p>
+                                    <p className="text-sm text-gray-500 dark:text-slate-400">Hours Modeled</p>
+                                </div>
+                                <div>
+                                    <p className="text-3xl font-bold brand-text">5+</p>
+                                    <p className="text-sm text-gray-500 dark:text-slate-400">Technologies</p>
+                                </div>
+                                <div>
+                                    <p className="text-3xl font-bold brand-text">Real-Time</p>
+                                    <p className="text-sm text-gray-500 dark:text-slate-400">Hub Pricing</p>
+                                </div>
+                            </div>
+
+                            {/* Industry Alignment Badges */}
+                            <div className="mt-6">
+                                <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">Aligned with:</p>
+                                <div className="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-slate-500 font-mono">
+                                    <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">EnergyTag</span>
+                                    <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">GHG Protocol</span>
+                                    <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">RE100</span>
+                                </div>
                             </div>
                         </div>
                     </motion.div>
