@@ -11,7 +11,7 @@ export default function Hero() {
     return (
         <header className="min-h-screen relative overflow-hidden gradient-mesh flex items-center">
             {/* Background overlay for depth */}
-            <div className="absolute inset-0 bg-navy-950/80"></div>
+            <div className="absolute inset-0 bg-white/80 dark:bg-navy-950/80 transition-colors duration-300"></div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -21,17 +21,17 @@ export default function Hero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, ease: 'easeOut' }}
                     >
-                        <div className="inline-block px-4 py-2 mb-6 text-sm font-semibold tracking-wider text-energy-green uppercase bg-energy-green/10 border border-energy-green/20 rounded-full backdrop-blur-sm">
+                        <div className="inline-block px-4 py-2 mb-6 text-sm font-semibold tracking-wider brand-text uppercase bg-energy-green/10 border border-energy-green/20 rounded-full backdrop-blur-sm">
                             Granular Carbon Accounting
                         </div>
 
-                        <h1 className="text-5xl sm:text-7xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                        <h1 className="text-5xl sm:text-7xl font-extrabold text-navy-950 dark:text-white mb-6 leading-tight tracking-tight">
                             24/7 CFE
                             <br />
-                            <span className="text-energy-green">Intelligence</span>
+                            <span className="brand-text">Intelligence</span>
                         </h1>
 
-                        <p className="text-xl mb-8 leading-relaxed text-slate-300">
+                        <p className="text-xl mb-8 leading-relaxed text-gray-600 dark:text-slate-300">
                             The source of truth for 8,760-hour energy procurement.
                             Model, stress-test, and validate carbon-free electricity strategies
                             with granular, time-matched analysis.
@@ -46,20 +46,20 @@ export default function Hero() {
                             </button>
                             <button
                                 onClick={() => document.getElementById('methodology')?.scrollIntoView({ behavior: 'smooth' })}
-                                className="px-8 py-4 text-lg font-semibold text-white bg-white/5 border border-white/10 backdrop-blur-md rounded-lg hover:bg-white/10 transition"
+                                className="px-8 py-4 text-lg font-semibold text-navy-950 dark:text-white bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md rounded-lg hover:bg-white/60 dark:hover:bg-white/10 transition"
                             >
                                 View Methodology
                             </button>
                         </div>
 
                         {/* Trust signals */}
-                        <div className="mt-12 pt-8 border-t border-white/10">
-                            <p className="text-sm text-slate-400 mb-3">Aligned with industry standards:</p>
-                            <div className="flex flex-wrap gap-4 text-xs text-slate-500 font-mono">
-                                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-md">EnergyTag</span>
-                                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-md">GHG Protocol</span>
-                                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-md">RE100</span>
-                                <span className="px-3 py-1 bg-white/5 border border-white/10 rounded-md">TCFD</span>
+                        <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/10">
+                            <p className="text-sm text-gray-500 dark:text-slate-400 mb-3">Aligned with industry standards:</p>
+                            <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-slate-500 font-mono">
+                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">EnergyTag</span>
+                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">GHG Protocol</span>
+                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">RE100</span>
+                                <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">TCFD</span>
                             </div>
                         </div>
                     </motion.div>

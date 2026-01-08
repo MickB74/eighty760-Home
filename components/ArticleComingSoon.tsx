@@ -3,57 +3,69 @@ import Link from 'next/link';
 
 export default function ComingSoon({ title, description }: { title: string; description: string }) {
     return (
-        <main className="min-h-screen bg-navy-950 flex items-center justify-center px-4">
-            <div className="max-w-2xl text-center">
-                <div className="mb-6">
-                    <span className="text-6xl">📝</span>
-                </div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white mb-4">
+        <main className="min-h-screen bg-gray-50 dark:bg-navy-950 flex items-center justify-center px-4 transition-colors duration-300">
+            <div className="max-w-2xl w-full">
+                <Link href="/blog" className="inline-flex items-center text-sm brand-text hover:underline mb-8">
+                    ← Back to Resources
+                </Link>
+
+                <h1 className="text-3xl md:text-4xl font-bold text-navy-950 dark:text-white mb-4">
                     {title}
                 </h1>
-                <p className="text-lg text-slate-300 mb-8">
-                    {description}
+
+                <p className="text-lg text-gray-600 dark:text-slate-300 mb-8">
+                    This detailed guide is currently being finalized by our research team.
+                    It will include interactive 8760 visualizations and downloadable datasets.
                 </p>
-                <div className="bg-energy-green/10 border border-energy-green/30 rounded-2xl p-6 mb-8">
-                    <p className="text-sm text-slate-300 mb-4">
-                        This article is currently in development. Sign up to be notified when it's published.
+
+                <div className="bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-8 shadow-md dark:shadow-none">
+                    <p className="text-sm text-gray-500 dark:text-slate-300 mb-4">
+                        Get notified when this article is published:
                     </p>
-                    <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+
+                    <div className="flex gap-3">
                         <input
                             type="email"
-                            placeholder="your@email.com"
-                            className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-energy-green"
+                            placeholder="Enter your email"
+                            className="flex-1 px-4 py-2 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 focus:outline-none focus:border-energy-green transition-colors"
                         />
-                        <button
-                            type="submit"
-                            className="px-6 py-2 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition"
-                        >
+                        <button className="px-6 py-2 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition">
                             Notify Me
                         </button>
-                    </form>
-                </div>
-                <div className="space-y-3">
-                    <Link
-                        href="/blog"
-                        className="block text-energy-green hover:underline"
-                    >
-                        ← Back to Resources
-                    </Link>
-                    <p className="text-slate-500 text-sm">In the meantime, explore our interactive tools:</p>
-                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                        <Link
-                            href="/aggregation"
-                            className="px-6 py-2 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition border border-white/20"
-                        >
-                            ERCOT Aggregation
-                        </Link>
-                        <Link
-                            href="/"
-                            className="px-6 py-2 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition border border-white/20"
-                        >
-                            Portfolio Simulator
-                        </Link>
                     </div>
+
+                    <p className="text-xs text-gray-400 dark:text-slate-500 mt-4">
+                        We respect your inbox. No spam, ever.
+                    </p>
+                </div>
+
+                <div className="mt-12 pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <p className="text-sm text-gray-500 dark:text-slate-400">
+                        Need this data for a project right now?
+                    </p>
+                    <div className="flex gap-4">
+                        <a
+                            href="mailto:research@eighty760.com"
+                            className="text-sm brand-text hover:underline"
+                        >
+                            Contact Research Team
+                        </a>
+                    </div>
+                </div>
+
+                <div className="mt-8 flex gap-4">
+                    <Link
+                        href="/aggregation"
+                        className="px-6 py-2 bg-slate-200 dark:bg-white/10 text-gray-900 dark:text-white font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-white/20 transition border border-transparent dark:border-white/20"
+                    >
+                        Run Simulation
+                    </Link>
+                    <Link
+                        href="/whitepaper"
+                        className="px-6 py-2 bg-slate-200 dark:bg-white/10 text-gray-900 dark:text-white font-semibold rounded-lg hover:bg-slate-300 dark:hover:bg-white/20 transition border border-transparent dark:border-white/20"
+                    >
+                        Read Whitepaper
+                    </Link>
                 </div>
             </div>
         </main>
