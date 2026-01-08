@@ -12,10 +12,7 @@ export default function MaturityLadder() {
     return (
         <section className="py-16 bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700">
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h2 className="text-3xl font-bold brand-text mb-4">Energy Procurement Maturity</h2>
-                <p className="text-gray-600 dark:text-gray-300 mb-12">
-                    Eighty760 is the bridge from <strong>Level 2</strong> to <strong>Level 4</strong>.
-                </p>
+                <h2 className="text-3xl font-bold brand-text mb-12">Energy Procurement Maturity</h2>
 
                 <div className="relative">
                     {/* Graphic Ladder */}
