@@ -3,7 +3,7 @@ import json
 import os
 
 # Configuration
-YEARS = [2020, 2021, 2022, 2023, 2024, 2025]
+YEARS = list(range(2010, 2026))  # 2010-2025 (16 years)
 HUBS = ['HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_HOUSTON', 'HB_PAN']
 INPUT_DIR = 'public/data/prices'
 OUTPUT_DIR = 'public/data/prices'
