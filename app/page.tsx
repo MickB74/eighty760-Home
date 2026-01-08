@@ -32,7 +32,7 @@ export default function Home() {
                         <div className="p-6 rounded-lg hover:shadow-md transition bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl bg-energy-green/10 backdrop-blur-sm">☀️</div>
                             <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">Generation Modeling</h3>
-                            <p className="text-sm mb-4 text-gray-600 dark:text-gray-300">
+                            <p className="text-sm mb-4 text-gray-700 dark:text-gray-300">
                                 Leveraging NREL&apos;s PVGIS and ERA5 weather data, our model generates high-fidelity hourly generation
                                 profiles. We utilize Typical Meteorological Year (TMY) data to ensure statistical reliability, while
                                 accounting for seasonal variability and localized weather patterns.
@@ -47,7 +47,7 @@ export default function Home() {
                         <div className="p-6 rounded-lg hover:shadow-md transition bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-700">
                             <div className="w-10 h-10 rounded-md flex items-center justify-center mb-4 text-xl bg-energy-green/10 backdrop-blur-sm">💲</div>
                             <h3 className="text-xl font-bold mb-2 text-gray-900 dark:text-gray-100">Scarcity Pricing Model</h3>
-                            <p className="text-sm mb-4 text-gray-600 dark:text-gray-300">
+                            <p className="text-sm mb-4 text-gray-700 dark:text-gray-300">
                                 REC values scale based on grid stress.
                             </p>
                             <div className="grid grid-cols-4 gap-2 mt-4">

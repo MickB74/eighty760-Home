@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
     return (
-        <main className="min-h-screen bg-navy-950">
+        <main className="min-h-screen bg-gray-50 dark:bg-navy-950 transition-colors duration-300">
             <Navigation />
             <ArticleComingSoon
                 title="How to Calculate the True Cost of a PPA"

@@ -434,12 +434,12 @@ export default function AggregationPage() {
     // --- Render ---
 
     return (
-        <main className="min-h-screen bg-navy-950">
+        <main className="min-h-screen bg-gray-50 dark:bg-navy-950 transition-colors duration-300">
             <Navigation />
 
             <div className="flex flex-col lg:flex-row h-[calc(100vh-80px)] overflow-hidden">
                 {/* Mobile Sidebar Toggle */}
-                <div className="lg:hidden p-4 border-b border-white/10 bg-navy-950 flex justify-between items-center shrink-0">
+                <div className="lg:hidden p-4 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 flex justify-between items-center shrink-0">
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Configuration</span>
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -450,7 +450,7 @@ export default function AggregationPage() {
                 </div>
 
                 {/* Sidebar - Configuration */}
-                <div className={`w-full lg:w-96 p-6 border-r border-white/10 bg-navy-950/50 backdrop-blur-sm overflow-y-auto h-full ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
+                <div className={`w-full lg:w-96 p-6 border-r border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950/50 backdrop-blur-sm overflow-y-auto h-full ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl font-bold brand-text">Configuration</h2>
                         <button
@@ -469,7 +469,7 @@ export default function AggregationPage() {
                                 <div>
                                     <div className="flex gap-2">
                                         <div className="flex-1">
-                                            <label className="text-xs text-gray-600 dark:text-gray-300 block mb-1">Price Year</label>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">Price Year</label>
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e) => setSelectedYear(e.target.value === 'Average' ? 'Average' : parseInt(e.target.value))}
@@ -518,7 +518,7 @@ export default function AggregationPage() {
                                     {/* Tech Specific Hubs */}
                                     <div className="grid grid-cols-3 gap-2 mt-2">
                                         <div>
-                                            <label className="text-xs text-gray-600 dark:text-gray-300 block mb-1">Load Hub</label>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">Load Hub</label>
                                             <select
                                                 value={loadHub}
                                                 onChange={(e) => setLoadHub(e.target.value)}
@@ -531,7 +531,7 @@ export default function AggregationPage() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-gray-600 dark:text-gray-300 block mb-1">Solar Hub</label>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">Solar Hub</label>
                                             <select
                                                 value={solarHub}
                                                 onChange={(e) => setSolarHub(e.target.value)}
@@ -544,7 +544,7 @@ export default function AggregationPage() {
                                             </select>
                                         </div>
                                         <div>
-                                            <label className="text-xs text-gray-600 dark:text-gray-300 block mb-1">Wind Hub</label>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">Wind Hub</label>
                                             <select
                                                 value={windHub}
                                                 onChange={(e) => setWindHub(e.target.value)}
@@ -562,7 +562,7 @@ export default function AggregationPage() {
                                 <div className="grid grid-cols-2 gap-2">
                                     <div>
                                         <div className="flex items-center gap-1 mb-1">
-                                            <label className="text-xs text-gray-600 dark:text-gray-300">REC Price ($)</label>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300">REC Price ($)</label>
                                             <InfoTooltip text="Cost to purchase Renewable Energy Certificates for unmatched load." />
                                         </div>
                                         <input
@@ -574,7 +574,7 @@ export default function AggregationPage() {
                                     </div>
                                     <div>
                                         <div className="flex items-center gap-1 mb-1">
-                                            <label className="text-xs text-gray-600 dark:text-gray-300">Avg Market ($)</label>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300">Avg Market ($)</label>
                                             <InfoTooltip text="Average wholesale electricity price used for settlement calculations (approximate)." />
                                         </div>
                                         <input
@@ -600,7 +600,7 @@ export default function AggregationPage() {
                                     </div>
                                     {financials.use_scarcity && (
                                         <div>
-                                            <div className="flex justify-between items-center text-xs mb-1 text-gray-600 dark:text-gray-300">
+                                            <div className="flex justify-between items-center text-xs mb-1 text-gray-700 dark:text-gray-300">
                                                 <div className="flex items-center gap-1">
                                                     <span>Intensity</span>
                                                     <InfoTooltip text="Multiplier scalar. 1.0x = Standard Scarcity Logic. Higher values increase the price multiplier during stress events." />
@@ -712,7 +712,7 @@ export default function AggregationPage() {
                         {/* 3. Tech Colors / PPA Prices (Collapsible or just list) */}
                         <section>
                             <details className="text-sm">
-                                <summary className="font-semibold cursor-pointer text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100">Advanced PPA Pricing</summary>
+                                <summary className="font-semibold cursor-pointer text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:text-gray-100">Advanced PPA Pricing</summary>
                                 <div className="mt-3 space-y-2 pl-2">
                                     {(['solar', 'wind', 'ccs', 'geo', 'nuc'] as const).map(tech => (
                                         <div key={tech} className="flex items-center justify-between text-xs">
@@ -733,7 +733,7 @@ export default function AggregationPage() {
                             <div className="flex justify-between items-center mb-4">
                                 <h3 className="font-semibold text-gray-900 dark:text-gray-100">Generation Portfolio</h3>
                                 <div className="flex items-center gap-2">
-                                    <label className="text-xs text-gray-600 dark:text-gray-300">Advanced Mode</label>
+                                    <label className="text-xs text-gray-700 dark:text-gray-300">Advanced Mode</label>
                                     <input
                                         type="checkbox"
                                         checked={useAdvancedAssets}
@@ -753,7 +753,7 @@ export default function AggregationPage() {
                                     {['Solar', 'Wind', 'Geothermal', 'Nuclear', 'CCS Gas'].map(tech => (
                                         <div key={tech} className="space-y-1">
                                             <div className="flex justify-between text-sm">
-                                                <span className="text-gray-600 dark:text-gray-300">{tech}</span>
+                                                <span className="text-gray-700 dark:text-gray-300">{tech}</span>
                                                 <span className="font-medium text-gray-900 dark:text-gray-100">{(capacities as any)[tech]} MW</span>
                                             </div>
                                             <input
@@ -783,7 +783,7 @@ export default function AggregationPage() {
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                         <div>
                             <h1 className="text-3xl font-bold brand-text">ERCOT North Aggregation</h1>
-                            <p className="text-gray-600 dark:text-gray-300">24/7 CFE Portfolio Optimization</p>
+                            <p className="text-gray-700 dark:text-gray-300">24/7 CFE Portfolio Optimization</p>
                         </div>
                         <div className="flex gap-2">
                             <button
@@ -801,7 +801,7 @@ export default function AggregationPage() {
                             <div className="flex items-center gap-2">
                                 <button
                                     onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}
-                                    className="p-1 hover:bg-gray-50 dark:hover:bg-slate-700 rounded transition-colors text-gray-600 dark:text-gray-300"
+                                    className="p-1 hover:bg-gray-50 dark:hover:bg-slate-700 rounded transition-colors text-gray-700 dark:text-gray-300"
                                 >
                                     <span className={`transform transition-transform inline-block ${isLoadCollapsed ? '-rotate-90' : 'rotate-0'}`}>
                                         ▼
@@ -809,7 +809,7 @@ export default function AggregationPage() {
                                 </button>
                                 <h3 className="text-lg font-semibold cursor-pointer" onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}>Load Aggregation</h3>
                             </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">
                                 Total Load: <span className="font-bold text-gray-900 dark:text-gray-100">{(participants.reduce((a, b) => a + b.load_mwh, 0)).toLocaleString()} MWh</span>
                             </span>
                         </div>
@@ -886,14 +886,14 @@ export default function AggregationPage() {
                                                 </td>
                                             </tr>
                                             <tr className="border-b border-white/10">
-                                                <td className="py-3 text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                     REC Income (Surplus)
                                                     <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
                                                 </td>
                                                 <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
                                             </tr>
                                             <tr className="border-b border-white/10">
-                                                <td className="py-3 text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                     REC Cost (Deficit)
                                                     <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
                                                 </td>
@@ -909,11 +909,11 @@ export default function AggregationPage() {
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td className="py-3 text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                                <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
                                                     Levelized Cost to Load ($/MWh)
                                                     <InfoTooltip text="Total Net Portfolio Cost / Total Annual Load" />
                                                 </td>
-                                                <td className="py-3 text-right text-gray-600 dark:text-gray-300">
+                                                <td className="py-3 text-right text-gray-700 dark:text-gray-300">
                                                     ${result.avg_cost_per_mwh.toFixed(2)}
                                                 </td>
                                             </tr>
@@ -1025,7 +1025,7 @@ export default function AggregationPage() {
                                     </div>
                                     <table className="w-full text-sm text-left">
                                         <thead>
-                                            <tr className="border-b border-white/10 text-gray-600 dark:text-gray-300">
+                                            <tr className="border-b border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300">
                                                 <th className="py-2 pr-4">Asset Name</th>
                                                 <th className="py-2 pr-4">Type</th>
                                                 <th className="py-2 pr-4">Hub</th>
@@ -1038,12 +1038,12 @@ export default function AggregationPage() {
                                         </thead>
                                         <tbody>
                                             {result.asset_details.map((asset, idx) => (
-                                                <tr key={idx} className="border-b border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
-                                                    <td className="py-3 pr-4 font-medium">{asset.name}</td>
-                                                    <td className="py-3 pr-4">{asset.type}</td>
-                                                    <td className="py-3 pr-4 text-gray-600 dark:text-gray-300">{asset.location}</td>
-                                                    <td className="py-3 pr-4 text-right">{asset.capacity_mw} MW</td>
-                                                    <td className="py-3 pr-4 text-right">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
+                                                <tr key={idx} className="border-b border-gray-200 dark:border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
+                                                    <td className="py-3 pr-4 font-medium text-navy-950 dark:text-white">{asset.name}</td>
+                                                    <td className="py-3 pr-4 text-navy-950 dark:text-white">{asset.type}</td>
+                                                    <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">{asset.location}</td>
+                                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.capacity_mw} MW</td>
+                                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
                                                     <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
                                                         ${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                     </td>
@@ -1057,7 +1057,7 @@ export default function AggregationPage() {
                                             ))}
                                         </tbody>
                                         <tfoot>
-                                            <tr className="border-t-2 border-gray-200 dark:border-slate-600 font-bold bg-gray-50 dark:bg-slate-700/50">
+                                            <tr className="border-t-2 border-gray-200 dark:border-slate-600 font-bold bg-gray-50 dark:bg-slate-700/50 text-navy-950 dark:text-white">
                                                 <td className="py-3 pr-4" colSpan={3}>Total</td>
                                                 <td className="py-3 pr-4 text-right">
                                                     {result.asset_details.reduce((sum, a) => sum + a.capacity_mw, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MW

@@ -52,33 +52,33 @@ const articles = [
 
 export default function BlogPage() {
     return (
-        <main className="min-h-screen bg-navy-950">
+        <main className="min-h-screen bg-gray-50 dark:bg-navy-950 transition-colors duration-300">
             <Navigation />
             {/* Hero Section */}
             <section className="pt-32 pb-16 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-block px-4 py-2 mb-6 text-sm font-semibold tracking-wider text-energy-green uppercase bg-energy-green/10 border border-energy-green/20 rounded-full backdrop-blur-sm">
+                    <div className="inline-block px-4 py-2 mb-6 text-sm font-semibold tracking-wider text-emerald-700 dark:text-energy-green uppercase bg-emerald-50 dark:bg-energy-green/10 border border-emerald-200 dark:border-energy-green/20 rounded-full backdrop-blur-sm">
                         Resources & Insights
                     </div>
-                    <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+                    <h1 className="text-4xl md:text-5xl font-bold mb-6 text-navy-950 dark:text-white">
                         Learn About 24/7 Carbon-Free Energy
                     </h1>
-                    <p className="text-xl text-slate-300 max-w-3xl mx-auto mb-8">
+                    <p className="text-xl text-gray-700 dark:text-slate-300 max-w-3xl mx-auto mb-8">
                         In-depth guides, analysis, and perspectives on hourly carbon accounting,
                         energy procurement, and the future of clean energy portfolios.
                     </p>
 
                     {/* Email Sign-up */}
-                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 max-w-xl mx-auto">
-                        <h3 className="text-lg font-semibold text-white mb-2">📬 Subscribe to 8760 Insights</h3>
-                        <p className="text-sm text-slate-400 mb-4">
+                    <div className="bg-white dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl p-6 max-w-xl mx-auto shadow-sm dark:shadow-none">
+                        <h3 className="text-lg font-semibold text-navy-950 dark:text-white mb-2">📬 Subscribe to 8760 Insights</h3>
+                        <p className="text-sm text-gray-500 dark:text-slate-400 mb-4">
                             Get weekly analysis on 24/7 CFE, market trends, and new modeling capabilities.
                         </p>
                         <form className="flex flex-col sm:flex-row gap-3">
                             <input
                                 type="email"
                                 placeholder="your@email.com"
-                                className="flex-1 px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-energy-green"
+                                className="flex-1 px-4 py-2 bg-gray-50 dark:bg-white/10 border border-gray-300 dark:border-white/20 rounded-lg text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-slate-500 focus:outline-none focus:border-energy-green"
                             />
                             <button
                                 type="submit"
@@ -87,7 +87,7 @@ export default function BlogPage() {
                                 Subscribe
                             </button>
                         </form>
-                        <p className="text-xs text-slate-500 mt-2">No spam. Unsubscribe anytime.</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-500 mt-2">No spam. Unsubscribe anytime.</p>
                     </div>
                 </div>
             </section>
@@ -100,23 +100,23 @@ export default function BlogPage() {
                             <Link
                                 key={article.slug}
                                 href={`/blog/${article.slug}`}
-                                className="group bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-energy-green/30 transition-all"
+                                className="group bg-white dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl p-6 hover:shadow-lg dark:hover:bg-white/10 hover:border-emerald-500/30 dark:hover:border-energy-green/30 transition-all"
                             >
                                 <div className="flex items-center gap-3 mb-4">
-                                    <span className="text-xs font-semibold px-3 py-1 bg-energy-green/10 text-energy-green rounded-full">
+                                    <span className="text-xs font-semibold px-3 py-1 bg-emerald-50 dark:bg-energy-green/10 text-emerald-700 dark:text-energy-green rounded-full">
                                         {article.category}
                                     </span>
-                                    <span className="text-xs text-slate-500">{article.readTime}</span>
+                                    <span className="text-xs text-gray-500 dark:text-slate-500">{article.readTime}</span>
                                 </div>
-                                <h2 className="text-xl font-bold text-white mb-2 group-hover:text-energy-green transition">
+                                <h2 className="text-xl font-bold text-navy-950 dark:text-white mb-2 group-hover:text-emerald-700 dark:group-hover:text-energy-green transition">
                                     {article.title}
                                 </h2>
-                                <p className="text-slate-400 text-sm mb-4">
+                                <p className="text-gray-600 dark:text-slate-400 text-sm mb-4">
                                     {article.description}
                                 </p>
                                 <div className="flex items-center justify-between">
-                                    <span className="text-xs text-slate-500">{article.date}</span>
-                                    <span className="text-energy-green text-sm font-medium group-hover:translate-x-1 transition-transform">
+                                    <span className="text-xs text-gray-500 dark:text-slate-500">{article.date}</span>
+                                    <span className="text-emerald-700 dark:text-energy-green text-sm font-medium group-hover:translate-x-1 transition-transform">
                                         Read more →
                                     </span>
                                 </div>

@@ -219,12 +219,12 @@ export default function AnalysisPage() {
     }, [simResult]);
 
     return (
-        <main className="min-h-screen bg-navy-950">
+        <main className="min-h-screen bg-gray-50 dark:bg-navy-950 transition-colors duration-300">
             <Navigation />
 
             <div className="flex flex-col lg:flex-row min-h-[calc(100vh-80px)]">
                 {/* Mobile Sidebar Toggle */}
-                <div className="lg:hidden p-4 border-b border-white/10 bg-navy-950 flex justify-between items-center">
+                <div className="lg:hidden p-4 border-b border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 flex justify-between items-center">
                     <span className="font-semibold text-gray-700 dark:text-gray-200">Configuration</span>
                     <button
                         onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -235,17 +235,17 @@ export default function AnalysisPage() {
                 </div>
 
                 {/* Sidebar */}
-                <div className={`w-full lg:w-80 p-6 border-r border-white/10 bg-navy-950/50 backdrop-blur-sm overflow-y-auto h-auto lg:h-[calc(100vh-80px)] ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
+                <div className={`w-full lg:w-80 p-6 border-r border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950/50 backdrop-blur-sm overflow-y-auto h-auto lg:h-[calc(100vh-80px)] ${isSidebarOpen ? 'block' : 'hidden'} lg:block`}>
                     <h2 className="text-xl font-bold brand-text mb-6">Configuration</h2>
 
                     <div className="space-y-8">
                         {/* Region */}
                         <section>
-                            <label className="block text-sm font-semibold mb-2">Region</label>
+                            <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-200">Region</label>
                             <select
                                 value={region}
                                 onChange={(e) => setRegion(e.target.value)}
-                                className="w-full p-2 rounded border border-white/10 bg-navy-950"
+                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-navy-950 text-gray-900 dark:text-gray-100"
                             >
                                 {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
                             </select>
@@ -253,16 +253,16 @@ export default function AnalysisPage() {
 
                         {/* Load */}
                         <section>
-                            <h3 className="font-semibold mb-3 border-b border-white/10 pb-1">1. Load Profile</h3>
+                            <h3 className="font-semibold mb-3 border-b border-gray-200 dark:border-white/10 pb-1 text-gray-700 dark:text-gray-200">1. Load Profile</h3>
                             <div className="space-y-3">
                                 {BUILDING_TYPES.map(type => (
                                     <div key={type}>
-                                        <label className="text-xs text-gray-600 dark:text-gray-300">{type} (MWh)</label>
+                                        <label className="text-xs text-gray-700 dark:text-gray-300">{type} (MWh)</label>
                                         <input
                                             type="number"
                                             value={loadInputs[type]}
                                             onChange={(e) => setLoadInputs({ ...loadInputs, [type]: parseFloat(e.target.value) || 0 })}
-                                            className="w-full p-2 rounded border border-white/10 bg-navy-950"
+                                            className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-navy-950 text-gray-900 dark:text-gray-100"
                                         />
                                     </div>
                                 ))}
@@ -271,19 +271,19 @@ export default function AnalysisPage() {
 
                         {/* Renewables */}
                         <section>
-                            <h3 className="font-semibold mb-3 border-b border-white/10 pb-1">2. Renewables (MW)</h3>
+                            <h3 className="font-semibold mb-3 border-b border-gray-200 dark:border-white/10 pb-1 text-gray-700 dark:text-gray-200">2. Renewables (MW)</h3>
                             <div className="space-y-3">
                                 <div>
-                                    <label className="text-xs text-gray-600 dark:text-gray-300">Solar Capacity</label>
-                                    <input type="number" value={caps.solar} onChange={e => setCaps({ ...caps, solar: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-navy-950" />
+                                    <label className="text-xs text-gray-700 dark:text-gray-300">Solar Capacity</label>
+                                    <input type="number" value={caps.solar} onChange={e => setCaps({ ...caps, solar: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-navy-950 text-gray-900 dark:text-gray-100" />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-600 dark:text-gray-300">Wind Capacity</label>
-                                    <input type="number" value={caps.wind} onChange={e => setCaps({ ...caps, wind: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-navy-950" />
+                                    <label className="text-xs text-gray-700 dark:text-gray-300">Wind Capacity</label>
+                                    <input type="number" value={caps.wind} onChange={e => setCaps({ ...caps, wind: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-navy-950 text-gray-900 dark:text-gray-100" />
                                 </div>
                                 <div>
-                                    <label className="text-xs text-gray-600 dark:text-gray-300">Battery (MWh)</label>
-                                    <input type="number" value={caps.battery} onChange={e => setCaps({ ...caps, battery: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border bg-navy-950" />
+                                    <label className="text-xs text-gray-700 dark:text-gray-300">Battery (MWh)</label>
+                                    <input type="number" value={caps.battery} onChange={e => setCaps({ ...caps, battery: parseFloat(e.target.value) || 0 })} className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-navy-950 text-gray-900 dark:text-gray-100" />
                                 </div>
                             </div>
                         </section>
@@ -313,12 +313,12 @@ export default function AnalysisPage() {
                             {/* Header */}
                             <div>
                                 <h1 className="text-3xl font-bold brand-text">Simulation Results</h1>
-                                <p className="text-gray-600 dark:text-gray-300">Region: {region} | Total Load: {simResult.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</p>
+                                <p className="text-gray-700 dark:text-gray-300">Region: {region} | Total Load: {simResult.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</p>
                             </div>
 
                             {/* Operational Analysis */}
                             <div>
-                                <h3 className="text-xl font-bold mb-4">Operational Analysis</h3>
+                                <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Operational Analysis</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
                                     <MetricCard
                                         label="Total Electricity Usage"
@@ -378,7 +378,7 @@ export default function AnalysisPage() {
 
                             {/* Financial & Environmental (kept separate or merged? Design only showed Operational. Keeping legacy metrics below for now but labelled) */}
                             <div>
-                                <h3 className="text-xl font-bold mb-4">Financial & Environmental</h3>
+                                <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Financial & Environmental</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                     <MetricCard
                                         label="Grid Emissions"
@@ -400,8 +400,8 @@ export default function AnalysisPage() {
                             </div>
 
                             {/* Chart */}
-                            <div className="bg-white/5 backdrop-blur-md p-4 rounded-lg border border-white/10 h-[400px]">
-                                <h3 className="text-lg font-bold mb-4">Summer Week Profile (Sample)</h3>
+                            <div className="bg-white dark:bg-white/5 backdrop-blur-md p-4 rounded-lg border border-gray-200 dark:border-white/10 h-[400px]">
+                                <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">Summer Week Profile (Sample)</h3>
                                 <div className="relative h-[320px] w-full">
                                     {chartData && <Line data={chartData} options={{
                                         responsive: true,
@@ -426,8 +426,8 @@ export default function AnalysisPage() {
                             </div>
 
                             <div className="bg-gray-100 dark:bg-slate-700 p-6 rounded-lg">
-                                <h3 className="font-bold mb-2">About this Simulation</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-300">
+                                <h3 className="font-bold mb-2 text-navy-950 dark:text-white">About this Simulation</h3>
+                                <p className="text-sm text-gray-700 dark:text-gray-300">
                                     This analysis uses NREL-based synthetic generation profiles and 2024 ISO-specific carbon intensity data.
                                     Battery optimization uses a greedy algorithm (charge on surplus, discharge on deficit).
                                 </p>
@@ -443,9 +443,9 @@ export default function AnalysisPage() {
 
 function MetricCard({ label, value, sub, color, tooltip }: { label: string, value: string, sub: string, color?: string, tooltip?: string }) {
     return (
-        <div className="bg-white/5 backdrop-blur-md p-4 rounded border border-white/10">
+        <div className="bg-white dark:bg-white/5 backdrop-blur-md p-4 rounded border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none">
             <div className="flex items-center gap-2 mb-1">
-                <div className="text-xs uppercase text-gray-600 dark:text-gray-300 font-semibold">{label}</div>
+                <div className="text-xs uppercase text-gray-700 dark:text-gray-300 font-semibold">{label}</div>
                 {tooltip && <InfoTooltip text={tooltip} size="sm" />}
             </div>
             <div className={`text-2xl font-mono font-bold my-1 ${color || 'brand-text'}`}>{value}</div>

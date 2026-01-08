@@ -83,7 +83,7 @@ export default function Navigation() {
                                 href={link.path}
                                 className={`font-medium transition duration-200 ${isActive(link.path)
                                     ? 'text-energy-green'
-                                    : 'text-slate-300 hover:text-energy-green'
+                                    : 'text-gray-700 dark:text-slate-300 hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}
@@ -120,7 +120,7 @@ export default function Navigation() {
                     <div className="md:hidden flex items-center">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-slate-300 hover:text-energy-green focus:outline-none p-2"
+                            className="text-gray-700 dark:text-slate-300 hover:text-energy-green focus:outline-none p-2"
                             aria-label="Toggle mobile menu"
                         >
                             {isMobileMenuOpen ? (
@@ -140,7 +140,7 @@ export default function Navigation() {
             {/* Mobile Navigation Menu with Glassmorphism */}
             {isMobileMenuOpen && (
                 <motion.div
-                    className="md:hidden bg-navy-950/95 backdrop-blur-lg border-t border-white/10 absolute w-full left-0 z-40 shadow-xl"
+                    className="md:hidden bg-white/95 dark:bg-navy-950/95 backdrop-blur-lg border-t border-gray-200 dark:border-white/10 absolute w-full left-0 z-40 shadow-xl"
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.3 }}
@@ -151,8 +151,8 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`block px-4 py-3 rounded-lg text-base font-medium transition duration-200 ${isActive(link.path)
-                                    ? 'bg-energy-green/10 text-energy-green border border-energy-green/20'
-                                    : 'text-slate-300 hover:bg-white/5 hover:text-energy-green'
+                                    ? 'bg-emerald-50 dark:bg-energy-green/10 text-emerald-700 dark:text-energy-green border border-emerald-200 dark:border-energy-green/20'
+                                    : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-emerald-700 dark:hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}
@@ -162,7 +162,7 @@ export default function Navigation() {
                         {/* Theme Toggle Mobile */}
                         <button
                             onClick={toggleTheme}
-                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-slate-300 transition-all"
+                            className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 border border-gray-200 dark:border-white/10 text-gray-700 dark:text-slate-300 transition-all"
                         >
                             {darkMode ? (
                                 <>
