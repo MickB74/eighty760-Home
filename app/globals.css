@@ -40,6 +40,11 @@ body:not(.dark) {
     @apply text-energy-green;
 }
 
+/* Light mode override for brand text (darker green for contrast) */
+:not(.dark) .brand-text {
+    @apply text-emerald-600;
+}
+
 /* Chart Container */
 .chart-container {
     position: relative;
