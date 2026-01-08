@@ -98,11 +98,17 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
 
     }, [hourlyData, hoveredHour, selectedHour]);
 
+    // Store callback in ref to prevent infinite loops
+    const onHourChangeRef = useRef(onHourChange);
+    useEffect(() => {
+        onHourChangeRef.current = onHourChange;
+    }, [onHourChange]);
+
     // Notify parent when the displayed hour changes
     useEffect(() => {
         const currentHour = hoveredHour !== null ? hoveredHour : selectedHour;
-        onHourChange?.(currentHour);
-    }, [hoveredHour, selectedHour, onHourChange]);
+        onHourChangeRef.current?.(currentHour);
+    }, [hoveredHour, selectedHour]);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();
