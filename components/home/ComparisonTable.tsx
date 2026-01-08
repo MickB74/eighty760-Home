@@ -16,7 +16,7 @@ export default function ComparisonTable() {
                         <thead>
                             <tr>
                                 <th className="p-4 border-b-2 border-gray-200 dark:border-slate-700 w-1/3"></th>
-                                <th className="p-4 border-b-2 border-energy-green bg-energy-green/10 backdrop-blur-sm text-energy-green font-bold text-lg w-2/3">
+                                <th className="p-4 border-b-2 border-emerald-500 dark:border-energy-green bg-emerald-50 dark:bg-energy-green/10 backdrop-blur-sm text-emerald-700 dark:text-energy-green font-bold text-lg w-2/3">
                                     Eighty760
                                 </th>
                             </tr>
@@ -24,19 +24,19 @@ export default function ComparisonTable() {
                         <tbody className="text-sm md:text-base">
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Primary Function</td>
-                                <td className="p-4 bg-energy-green/5 font-semibold text-energy-green">Scenario & Portfolio Modeling</td>
+                                <td className="p-4 bg-emerald-50/50 dark:bg-energy-green/5 font-semibold text-emerald-700 dark:text-energy-green">Scenario & Portfolio Modeling</td>
                             </tr>
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Time Horizon</td>
-                                <td className="p-4 bg-energy-green/5 font-semibold text-energy-green">Forward-looking (Planning)</td>
+                                <td className="p-4 bg-emerald-50/50 dark:bg-energy-green/5 font-semibold text-emerald-700 dark:text-energy-green">Forward-looking (Planning)</td>
                             </tr>
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Key Value</td>
-                                <td className="p-4 bg-energy-green/5 font-semibold text-energy-green">Procurement Decision Support</td>
+                                <td className="p-4 bg-emerald-50/50 dark:bg-energy-green/5 font-semibold text-emerald-700 dark:text-energy-green">Procurement Decision Support</td>
                             </tr>
                             <tr className="border-b border-gray-100 dark:border-slate-800">
                                 <td className="p-4 font-medium text-gray-900 dark:text-gray-100">Granularity</td>
-                                <td className="p-4 bg-energy-green/5 font-semibold text-energy-green">Hourly (8760)</td>
+                                <td className="p-4 bg-emerald-50/50 dark:bg-energy-green/5 font-semibold text-emerald-700 dark:text-energy-green">Hourly (8760)</td>
                             </tr>
                         </tbody>
                     </table>

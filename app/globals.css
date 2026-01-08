@@ -10,7 +10,7 @@
 }
 
 body {
-    font-family: var(--font-inter), system-ui, -apple-system, Arial, sans-serif;
+    font-family: var(--font-outfit), system-ui, -apple-system, Arial, sans-serif;
     @apply bg-navy-950 text-slate-100 antialiased transition-colors duration-300;
 }
 
@@ -42,7 +42,7 @@ body:not(.dark) {
 
 /* Light mode override for brand text (darker green for contrast) */
 :not(.dark) .brand-text {
-    @apply text-emerald-600;
+    @apply text-emerald-700 font-medium;
 }
 
 /* Chart Container */

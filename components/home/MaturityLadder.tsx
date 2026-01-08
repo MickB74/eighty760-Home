@@ -21,9 +21,9 @@ export default function MaturityLadder() {
                             return (
                                 <div
                                     key={lvl.level}
-                                    className="relative flex items-center p-4 rounded-lg border transition-all duration-300 bg-white dark:bg-slate-900 border-energy-green shadow-md"
+                                    className="relative flex items-center p-4 rounded-lg border transition-all duration-300 bg-white dark:bg-slate-900 border-emerald-500/30 dark:border-energy-green shadow-md"
                                 >
-                                    <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mr-6 flex-shrink-0 bg-energy-green text-navy-950">
+                                    <div className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg mr-6 flex-shrink-0 bg-emerald-100 dark:bg-energy-green text-emerald-800 dark:text-navy-950">
                                         {lvl.level}
                                     </div>
                                     <div className="text-left">
