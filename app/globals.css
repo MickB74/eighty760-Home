@@ -10,12 +10,17 @@
 }
 
 body {
-    @apply bg-navy-950 text-slate-100 transition-colors duration-300;
+    font-family: var(--font-inter), system-ui, -apple-system, Arial, sans-serif;
+    @apply bg-navy-950 text-slate-100 antialiased transition-colors duration-300;
 }
 
-/* Light mode override (if user toggles) */
-body.light {
-    @apply bg-white text-gray-900;
+/* Light mode background */
+body:not(.dark) {
+    @apply bg-gray-50 text-gray-900;
+}
+
+.dark body {
+    @apply bg-navy-950 text-slate-100;
 }
 
 /* Gradient Mesh Background for Hero Sections */
