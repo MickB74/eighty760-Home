@@ -134,6 +134,9 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                     {/* Solar */}
                     <circle cx="80" cy="80" r="30" fill="#fbbf24" opacity="0.2" />
                     <text x="80" y="85" textAnchor="middle" fill="white" fontSize="24">☀️</text>
+                    <text x="80" y="50" textAnchor="middle" fill="#fbbf24" fontSize="12" fontWeight="600">
+                        Solar
+                    </text>
                     <text x="80" y="125" textAnchor="middle" fill="#fbbf24" fontSize="14" fontWeight="bold">
                         {solar.toFixed(0)} MW
                     </text>
@@ -141,6 +144,9 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                     {/* Wind */}
                     <circle cx="80" cy="200" r="30" fill="#3b82f6" opacity="0.2" />
                     <text x="80" y="205" textAnchor="middle" fill="white" fontSize="24">💨</text>
+                    <text x="80" y="170" textAnchor="middle" fill="#3b82f6" fontSize="12" fontWeight="600">
+                        Wind
+                    </text>
                     <text x="80" y="245" textAnchor="middle" fill="#3b82f6" fontSize="14" fontWeight="bold">
                         {wind.toFixed(0)} MW
                     </text>
@@ -148,6 +154,9 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                     {/* Nuclear */}
                     <circle cx="80" cy="320" r="30" fill="#8b5cf6" opacity="0.2" />
                     <text x="80" y="325" textAnchor="middle" fill="white" fontSize="24">⚛️</text>
+                    <text x="80" y="290" textAnchor="middle" fill="#8b5cf6" fontSize="12" fontWeight="600">
+                        Nuclear
+                    </text>
                     <text x="80" y="365" textAnchor="middle" fill="#8b5cf6" fontSize="14" fontWeight="bold">
                         {nuclear.toFixed(0)} MW
                     </text>
@@ -157,6 +166,9 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                 <g id="battery">
                     <rect x="330" y="170" width="80" height="60" rx="10" fill="#10b981" opacity="0.2" stroke="#10b981" strokeWidth="2" />
                     <text x="370" y="210" textAnchor="middle" fill="white" fontSize="32">🔋</text>
+                    <text x="370" y="150" textAnchor="middle" fill="#10b981" fontSize="12" fontWeight="600">
+                        Battery
+                    </text>
                     <text x="370" y="260" textAnchor="middle" fill="#10b981" fontSize="14" fontWeight="bold">
                         {battery.toFixed(0)} MW
                     </text>
@@ -166,6 +178,9 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                 <g id="load">
                     <rect x="630" y="170" width="90" height="60" rx="10" fill="#22c55e" opacity="0.2" stroke="#22c55e" strokeWidth="2" />
                     <text x="675" y="210" textAnchor="middle" fill="white" fontSize="32">🏭</text>
+                    <text x="675" y="150" textAnchor="middle" fill="#22c55e" fontSize="12" fontWeight="600">
+                        Load
+                    </text>
                     <text x="675" y="260" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
                         {load.toFixed(0)} MW
                     </text>
