@@ -82,30 +82,32 @@ export default function AboutPage() {
                     <h2 className="text-2xl font-bold text-white mb-6">Who Built This</h2>
                     <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 mb-12">
                         <p className="text-slate-300 mb-4">
-                            <strong className="text-white">Michael Barry</strong> is the creator of Eighty760 and founder of{' '}
+                            <strong className="text-white">Michael Barry</strong> is the founder of{' '}
                             <a href="https://www.sustain74.com" target="_blank" rel="noopener noreferrer" className="text-energy-green hover:underline">
                                 Sustain74
                             </a>
-                            , an ESG strategy consultancy helping organizations navigate clean energy procurement and carbon accounting.
+                            , where he helps organizations build ESG fluency and navigate the shift from compliance-focused renewable energy
+                            programs to strategic, impact-driven approaches.
                         </p>
 
                         <p className="text-slate-300 mb-4">
-                            With over 15 years of experience in clean energy and sustainability, Michael has worked with Fortune 500
-                            companies on net-zero strategies, renewable energy procurement, and ESG program development. This hands-on
-                            experience revealed a critical gap: <strong className="text-white">annual renewable energy matching creates
-                                accounting fiction that masks real emissions.</strong>
+                            After years leading ESG strategy inside complex organizations and consulting with Fortune 500 companies,
+                            Michael saw a persistent challenge: teams were investing in renewable energy programs based on incomplete
+                            or misleading metrics. Annual REC matching created accounting fiction—allowing companies to claim "100%
+                            renewable" while their operations continued to drive emissions during peak carbon hours.
                         </p>
 
                         <p className="text-slate-300 mb-4">
-                            Eighty760 was built to address this problem directly. After seeing countless "100% renewable" claims that
-                            ignored the hourly reality of grid carbon intensity, Michael developed this platform to provide transparent,
-                            hourly-granular tools that show the true carbon impact of energy portfolios.
+                            <strong className="text-white">Eighty760 was built to solve this problem.</strong> The platform gives
+                            ESG professionals, energy managers, and sustainability teams the tools to see the full picture—moving beyond
+                            annual averages to understand hourly carbon matching, basis risk, and the true impact of their renewable
+                            portfolios.
                         </p>
 
                         <p className="text-slate-300 mb-6">
-                            The platform combines deep expertise in energy modeling, carbon accounting, and real-world grid operations
-                            to make sophisticated 24/7 CFE analysis accessible to sustainability professionals, energy managers, and
-                            climate strategists.
+                            Whether you're evaluating a virtual PPA, building a business case for battery storage, or trying to articulate
+                            why 24/7 CFE matters to your executives, Eighty760 provides the transparent, data-driven insights you need
+                            to lead the conversation and drive measurable results.
                         </p>
 
                         <div className="flex flex-wrap gap-3 pt-4 border-t border-white/10">
