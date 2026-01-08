@@ -42,12 +42,15 @@ export default function Navigation() {
     const isActive = (path: string) => pathname === path;
 
     const navLinks = [
-        { name: 'Home', path: '/' },
-        { name: 'ERCOT Aggregation', path: '/aggregation' },
-        { name: 'Analysis', path: '/analysis' },
-        { name: 'Resources', path: '/blog' },
-        { name: 'About', path: '/about' },
-        { name: 'Methodology', path: '/whitepaper' },
+        { name: 'Home', path: '/', section: null },
+        // Tools Section
+        { name: 'Aggregation', path: '/aggregation', section: 'tools' },
+        { name: 'Analysis', path: '/analysis', section: 'tools' },
+        // Learn Section
+        { name: 'Resources', path: '/blog', section: 'learn' },
+        { name: 'Methodology', path: '/whitepaper', section: 'learn' },
+        // Company Section
+        { name: 'About', path: '/about', section: 'company' },
     ];
 
     return (
