@@ -7,7 +7,7 @@ export default function MetricsBar() {
         { value: '8,760', label: 'Hours Modeled Annually', icon: '⏰' },
         { value: '$100M+', label: 'Energy Spend Analyzed', icon: '💰' },
         { value: '5+', label: 'Clean Technologies', icon: '⚡' },
-        { value: '6 Years', label: 'Historical ERCOT Data', icon: '📊' },
+        { value: '26 Years', label: 'Historical Weather Data', icon: '📊' },
     ];
 
     return (

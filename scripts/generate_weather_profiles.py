@@ -5,8 +5,8 @@ import os
 import json
 import time
 
-# Configuration
-YEARS = [2020, 2021, 2022, 2023, 2024, 2025]
+# Configuration  
+YEARS = list(range(2000, 2026))  # 2000-2025 (26 years) - Complete dataset
 OUTPUT_DIR = "public/data/profiles"
 
 # Hub Locations (Lat, Lon)
