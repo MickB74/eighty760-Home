@@ -10,7 +10,7 @@
 }
 
 body {
-    font-family: var(--font-outfit), system-ui, -apple-system, Arial, sans-serif;
+    font-family: var(--font-inter), system-ui, -apple-system, Arial, sans-serif;
     @apply bg-navy-950 text-slate-100 antialiased transition-colors duration-300;
 }
 

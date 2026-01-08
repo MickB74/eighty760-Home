@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Outfit, IBM_Plex_Mono } from "next/font/google";
+import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 
-const outfit = Outfit({ subsets: ["latin"], variable: '--font-outfit' });
+const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const ibmPlexMono = IBM_Plex_Mono({
     weight: ['700'],
     subsets: ["latin"],
@@ -86,7 +86,7 @@ export default function RootLayout({
                     }}
                 />
             </head>
-            <body className={`${outfit.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
+            <body className={`${inter.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
                 {children}
                 <Script defer src="https://cdn.vercel-insights.com/v1/script.js" />
 
