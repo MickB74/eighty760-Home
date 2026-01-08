@@ -8,6 +8,8 @@ interface EnergyFlowProps {
     solar: number;
     wind: number;
     nuclear: number;
+    geothermal: number;
+    ccs: number;
     battery: number;
     load: number;
     gridDeficit: number;
@@ -15,11 +17,11 @@ interface EnergyFlowProps {
 
 interface Particle {
     id: number;
-    source: 'solar' | 'wind' | 'nuclear' | 'battery' | 'grid';
+    source: 'solar' | 'wind' | 'nuclear' | 'geothermal' | 'ccs' | 'battery' | 'grid';
     progress: number;
 }
 
-export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery, load, gridDeficit }: EnergyFlowProps) {
+export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geothermal, ccs, battery, load, gridDeficit }: EnergyFlowProps) {
     const [particles, setParticles] = useState<Particle[]>([]);
     const [particleId, setParticleId] = useState(0);
 
@@ -61,10 +63,28 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                 });
             }
 
+            // Geothermal particles (steady baseload)
+            if (geothermal > 0) {
+                newParticles.push({
+                    id: particleId + 3000,
+                    source: 'geothermal',
+                    progress: 0
+                });
+            }
+
+            // CCS Gas particles
+            if (ccs > 0) {
+                newParticles.push({
+                    id: particleId + 4000,
+                    source: 'ccs',
+                    progress: 0
+                });
+            }
+
             // Battery particles
             if (battery > 0) {
                 newParticles.push({
-                    id: particleId + 3000,
+                    id: particleId + 5000,
                     source: 'battery',
                     progress: 0
                 });
@@ -75,7 +95,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                 const count = Math.ceil(gridDeficit / 50);
                 for (let i = 0; i < Math.min(count, 2); i++) {
                     newParticles.push({
-                        id: particleId + 4000 + i,
+                        id: particleId + 6000 + i,
                         source: 'grid',
                         progress: 0
                     });
@@ -83,11 +103,11 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
             }
 
             setParticles(prev => [...prev.filter(p => p.progress < 1), ...newParticles]);
-            setParticleId(prev => prev + 5000);
+            setParticleId(prev => prev + 7000);
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [solar, wind, nuclear, battery, gridDeficit, particleId]);
+    }, [solar, wind, nuclear, geothermal, ccs, battery, gridDeficit, particleId]);
 
     // Animate particles
     useEffect(() => {
@@ -106,6 +126,8 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
             case 'solar': return '#fbbf24'; // yellow
             case 'wind': return '#3b82f6'; // blue
             case 'nuclear': return '#8b5cf6'; // purple
+            case 'geothermal': return '#f97316'; // orange
+            case 'ccs': return '#a78bfa'; // light purple
             case 'battery': return '#10b981'; // green
             case 'grid': return '#ef4444'; // red
             default: return '#64748b';
@@ -152,13 +174,33 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                     </text>
 
                     {/* Nuclear */}
-                    <circle cx="80" cy="320" r="30" fill="#8b5cf6" opacity="0.2" />
-                    <text x="80" y="325" textAnchor="middle" fill="white" fontSize="24">⚛️</text>
-                    <text x="80" y="290" textAnchor="middle" fill="#8b5cf6" fontSize="12" fontWeight="600">
+                    <circle cx="80" cy="280" r="30" fill="#8b5cf6" opacity="0.2" />
+                    <text x="80" y="285" textAnchor="middle" fill="white" fontSize="24">⚛️</text>
+                    <text x="80" y="250" textAnchor="middle" fill="#8b5cf6" fontSize="12" fontWeight="600">
                         Nuclear
                     </text>
-                    <text x="80" y="365" textAnchor="middle" fill="#8b5cf6" fontSize="14" fontWeight="bold">
+                    <text x="80" y="325" textAnchor="middle" fill="#8b5cf6" fontSize="14" fontWeight="bold">
                         {nuclear.toFixed(0)} MW
+                    </text>
+
+                    {/* Geothermal */}
+                    <circle cx="200" cy="80" r="30" fill="#f97316" opacity="0.2" />
+                    <text x="200" y="85" textAnchor="middle" fill="white" fontSize="24">🌋</text>
+                    <text x="200" y="50" textAnchor="middle" fill="#f97316" fontSize="12" fontWeight="600">
+                        Geothermal
+                    </text>
+                    <text x="200" y="125" textAnchor="middle" fill="#f97316" fontSize="14" fontWeight="bold">
+                        {geothermal.toFixed(0)} MW
+                    </text>
+
+                    {/* CCS Gas */}
+                    <circle cx="200" cy="280" r="30" fill="#a78bfa" opacity="0.2" />
+                    <text x="200" y="285" textAnchor="middle" fill="white" fontSize="24">🏭</text>
+                    <text x="200" y="250" textAnchor="middle" fill="#a78bfa" fontSize="12" fontWeight="600">
+                        CCS Gas
+                    </text>
+                    <text x="200" y="325" textAnchor="middle" fill="#a78bfa" fontSize="14" fontWeight="bold">
+                        {ccs.toFixed(0)} MW
                     </text>
                 </g>
 
@@ -210,16 +252,22 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                 {/* Paths */}
                 <g id="paths" opacity="0.3">
                     {/* Solar to Battery */}
-                    <path d="M 110 80 Q 220 80 330 190" stroke="#fbbf24" strokeWidth={Math.max(2, solar / 30)} fill="none" />
+                    <path d="M 110 80 Q 220 130 330 190" stroke="#fbbf24" strokeWidth={Math.max(2, solar / 30)} fill="none" />
 
                     {/* Wind to Battery */}
                     <path d="M 110 200 Q 220 200 330 200" stroke="#3b82f6" strokeWidth={Math.max(2, wind / 30)} fill="none" />
 
                     {/* Nuclear to Battery */}
-                    <path d="M 110 320 Q 220 320 330 210" stroke="#8b5cf6" strokeWidth={Math.max(2, nuclear / 30)} fill="none" />
+                    <path d="M 110 280 Q 220 240 330 210" stroke="#8b5cf6" strokeWidth={Math.max(2, nuclear / 30)} fill="none" />
+
+                    {/* Geothermal to Battery */}
+                    <path d="M 230 80 Q 280 130 330 190" stroke="#f97316" strokeWidth={Math.max(2, geothermal / 30)} fill="none" />
+
+                    {/* CCS to Battery */}
+                    <path d="M 230 280 Q 280 240 330 210" stroke="#a78bfa" strokeWidth={Math.max(2, ccs / 30)} fill="none" />
 
                     {/* Battery to Load */}
-                    <path d="M 410 200 L 630 200" stroke="#10b981" strokeWidth={Math.max(2, (solar + wind + nuclear + battery) / 30)} fill="none" />
+                    <path d="M 410 200 L 630 200" stroke="#10b981" strokeWidth={Math.max(2, (solar + wind + nuclear + geothermal + ccs + battery) / 30)} fill="none" />
                 </g>
 
                 {/* Animated Particles */}
@@ -227,11 +275,15 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
                     let path: [number, number][] = [];
 
                     if (particle.source === 'solar') {
-                        path = [[110, 80], [220, 80], [330, 190], [410, 200], [630, 200]];
+                        path = [[110, 80], [220, 130], [330, 190], [410, 200], [630, 200]];
                     } else if (particle.source === 'wind') {
                         path = [[110, 200], [220, 200], [330, 200], [410, 200], [630, 200]];
                     } else if (particle.source === 'nuclear') {
-                        path = [[110, 320], [220, 320], [330, 210], [410, 200], [630, 200]];
+                        path = [[110, 280], [220, 240], [330, 210], [410, 200], [630, 200]];
+                    } else if (particle.source === 'geothermal') {
+                        path = [[230, 80], [280, 130], [330, 190], [410, 200], [630, 200]];
+                    } else if (particle.source === 'ccs') {
+                        path = [[230, 280], [280, 240], [330, 210], [410, 200], [630, 200]];
                     } else if (particle.source === 'battery') {
                         path = [[370, 200], [410, 200], [630, 200]];
                     } else if (particle.source === 'grid') {
@@ -265,7 +317,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, battery,
             <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
                 <div className="bg-navy-950/50 rounded-lg p-3">
                     <div className="text-slate-400 text-xs mb-1">Clean Generation</div>
-                    <div className="text-energy-green font-bold">{(solar + wind + nuclear).toFixed(1)} MW</div>
+                    <div className="text-energy-green font-bold">{(solar + wind + nuclear + geothermal + ccs).toFixed(1)} MW</div>
                 </div>
                 <div className="bg-navy-950/50 rounded-lg p-3">
                     <div className="text-slate-400 text-xs mb-1">CFE Match Rate</div>

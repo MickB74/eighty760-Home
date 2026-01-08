@@ -856,6 +856,8 @@ export default function AggregationPage() {
                                     solar={result.solar_profile[currentHour] || 0}
                                     wind={result.wind_profile[currentHour] || 0}
                                     nuclear={result.nuc_profile[currentHour] || 0}
+                                    geothermal={result.geo_profile[currentHour] || 0}
+                                    ccs={result.ccs_profile[currentHour] || 0}
                                     battery={result.battery_discharge[currentHour] || 0}
                                     load={result.load_profile[currentHour] || 0}
                                     gridDeficit={Math.max(0, (result.load_profile[currentHour] || 0) - (result.matched_profile[currentHour] || 0))}
