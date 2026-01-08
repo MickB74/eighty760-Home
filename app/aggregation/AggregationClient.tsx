@@ -117,6 +117,9 @@ export default function AggregationPage() {
     const [currentHour, setCurrentHour] = useState(0);
     const [solarHub, setSolarHub] = useState<string>('West');
     const [windHub, setWindHub] = useState<string>('Panhandle');
+    const [nuclearHub, setNuclearHub] = useState<string>('North');
+    const [geothermalHub, setGeothermalHub] = useState<string>('West');
+    const [ccsHub, setCcsHub] = useState<string>('Houston');
     const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
     const [allHubPrices, setAllHubPrices] = useState<Record<string, number[]>>({}); // Cache for assets
 
@@ -517,7 +520,7 @@ export default function AggregationPage() {
                                         />
                                     </div>
 
-                                    {/* Tech Specific Hubs */}
+                                    {/* Tech Specific Hubs - Row 1 */}
                                     <div className="grid grid-cols-3 gap-2 mt-2">
                                         <div>
                                             <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">Load Hub</label>
@@ -550,6 +553,49 @@ export default function AggregationPage() {
                                             <select
                                                 value={windHub}
                                                 onChange={(e) => setWindHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                disabled={typeof selectedYear !== 'number'}
+                                            >
+                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                    <option key={h} value={h}>{h}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    {/* Tech Specific Hubs - Row 2 */}
+                                    <div className="grid grid-cols-3 gap-2 mt-2">
+                                        <div>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">Nuclear Hub</label>
+                                            <select
+                                                value={nuclearHub}
+                                                onChange={(e) => setNuclearHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                disabled={typeof selectedYear !== 'number'}
+                                            >
+                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                    <option key={h} value={h}>{h}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">Geothermal Hub</label>
+                                            <select
+                                                value={geothermalHub}
+                                                onChange={(e) => setGeothermalHub(e.target.value)}
+                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                disabled={typeof selectedYear !== 'number'}
+                                            >
+                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                    <option key={h} value={h}>{h}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-xs text-gray-700 dark:text-gray-300 block mb-1">CCS Gas Hub</label>
+                                            <select
+                                                value={ccsHub}
+                                                onChange={(e) => setCcsHub(e.target.value)}
                                                 className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
