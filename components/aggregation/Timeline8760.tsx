@@ -22,11 +22,12 @@ interface TimelineProps {
     windGen?: number[];
     nuclearGen?: number[];
     batteryDischarge?: number[];
+    onHourChange?: (hour: number) => void; // NEW: Callback to notify parent of hour changes
 }
 
-export default function Timeline8760({ loadProfile, matchedProfile, solarGen, windGen, nuclearGen, batteryDischarge }: TimelineProps) {
+export default function Timeline8760({ loadProfile, matchedProfile, solarGen, windGen, nuclearGen, batteryDischarge, onHourChange }: TimelineProps) {
     const [hoveredHour, setHoveredHour] = useState<number | null>(null);
-    const [selectedHour, setSelectedHour] = useState<number>(4380); // Default to middle of year
+    const [selectedHour, setSelectedHour] = useState<number>(0); // Changed default to 0 (Jan 1, 1st hour)
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -96,6 +97,12 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
         ctx.setLineDash([]);
 
     }, [hourlyData, hoveredHour, selectedHour]);
+
+    // Notify parent when the displayed hour changes
+    useEffect(() => {
+        const currentHour = hoveredHour !== null ? hoveredHour : selectedHour;
+        onHourChange?.(currentHour);
+    }, [hoveredHour, selectedHour, onHourChange]);
 
     const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
         const rect = e.currentTarget.getBoundingClientRect();

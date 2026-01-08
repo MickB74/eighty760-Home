@@ -113,6 +113,8 @@ export default function AggregationPage() {
     const [selectedYear, setSelectedYear] = useState<number | 'Average'>(2024);
     const [useTMY, setUseTMY] = useState(false); // New TMY Toggle
     const [loadHub, setLoadHub] = useState<string>('North');
+    // Track current hour for Energy Flow visualization (default to hour 0 = Jan 1, 1st hour)
+    const [currentHour, setCurrentHour] = useState(0);
     const [solarHub, setSolarHub] = useState<string>('West');
     const [windHub, setWindHub] = useState<string>('Panhandle');
     const [historicalPrices, setHistoricalPrices] = useState<number[] | null>(null);
@@ -843,15 +845,20 @@ export default function AggregationPage() {
                                 <Timeline8760
                                     loadProfile={result.load_profile}
                                     matchedProfile={result.matched_profile}
+                                    solarGen={result.solar_profile}
+                                    windGen={result.wind_profile}
+                                    nuclearGen={result.nuc_profile}
+                                    batteryDischarge={result.battery_discharge}
+                                    onHourChange={(hour) => setCurrentHour(hour)}
                                 />
                                 <EnergyFlowDiagram
-                                    hour={4380}
-                                    solar={0}
-                                    wind={0}
-                                    nuclear={0}
-                                    battery={0}
-                                    load={result.load_profile[4380] || 0}
-                                    gridDeficit={Math.max(0, (result.load_profile[4380] || 0) - (result.matched_profile[4380] || 0))}
+                                    hour={currentHour}
+                                    solar={result.solar_profile[currentHour] || 0}
+                                    wind={result.wind_profile[currentHour] || 0}
+                                    nuclear={result.nuc_profile[currentHour] || 0}
+                                    battery={result.battery_discharge[currentHour] || 0}
+                                    load={result.load_profile[currentHour] || 0}
+                                    gridDeficit={Math.max(0, (result.load_profile[currentHour] || 0) - (result.matched_profile[currentHour] || 0))}
                                 />
                             </div>
 
