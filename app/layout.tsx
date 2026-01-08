@@ -89,6 +89,17 @@ export default function RootLayout({
             <body className={`${outfit.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
                 {children}
                 <Script defer src="https://cdn.vercel-insights.com/v1/script.js" />
+
+                {/* Google Analytics */}
+                <Script src="https://www.googletagmanager.com/gtag/js?id=G-HS1WYM4MCP" strategy="afterInteractive" />
+                <Script id="google-analytics" strategy="afterInteractive">
+                    {`
+                        window.dataLayer = window.dataLayer || [];
+                        function gtag(){dataLayer.push(arguments);}
+                        gtag('js', new Date());
+                        gtag('config', 'G-HS1WYM4MCP');
+                    `}
+                </Script>
             </body>
         </html>
     );
