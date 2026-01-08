@@ -176,7 +176,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                     {/* Nuclear */}
                     <circle cx="80" cy="280" r="30" fill="#8b5cf6" opacity="0.2" />
                     <text x="80" y="285" textAnchor="middle" fill="white" fontSize="24">⚛️</text>
-                    <text x="80" y="250" textAnchor="middle" fill="#8b5cf6" fontSize="12" fontWeight="600">
+                    <text x="80" y="250" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">
                         Nuclear
                     </text>
                     <text x="80" y="325" textAnchor="middle" fill="#8b5cf6" fontSize="14" fontWeight="bold">
