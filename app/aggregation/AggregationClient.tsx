@@ -241,6 +241,9 @@ export default function AggregationPage() {
                     let loc: any = loadHub === 'HB_NORTH' ? 'North' : loadHub; // Default for others
                     if (type === 'Solar') loc = solarHub === 'HB_NORTH' ? 'North' : solarHub;
                     if (type === 'Wind') loc = windHub === 'HB_NORTH' ? 'North' : windHub;
+                    if (type === 'Nuclear') loc = nuclearHub === 'HB_NORTH' ? 'North' : nuclearHub;
+                    if (type === 'Geothermal') loc = geothermalHub === 'HB_NORTH' ? 'North' : geothermalHub;
+                    if (type === 'CCS Gas') loc = ccsHub === 'HB_NORTH' ? 'North' : ccsHub;
 
                     tempAssets.push({
                         id: `temp-${type}`,
@@ -254,7 +257,7 @@ export default function AggregationPage() {
             });
             return tempAssets;
         }
-    }, [useAdvancedAssets, assets, capacities, loadHub, solarHub, windHub]);
+    }, [useAdvancedAssets, assets, capacities, loadHub, solarHub, windHub, nuclearHub, geothermalHub, ccsHub]);
 
 
     // UseEffect to load generation profiles (Solar/Wind) based on location and year
