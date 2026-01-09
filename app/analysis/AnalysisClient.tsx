@@ -104,17 +104,82 @@ export default function AnalysisPage() {
         });
     }, []);
 
-    // Load portfolio from Aggregation on mount
+    // Load portfolio from Aggregation on mount and auto-run simulation
     useEffect(() => {
         const stored = loadPortfolio();
         if (stored) {
             setPortfolio(stored);
             setLoadedFromAggregation(true);
-            // Auto-run Aggregation simulation with loaded portfolio
-            // Note: We'd need to load prices + profiles, similar to Aggregation page
-            // For simplicity, show portfolio info but keep manual simulation for now
+
+            // Map portfolio to Analysis inputs
+            const mappedLoads: Record<string, number> = {
+                "Office": 0,
+                "Data Center": 0,
+                "Retail": 0,
+                "Residential": 0,
+                "Hospital": 0,
+                "Warehouse": 0
+            };
+
+            // Map participants to building loads
+            stored.participants.forEach(p => {
+                if (mappedLoads.hasOwnProperty(p.buildingType)) {
+                    mappedLoads[p.buildingType] += p.annualLoad;
+                }
+            });
+
+            // Calculate total capacities from assets
+            const totalSolar = stored.assets.filter(a => a.technology === 'Solar').reduce((sum, a) => sum + a.capacity, 0);
+            const totalWind = stored.assets.filter(a => a.technology === 'Wind').reduce((sum, a) => sum + a.capacity, 0);
+            const totalNuclear = stored.assets.filter(a => a.technology === 'Nuclear').reduce((sum, a) => sum + a.capacity, 0);
+            const totalGeo = stored.assets.filter(a => a.technology === 'Geothermal').reduce((sum, a) => sum + a.capacity, 0);
+            const totalHydro = stored.assets.filter(a => a.technology === 'Hydro').reduce((sum, a) => sum + a.capacity, 0);
+
+            // Update state with mapped parameters
+            setLoadInputs(mappedLoads);
+            setCaps({
+                solar: totalSolar,
+                wind: totalWind,
+                nuclear: totalNuclear,
+                geo: totalGeo,
+                hydro: totalHydro,
+                battery: stored.battery.mw * stored.battery.hours
+            });
+            setFinancials({
+                baseRecPrice: stored.financials.baseRecPrice,
+                useRecScaling: stored.financials.useRecScaling,
+                scarcityIntensity: stored.financials.scarcityIntensity
+            });
+
+            // Auto-run simulation after parameters are set
+            setTimeout(() => {
+                if (emissionsData.length > 0) {
+                    // Prepare portfolio
+                    const portfolio: BuildingPortfolioItem[] = Object.entries(mappedLoads)
+                        .filter(([_, val]) => val > 0)
+                        .map(([type, val]) => ({ type, annual_mwh: val }));
+
+                    // Run simulation with mapped parameters
+                    const result = runSimulation({
+                        year: 2023,
+                        region,
+                        building_portfolio: portfolio,
+                        solar_capacity: totalSolar,
+                        wind_capacity: totalWind,
+                        nuclear_capacity: totalNuclear,
+                        geothermal_capacity: totalGeo,
+                        hydro_capacity: totalHydro,
+                        battery_capacity_mwh: stored.battery.mw * stored.battery.hours,
+                        base_rec_price: stored.financials.baseRecPrice,
+                        use_rec_scaling: stored.financials.useRecScaling,
+                        scarcity_intensity: stored.financials.scarcityIntensity,
+                        hourly_emissions_lb_mwh: undefined // Could be extracted if needed
+                    });
+                    setSimResult(result);
+                }
+            }, 500); // Small delay to ensure emissions data is loaded
         }
-    }, []);
+    }, [emissionsData]);
 
     // Run Simulation
     const handleRun = () => {
