@@ -148,6 +148,43 @@ export default function AggregationPage() {
         });
     };
 
+    // --- Effects ---
+
+    // Restore saved portfolio on mount
+    useEffect(() => {
+        const saved = loadPortfolio();
+        if (saved) {
+            // Restore participants
+            setParticipants(saved.participants);
+
+            // Restore assets
+            setAssets(saved.assets);
+            if (saved.assets.length > 0) {
+                setUseAdvancedAssets(true);
+            }
+
+            // Restore battery
+            setCapacities(prev => ({
+                ...prev,
+                Battery_MW: saved.battery.mw,
+                Battery_Hours: saved.battery.hours
+            }));
+
+            // Restore financials
+            setFinancials(saved.financials);
+
+            // Restore year and hub selections
+            setSelectedYear(saved.year);
+            setLoadHub(saved.loadHub);
+            setSolarHub(saved.solarHub);
+            setWindHub(saved.windHub);
+            setNuclearHub(saved.nuclearHub);
+            setGeothermalHub(saved.geothermalHub);
+            setCcsHub(saved.ccsHub);
+        }
+    }, []); // Run once on mount
+
+
     // 7. UI State
     const [isLoadCollapsed, setIsLoadCollapsed] = useState(false);
 
