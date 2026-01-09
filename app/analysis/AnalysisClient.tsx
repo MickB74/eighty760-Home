@@ -123,17 +123,17 @@ export default function AnalysisPage() {
 
             // Map participants to building loads
             stored.participants.forEach(p => {
-                if (mappedLoads.hasOwnProperty(p.buildingType)) {
-                    mappedLoads[p.buildingType] += p.annualLoad;
+                if (mappedLoads.hasOwnProperty(p.type)) {
+                    mappedLoads[p.type] += p.load_mwh;
                 }
             });
 
             // Calculate total capacities from assets
-            const totalSolar = stored.assets.filter(a => a.technology === 'Solar').reduce((sum, a) => sum + a.capacity, 0);
-            const totalWind = stored.assets.filter(a => a.technology === 'Wind').reduce((sum, a) => sum + a.capacity, 0);
-            const totalNuclear = stored.assets.filter(a => a.technology === 'Nuclear').reduce((sum, a) => sum + a.capacity, 0);
-            const totalGeo = stored.assets.filter(a => a.technology === 'Geothermal').reduce((sum, a) => sum + a.capacity, 0);
-            const totalHydro = stored.assets.filter(a => a.technology === 'Hydro').reduce((sum, a) => sum + a.capacity, 0);
+            const totalSolar = stored.assets.filter(a => a.type === 'Solar').reduce((sum, a) => sum + a.capacity_mw, 0);
+            const totalWind = stored.assets.filter(a => a.type === 'Wind').reduce((sum, a) => sum + a.capacity_mw, 0);
+            const totalNuclear = stored.assets.filter(a => a.type === 'Nuclear').reduce((sum, a) => sum + a.capacity_mw, 0);
+            const totalGeo = stored.assets.filter(a => a.type === 'Geothermal').reduce((sum, a) => sum + a.capacity_mw, 0);
+            const totalCCS = stored.assets.filter(a => a.type === 'CCS Gas').reduce((sum, a) => sum + a.capacity_mw, 0);
 
             // Update state with mapped parameters
             setLoadInputs(mappedLoads);
@@ -146,9 +146,9 @@ export default function AnalysisPage() {
                 battery: stored.battery.mw * stored.battery.hours
             });
             setFinancials({
-                baseRecPrice: stored.financials.baseRecPrice,
-                useRecScaling: stored.financials.useRecScaling,
-                scarcityIntensity: stored.financials.scarcityIntensity
+                baseRecPrice: stored.financials.rec_price,
+                useRecScaling: stored.financials.use_scarcity || false,
+                scarcityIntensity: stored.financials.scarcity_intensity || 1.0
             });
 
             // Auto-run simulation after parameters are set
@@ -170,9 +170,9 @@ export default function AnalysisPage() {
                         geothermal_capacity: totalGeo,
                         hydro_capacity: totalHydro,
                         battery_capacity_mwh: stored.battery.mw * stored.battery.hours,
-                        base_rec_price: stored.financials.baseRecPrice,
-                        use_rec_scaling: stored.financials.useRecScaling,
-                        scarcity_intensity: stored.financials.scarcityIntensity,
+                        base_rec_price: stored.financials.rec_price,
+                        use_rec_scaling: stored.financials.use_scarcity || false,
+                        scarcity_intensity: stored.financials.scarcity_intensity || 1.0,
                         hourly_emissions_lb_mwh: undefined // Could be extracted if needed
                     });
                     setSimResult(result);
