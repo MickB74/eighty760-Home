@@ -2,7 +2,7 @@
 
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
-import Simulator from '@/components/Simulator';
+
 import ComparisonTable from '@/components/home/ComparisonTable';
 import HowItWorks from '@/components/home/HowItWorks';
 import UseCases from '@/components/home/UseCases';
@@ -22,7 +22,7 @@ export default function Home() {
             <ComparisonTable />
             <HowItWorks />
 
-            <Simulator />
+
 
             <UseCases />
             <MaturityLadder />

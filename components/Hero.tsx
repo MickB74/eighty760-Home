@@ -1,11 +1,11 @@
 'use client';
 
-import CarbonHeatmap from './home/CarbonHeatmap';
+import HeroSimulator from './home/HeroSimulator';
 import { motion } from 'framer-motion';
 
 export default function Hero() {
-    const scrollToSimulator = () => {
-        document.getElementById('simulator')?.scrollIntoView({ behavior: 'smooth' });
+    const scrollToMethodology = () => {
+        document.getElementById('methodology')?.scrollIntoView({ behavior: 'smooth' });
     };
 
     return (
@@ -33,10 +33,10 @@ export default function Hero() {
 
                         <div className="flex flex-col sm:flex-row gap-4">
                             <button
-                                onClick={scrollToSimulator}
+                                onClick={scrollToMethodology}
                                 className="px-8 py-4 text-lg font-bold bg-energy-green text-navy-950 rounded-lg shadow-lg transition hover:bg-energy-green/90 hover:scale-105 transform"
                             >
-                                Explore Live Demo →
+                                Start Analysis →
                             </button>
                             <button
                                 onClick={() => document.getElementById('methodology')?.scrollIntoView({ behavior: 'smooth' })}
@@ -81,7 +81,7 @@ export default function Hero() {
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
                     >
-                        <CarbonHeatmap />
+                        <HeroSimulator />
                     </motion.div>
                 </div>
             </div>

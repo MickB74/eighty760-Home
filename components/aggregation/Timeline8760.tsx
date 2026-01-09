@@ -12,6 +12,7 @@ interface TimelineHourData {
     load: number;
     matched: number;
     deficit: number;
+    overgeneration: number;
     carbonIntensity: number;
 }
 
@@ -36,16 +37,26 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
         const matched = matchedProfile[i] || 0;
         const deficit = Math.max(0, load - matched);
 
+        // Calculate total clean generation for this hour
+        const s = solarGen?.[i] || 0;
+        const w = windGen?.[i] || 0;
+        const n = nuclearGen?.[i] || 0;
+        const b = batteryDischarge?.[i] || 0;
+        const totalGen = s + w + n + b;
+
+        const overgeneration = Math.max(0, totalGen - load);
+
         return {
             hour: i,
             timestamp: formatHourToDate(i),
-            solar: solarGen?.[i] || 0,
-            wind: windGen?.[i] || 0,
-            nuclear: nuclearGen?.[i] || 0,
-            battery: batteryDischarge?.[i] || 0,
+            solar: s,
+            wind: w,
+            nuclear: n,
+            battery: b,
             load,
             matched,
             deficit,
+            overgeneration,
             carbonIntensity: deficit > 0 ? 500 : 200 // Simplified
         };
     });
@@ -62,22 +73,61 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
         const height = canvas.height;
         const barWidth = width / 8760;
 
+        // Split height: Top 70% for Load/Deficit, Bottom 30% for Overgeneration
+        const zeroLineY = height * 0.7;
+        const topHeight = zeroLineY;
+        const bottomHeight = height - zeroLineY;
+
         ctx.clearRect(0, 0, width, height);
+
+        // Draw zero line
+        ctx.beginPath();
+        ctx.moveTo(0, zeroLineY);
+        ctx.lineTo(width, zeroLineY);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.stroke();
 
         // Draw each hour as a vertical bar
         hourlyData.forEach((data, i) => {
             const x = i * barWidth;
-            const matchRate = data.load > 0 ? data.matched / data.load : 0;
 
-            // Color based on match rate (green = good, red = bad)
-            const hue = matchRate * 120; // 0 = red, 120 = green
-            ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
+            // --- DRAW TOP BAR (Load / Deficit) ---
+            if (data.load > 0) {
+                const matchRate = data.matched / data.load;
 
-            // Height based on deficit
-            const deficitRatio = data.load > 0 ? data.deficit / data.load : 0;
-            const barHeight = Math.max(2, deficitRatio * height);
+                // Color based on match rate (green = good, red = bad)
+                const hue = matchRate * 120; // 0 = red, 120 = green
+                ctx.fillStyle = `hsl(${hue}, 70%, 50%)`;
 
-            ctx.fillRect(x, height - barHeight, Math.max(1, barWidth), barHeight);
+                // Height logic:
+                // We want matched + deficit to fill the space if load is high? 
+                // Currently logic seems to be: height based on deficitRatio? 
+                // Let's stick to the previous visual logic: 
+                // It seemed to show Deficit as a bar.
+                // Re-reading previous code: `barHeight = Math.max(2, deficitRatio * height)`
+                // If match is 100%, deficitRatio is 0, barHeight is 2px (tiny green bar).
+                // If deficit is 100%, deficitRatio is 1, barHeight is full height (red bar).
+                // So the chart primarily visualizes GRID DEFICIT.
+
+                const deficitRatio = data.deficit / data.load;
+                const barHeight = Math.max(2, deficitRatio * topHeight);
+
+                // Draw upwards from zeroLineY
+                ctx.fillRect(x, zeroLineY - barHeight, Math.max(1, barWidth), barHeight);
+            }
+
+            // --- DRAW BOTTOM BAR (Overgeneration) ---
+            if (data.overgeneration > 0) {
+                // Normalize overgeneration height relative to load? 
+                // Or just clamp it?
+                // Let's assume max overgen is roughly 2x load for scaling, or just use ratio.
+                const overgenRatio = Math.min(1, data.overgeneration / (data.load || 1));
+                const overgenHeight = Math.max(2, overgenRatio * bottomHeight);
+
+                // Cyan color for clean excess
+                ctx.fillStyle = '#06b6d4'; // cyan-500
+                ctx.fillRect(x, zeroLineY, Math.max(1, barWidth), overgenHeight);
+            }
         });
 
         // Draw hover indicator
@@ -135,7 +185,7 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
 
             {/* Stats Panel */}
             <div className="bg-navy-950/50 border border-energy-green/20 rounded-xl p-4 mb-4">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-3">
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-3">
                     <div>
                         <div className="text-xs text-slate-500">Hour</div>
                         <div className="text-lg font-bold text-energy-green">{currentData.hour.toLocaleString()}</div>
@@ -153,6 +203,12 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
                         <div className="text-xs text-slate-500">Grid Deficit</div>
                         <div className={`text-lg font-bold ${currentData.deficit > 0 ? 'text-red-500' : 'text-green-500'}`}>
                             {currentData.deficit.toFixed(1)} MWh
+                        </div>
+                    </div>
+                    <div>
+                        <div className="text-xs text-slate-500">Overgeneration</div>
+                        <div className={`text-lg font-bold ${currentData.overgeneration > 0 ? 'text-cyan-500' : 'text-slate-500'}`}>
+                            {currentData.overgeneration?.toFixed(1) || '0.0'} MWh
                         </div>
                     </div>
                 </div>
@@ -191,8 +247,8 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
                 <canvas
                     ref={canvasRef}
                     width={1200}
-                    height={100}
-                    className="w-full h-24 cursor-crosshair rounded-lg border border-white/10"
+                    height={140}
+                    className="w-full h-32 cursor-crosshair rounded-lg border border-white/10"
                     onMouseMove={handleMouseMove}
                     onMouseLeave={() => setHoveredHour(null)}
                     onClick={handleClick}
@@ -223,6 +279,10 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-red-500 rounded"></div>
                     <span>Grid Dependent</span>
+                </div>
+                <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-cyan-500 rounded"></div>
+                    <span>Overgeneration</span>
                 </div>
             </div>
         </div>
