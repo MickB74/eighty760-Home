@@ -162,25 +162,25 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
                     {currentData.solar > 0 && (
                         <div className="flex items-center gap-1">
                             <span>☀️</span>
-                            <span className="text-slate-400">{currentData.solar.toFixed(0)} MW</span>
+                            <span className="text-slate-400">{currentData.solar.toFixed(0)} MWh</span>
                         </div>
                     )}
                     {currentData.wind > 0 && (
                         <div className="flex items-center gap-1">
                             <span>💨</span>
-                            <span className="text-slate-400">{currentData.wind.toFixed(0)} MW</span>
+                            <span className="text-slate-400">{currentData.wind.toFixed(0)} MWh</span>
                         </div>
                     )}
                     {currentData.nuclear > 0 && (
                         <div className="flex items-center gap-1">
                             <span>⚛️</span>
-                            <span className="text-slate-400">{currentData.nuclear.toFixed(0)} MW</span>
+                            <span className="text-slate-400">{currentData.nuclear.toFixed(0)} MWh</span>
                         </div>
                     )}
                     {currentData.battery > 0 && (
                         <div className="flex items-center gap-1">
                             <span>🔋</span>
-                            <span className="text-slate-400">{currentData.battery.toFixed(0)} MW</span>
+                            <span className="text-slate-400">{currentData.battery.toFixed(0)} MWh</span>
                         </div>
                     )}
                 </div>
