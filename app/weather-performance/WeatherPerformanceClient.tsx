@@ -567,6 +567,7 @@ export default function WeatherPerformanceClient() {
                         )}
                     </div>
                 </div>
+            </div>
         </main>
     );
 }
