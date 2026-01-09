@@ -66,7 +66,7 @@ export default function WeatherPerformanceClient() {
         const config = {
             year: 2023, // Will be overridden per year
             region: "ERCOT",
-            building_portfolio: [{ type: buildingType, annual_mwh: annualLoad }] as BuildingPortfolioItem[],
+            building_portfolio: [{ type: buildingType, annual_mwh: annualLoad }],
             solar_capacity: solarCapacity,
             wind_capacity: windCapacity,
             nuclear_capacity: 0,
