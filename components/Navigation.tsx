@@ -45,7 +45,6 @@ export default function Navigation() {
         { name: 'Home', path: '/', section: null },
         // Tools Section
         { name: 'Aggregation', path: '/aggregation', section: 'tools' },
-        { name: 'Weather Performance', path: '/weather-performance', section: 'tools' },
         { name: 'Analysis', path: '/analysis', section: 'tools' },
         // Learn Section
         { name: 'Resources', path: '/blog', section: 'learn' },
