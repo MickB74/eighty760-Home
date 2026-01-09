@@ -18,20 +18,18 @@ import {
     LinearScale,
     PointElement,
     LineElement,
-    BarElement,
     Title,
     Tooltip,
     Legend,
     Filler,
 } from 'chart.js';
-import { Line, Bar } from 'react-chartjs-2';
+import { Line } from 'react-chartjs-2';
 
 ChartJS.register(
     CategoryScale,
     LinearScale,
     PointElement,
     LineElement,
-    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -56,6 +54,7 @@ export default function WeatherPerformanceClient() {
     const [progress, setProgress] = useState(0);
     const [yearlyResults, setYearlyResults] = useState<YearlyPerformance[]>([]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [expandedYear, setExpandedYear] = useState<number | null>(null);
 
     const handleCompareYears = async () => {
         setLoading(true);
@@ -95,81 +94,7 @@ export default function WeatherPerformanceClient() {
         return getWeatherStatistics(yearlyResults);
     }, [yearlyResults]);
 
-    // Performance comparison chart data
-    const comparisonChartData = useMemo(() => {
-        if (yearlyResults.length === 0) return null;
 
-        return {
-            labels: yearlyResults.map(r => r.year.toString()),
-            datasets: [
-                {
-                    label: 'CFE Score (%)',
-                    data: yearlyResults.map(r => r.result.results.cfe_percent),
-                    backgroundColor: 'rgba(16, 185, 129, 0.7)',
-                    borderColor: 'rgb(16, 185, 129)',
-                    borderWidth: 2,
-                },
-            ],
-        };
-    }, [yearlyResults]);
-
-    // Generation profile comparison (daily averages)
-    const generationProfileData = useMemo(() => {
-        if (yearlyResults.length === 0) return null;
-
-        const days = Array.from({ length: 365 }, (_, i) => i + 1);
-        const colors = [
-            'rgba(59, 130, 246, 0.8)',
-            'rgba(16, 185, 129, 0.8)',
-            'rgba(245, 158, 11, 0.8)',
-            'rgba(239, 68, 68, 0.8)',
-            'rgba(168, 85, 247, 0.8)',
-            'rgba(236, 72, 153, 0.8)',
-        ];
-
-        const datasets = yearlyResults.map((result, idx) => {
-            // Aggregate solar generation to daily
-            const solarDaily = aggregateToDaily(
-                result.result.df.map(d => d.Solar_Gen)
-            );
-
-            return {
-                label: `Solar ${result.year}`,
-                data: solarDaily,
-                borderColor: colors[idx],
-                borderWidth: 1.5,
-                pointRadius: 0,
-                fill: false,
-            };
-        });
-
-        return {
-            labels: days,
-            datasets,
-        };
-    }, [yearlyResults]);
-
-    // Cost comparison chart
-    const costChartData = useMemo(() => {
-        if (yearlyResults.length === 0) return null;
-
-        return {
-            labels: yearlyResults.map(r => r.year.toString()),
-            datasets: [
-                {
-                    label: 'Net REC Cost ($)',
-                    data: yearlyResults.map(r => r.result.results.net_rec_cost),
-                    backgroundColor: yearlyResults.map(r =>
-                        r.result.results.net_rec_cost < 0 ? 'rgba(239, 68, 68, 0.7)' : 'rgba(16, 185, 129, 0.7)'
-                    ),
-                    borderColor: yearlyResults.map(r =>
-                        r.result.results.net_rec_cost < 0 ? 'rgb(239, 68, 68)' : 'rgb(16, 185, 129)'
-                    ),
-                    borderWidth: 2,
-                },
-            ],
-        };
-    }, [yearlyResults]);
 
     return (
         <main className="min-h-screen bg-gray-50 dark:bg-navy-950 transition-colors duration-300">
@@ -328,48 +253,201 @@ export default function WeatherPerformanceClient() {
                                 </p>
                             </div>
 
-                            {/* Performance Metrics Table */}
+                            {/* Year Cards Gallery */}
                             <div>
                                 <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">
-                                    Year-by-Year Performance
+                                    Performance by Year
                                 </h3>
-                                <div className="bg-white dark:bg-white/5 backdrop-blur-md rounded-lg border border-gray-200 dark:border-white/10 overflow-hidden">
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-sm">
-                                            <thead className="bg-gray-50 dark:bg-slate-800 border-b border-gray-200 dark:border-white/10">
-                                                <tr>
-                                                    <th className="px-4 py-3 text-left font-semibold text-gray-700 dark:text-gray-200">Year</th>
-                                                    <th className="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-200">CFE Score</th>
-                                                    <th className="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-200">Grid (MWh)</th>
-                                                    <th className="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-200">Clean Gen (MWh)</th>
-                                                    <th className="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-200">Avoided (MT CO₂)</th>
-                                                    <th className="px-4 py-3 text-right font-semibold text-gray-700 dark:text-gray-200">Net Cost ($)</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody className="divide-y divide-gray-200 dark:divide-white/10">
-                                                {yearlyResults.map((result) => (
-                                                    <tr key={result.year} className="hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors">
-                                                        <td className="px-4 py-3 font-semibold text-gray-900 dark:text-gray-100">{result.year}</td>
-                                                        <td className="px-4 py-3 text-right font-mono text-gray-900 dark:text-gray-100">
-                                                            {result.result.results.cfe_percent.toFixed(1)}%
-                                                        </td>
-                                                        <td className="px-4 py-3 text-right font-mono text-gray-900 dark:text-gray-100">
-                                                            {result.result.results.grid_consumption.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                        </td>
-                                                        <td className="px-4 py-3 text-right font-mono text-gray-900 dark:text-gray-100">
-                                                            {result.result.results.total_clean_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                        </td>
-                                                        <td className="px-4 py-3 text-right font-mono text-gray-900 dark:text-gray-100">
-                                                            {result.result.results.avoided_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                        </td>
-                                                        <td className={`px-4 py-3 text-right font-mono ${result.result.results.net_rec_cost < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                                                            {result.result.results.net_rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {yearlyResults.map((result) => {
+                                        const isExpanded = expandedYear === result.year;
+                                        const cfeScore = result.result.results.cfe_percent;
+                                        const gridConsumption = result.result.results.grid_consumption;
+                                        const cleanGen = result.result.results.total_clean_generation;
+                                        const emissions = result.result.results.avoided_emissions_mt;
+                                        const netCost = result.result.results.net_rec_cost;
+
+                                        // Determine performance grade
+                                        let performanceGrade = '🟡';
+                                        let gradeText = 'Good';
+                                        let gradientClass = 'from-yellow-500/20 to-orange-500/20';
+
+                                        if (cfeScore >= 80) {
+                                            performanceGrade = '🟢';
+                                            gradeText = 'Excellent';
+                                            gradientClass = 'from-green-500/20 to-emerald-500/20';
+                                        } else if (cfeScore >= 60) {
+                                            performanceGrade = '🟢';
+                                            gradeText = 'Very Good';
+                                            gradientClass = 'from-lime-500/20 to-green-500/20';
+                                        } else if (cfeScore < 40) {
+                                            performanceGrade = '🔴';
+                                            gradeText = 'Needs Improvement';
+                                            gradientClass = 'from-red-500/20 to-orange-500/20';
+                                        }
+
+                                        return (
+                                            <div
+                                                key={result.year}
+                                                className={`bg-gradient-to-br ${gradientClass} backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-[1.02] cursor-pointer ${isExpanded ? 'md:col-span-2 lg:col-span-3' : ''
+                                                    }`}
+                                                onClick={() => setExpandedYear(isExpanded ? null : result.year)}
+                                            >
+                                                <div className="bg-white/60 dark:bg-white/5 backdrop-blur-sm p-6">
+                                                    {/* Card Header */}
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <div className="flex items-center gap-3">
+                                                            <span className="text-3xl">{performanceGrade}</span>
+                                                            <div>
+                                                                <h4 className="text-2xl font-bold text-navy-950 dark:text-white">
+                                                                    {result.year}
+                                                                </h4>
+                                                                <p className="text-sm text-gray-600 dark:text-gray-400">{gradeText} Performance</p>
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="text-3xl font-bold brand-text">
+                                                                {cfeScore.toFixed(1)}%
+                                                            </div>
+                                                            <p className="text-xs text-gray-600 dark:text-gray-400">CFE Score</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {/* Quick Metrics */}
+                                                    {!isExpanded && (
+                                                        <div className="grid grid-cols-2 gap-3">
+                                                            <div className="bg-white/70 dark:bg-navy-950/30 p-3 rounded-lg">
+                                                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Clean Energy</p>
+                                                                <p className="font-bold text-navy-950 dark:text-white">
+                                                                    {cleanGen.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
+                                                                </p>
+                                                            </div>
+                                                            <div className="bg-white/70 dark:bg-navy-950/30 p-3 rounded-lg">
+                                                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Grid Usage</p>
+                                                                <p className="font-bold text-navy-950 dark:text-white">
+                                                                    {gridConsumption.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
+                                                                </p>
+                                                            </div>
+                                                            <div className="bg-white/70 dark:bg-navy-950/30 p-3 rounded-lg">
+                                                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Emissions Avoided</p>
+                                                                <p className="font-bold text-navy-950 dark:text-white">
+                                                                    {emissions.toLocaleString(undefined, { maximumFractionDigits: 0 })} MT
+                                                                </p>
+                                                            </div>
+                                                            <div className="bg-white/70 dark:bg-navy-950/30 p-3 rounded-lg">
+                                                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Net Cost</p>
+                                                                <p className={`font-bold ${netCost < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                                    ${Math.abs(netCost).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                    {netCost < 0 ? ' ⚠️' : ' ✓'}
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Expanded Details */}
+                                                    {isExpanded && (
+                                                        <div className="mt-4 space-y-4 animate-in fade-in duration-300">
+                                                            {/* Detailed Metrics Grid */}
+                                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                                <div className="bg-white/70 dark:bg-navy-950/30 p-4 rounded-lg">
+                                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">CFE Score</p>
+                                                                    <p className="text-2xl font-bold brand-text">{cfeScore.toFixed(1)}%</p>
+                                                                </div>
+                                                                <div className="bg-white/70 dark:bg-navy-950/30 p-4 rounded-lg">
+                                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Clean Generation</p>
+                                                                    <p className="text-2xl font-bold text-navy-950 dark:text-white">
+                                                                        {cleanGen.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-500 dark:text-gray-400">MWh</p>
+                                                                </div>
+                                                                <div className="bg-white/70 dark:bg-navy-950/30 p-4 rounded-lg">
+                                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Grid Consumption</p>
+                                                                    <p className="text-2xl font-bold text-navy-950 dark:text-white">
+                                                                        {gridConsumption.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-500 dark:text-gray-400">MWh</p>
+                                                                </div>
+                                                                <div className="bg-white/70 dark:bg-navy-950/30 p-4 rounded-lg">
+                                                                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Emissions Avoided</p>
+                                                                    <p className="text-2xl font-bold text-navy-950 dark:text-white">
+                                                                        {emissions.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                    </p>
+                                                                    <p className="text-xs text-gray-500 dark:text-gray-400">MT CO₂</p>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Cost Breakdown */}
+                                                            <div className="bg-white/70 dark:bg-navy-950/30 p-4 rounded-lg">
+                                                                <h5 className="font-semibold mb-2 text-navy-950 dark:text-white">Financial Impact</h5>
+                                                                <div className="flex items-center justify-between">
+                                                                    <span className="text-gray-700 dark:text-gray-300">Net REC Cost</span>
+                                                                    <span className={`text-xl font-bold ${netCost < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                                        ${netCost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+
+                                                            {/* Daily Solar Profile Chart */}
+                                                            <div className="bg-white/70 dark:bg-navy-950/30 p-4 rounded-lg">
+                                                                <h5 className="font-semibold mb-3 text-navy-950 dark:text-white">Daily Solar Generation Profile</h5>
+                                                                <div className="h-48">
+                                                                    {(() => {
+                                                                        const solarDaily = aggregateToDaily(
+                                                                            result.result.df.map(d => d.Solar_Gen)
+                                                                        );
+                                                                        const days = Array.from({ length: 365 }, (_, i) => i + 1);
+
+                                                                        return (
+                                                                            <Line
+                                                                                data={{
+                                                                                    labels: days,
+                                                                                    datasets: [{
+                                                                                        label: 'Solar Generation (MW)',
+                                                                                        data: solarDaily,
+                                                                                        borderColor: 'rgb(16, 185, 129)',
+                                                                                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                                                                        borderWidth: 2,
+                                                                                        pointRadius: 0,
+                                                                                        fill: true,
+                                                                                    }]
+                                                                                }}
+                                                                                options={{
+                                                                                    responsive: true,
+                                                                                    maintainAspectRatio: false,
+                                                                                    scales: {
+                                                                                        x: {
+                                                                                            title: { display: true, text: 'Day of Year' },
+                                                                                            ticks: { maxTicksLimit: 12 },
+                                                                                        },
+                                                                                        y: {
+                                                                                            title: { display: true, text: 'Daily Avg MW' },
+                                                                                        },
+                                                                                    },
+                                                                                    plugins: {
+                                                                                        legend: { display: false },
+                                                                                    },
+                                                                                }}
+                                                                            />
+                                                                        );
+                                                                    })()}
+                                                                </div>
+                                                            </div>
+
+                                                            <p className="text-xs text-center text-gray-500 dark:text-gray-400 italic">
+                                                                Click card to collapse
+                                                            </p>
+                                                        </div>
+                                                    )}
+
+                                                    {!isExpanded && (
+                                                        <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-3 italic">
+                                                            Click to expand details
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
@@ -380,120 +458,38 @@ export default function WeatherPerformanceClient() {
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                     {stats.map((stat) => (
-                                        <div key={stat.metric} className="bg-white dark:bg-white/5 backdrop-blur-md p-4 rounded border border-gray-200 dark:border-white/10">
-                                            <div className="text-xs uppercase text-gray-700 dark:text-gray-300 font-semibold mb-2">
+                                        <div key={stat.metric} className="bg-white dark:bg-white/5 backdrop-blur-md p-4 rounded-lg border border-gray-200 dark:border-white/10">
+                                            <div className="text-xs uppercase text-gray-700 dark:text-gray-300 font-semibold mb-3">
                                                 {stat.metric}
                                             </div>
-                                            <div className="grid grid-cols-2 gap-2 text-xs">
-                                                <div>
-                                                    <span className="text-gray-500 dark:text-gray-400">Min: </span>
-                                                    <span className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                                                        {stat.min.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-                                                    </span>
-                                                    <span className="text-gray-400 dark:text-gray-500 ml-1">({stat.worstYear})</span>
+                                            <div className="space-y-2">
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400">Best</span>
+                                                    <div className="text-right">
+                                                        <span className="font-mono font-bold text-green-600 dark:text-green-400">
+                                                            {stat.max.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">({stat.bestYear})</span>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <span className="text-gray-500 dark:text-gray-400">Max: </span>
-                                                    <span className="font-mono font-bold text-gray-900 dark:text-gray-100">
-                                                        {stat.max.toLocaleString(undefined, { maximumFractionDigits: 1 })}
-                                                    </span>
-                                                    <span className="text-gray-400 dark:text-gray-500 ml-1">({stat.bestYear})</span>
-                                                </div>
-                                                <div className="col-span-2">
-                                                    <span className="text-gray-500 dark:text-gray-400">Avg: </span>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400">Average</span>
                                                     <span className="font-mono font-bold text-gray-900 dark:text-gray-100">
                                                         {stat.avg.toLocaleString(undefined, { maximumFractionDigits: 1 })}
                                                     </span>
                                                 </div>
+                                                <div className="flex items-center justify-between">
+                                                    <span className="text-sm text-gray-500 dark:text-gray-400">Worst</span>
+                                                    <div className="text-right">
+                                                        <span className="font-mono font-bold text-red-600 dark:text-red-400">
+                                                            {stat.min.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+                                                        </span>
+                                                        <span className="text-xs text-gray-400 dark:text-gray-500 ml-2">({stat.worstYear})</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
-                                </div>
-                            </div>
-
-                            {/* Charts */}
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                                {/* CFE Comparison Chart */}
-                                <div className="bg-white dark:bg-white/5 backdrop-blur-md p-4 rounded-lg border border-gray-200 dark:border-white/10">
-                                    <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">CFE Score by Year</h3>
-                                    <div className="h-64">
-                                        {comparisonChartData && (
-                                            <Bar
-                                                data={comparisonChartData}
-                                                options={{
-                                                    responsive: true,
-                                                    maintainAspectRatio: false,
-                                                    scales: {
-                                                        y: {
-                                                            beginAtZero: true,
-                                                            max: 100,
-                                                            title: { display: true, text: 'CFE Score (%)' },
-                                                        },
-                                                    },
-                                                    plugins: {
-                                                        legend: { display: false },
-                                                    },
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Cost Comparison Chart */}
-                                <div className="bg-white dark:bg-white/5 backdrop-blur-md p-4 rounded-lg border border-gray-200 dark:border-white/10">
-                                    <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">Net REC Cost by Year</h3>
-                                    <div className="h-64">
-                                        {costChartData && (
-                                            <Bar
-                                                data={costChartData}
-                                                options={{
-                                                    responsive: true,
-                                                    maintainAspectRatio: false,
-                                                    scales: {
-                                                        y: {
-                                                            title: { display: true, text: 'Cost ($)' },
-                                                        },
-                                                    },
-                                                    plugins: {
-                                                        legend: { display: false },
-                                                    },
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* Generation Profile Comparison */}
-                            <div className="bg-white dark:bg-white/5 backdrop-blur-md p-4 rounded-lg border border-gray-200 dark:border-white/10">
-                                <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">
-                                    Daily Solar Generation Profile (All Years)
-                                </h3>
-                                <div className="h-80">
-                                    {generationProfileData && (
-                                        <Line
-                                            data={generationProfileData}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                scales: {
-                                                    x: {
-                                                        title: { display: true, text: 'Day of Year' },
-                                                        ticks: { maxTicksLimit: 12 },
-                                                    },
-                                                    y: {
-                                                        title: { display: true, text: 'Daily Avg MW' },
-                                                    },
-                                                },
-                                                plugins: {
-                                                    legend: {
-                                                        display: true,
-                                                        position: 'top',
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                    )}
                                 </div>
                             </div>
 

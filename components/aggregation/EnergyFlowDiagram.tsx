@@ -160,7 +160,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         Solar
                     </text>
                     <text x="80" y="125" textAnchor="middle" fill="#fbbf24" fontSize="14" fontWeight="bold">
-                        {solar.toFixed(0)} MW
+                        {solar.toFixed(0)} MWh
                     </text>
 
                     {/* Wind */}
@@ -170,7 +170,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         Wind
                     </text>
                     <text x="80" y="245" textAnchor="middle" fill="#3b82f6" fontSize="14" fontWeight="bold">
-                        {wind.toFixed(0)} MW
+                        {wind.toFixed(0)} MWh
                     </text>
 
                     {/* Nuclear */}
@@ -180,7 +180,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         Nuclear
                     </text>
                     <text x="80" y="325" textAnchor="middle" fill="#8b5cf6" fontSize="14" fontWeight="bold">
-                        {nuclear.toFixed(0)} MW
+                        {nuclear.toFixed(0)} MWh
                     </text>
 
                     {/* Geothermal */}
@@ -190,7 +190,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         Geothermal
                     </text>
                     <text x="200" y="125" textAnchor="middle" fill="#f97316" fontSize="14" fontWeight="bold">
-                        {geothermal.toFixed(0)} MW
+                        {geothermal.toFixed(0)} MWh
                     </text>
 
                     {/* CCS Gas */}
@@ -200,7 +200,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         CCS Gas
                     </text>
                     <text x="200" y="325" textAnchor="middle" fill="#a78bfa" fontSize="14" fontWeight="bold">
-                        {ccs.toFixed(0)} MW
+                        {ccs.toFixed(0)} MWh
                     </text>
                 </g>
 
@@ -212,7 +212,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         Battery
                     </text>
                     <text x="370" y="260" textAnchor="middle" fill="#10b981" fontSize="14" fontWeight="bold">
-                        {battery.toFixed(0)} MW
+                        {battery.toFixed(0)} MWh
                     </text>
                 </g>
 
@@ -224,7 +224,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         Load
                     </text>
                     <text x="675" y="260" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
-                        {load.toFixed(0)} MW
+                        {load.toFixed(0)} MWh
                     </text>
                 </g>
 
@@ -234,7 +234,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                         <circle cx="675" cy="340" r="25" fill="#ef4444" opacity="0.2" stroke="#ef4444" strokeWidth="2" />
                         <text x="675" y="345" textAnchor="middle" fill="white" fontSize="20">⚡</text>
                         <text x="675" y="380" textAnchor="middle" fill="#ef4444" fontSize="12" fontWeight="bold">
-                            Grid: {gridDeficit.toFixed(0)} MW
+                            Grid: {gridDeficit.toFixed(0)} MWh
                         </text>
 
                         {/* Grid to Load path */}
@@ -317,7 +317,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
             <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
                 <div className="bg-navy-950/50 rounded-lg p-3">
                     <div className="text-slate-400 text-xs mb-1">Clean Generation</div>
-                    <div className="text-energy-green font-bold">{(solar + wind + nuclear + geothermal + ccs).toFixed(1)} MW</div>
+                    <div className="text-energy-green font-bold">{(solar + wind + nuclear + geothermal + ccs).toFixed(1)} MWh</div>
                 </div>
                 <div className="bg-navy-950/50 rounded-lg p-3">
                     <div className="text-slate-400 text-xs mb-1">CFE Match Rate</div>
