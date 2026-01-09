@@ -522,14 +522,14 @@ export default function WeatherPerformanceClient() {
                                             <strong>Planning Recommendation:</strong> Design your portfolio for the worst-case weather scenario
                                             (Year {stats[0].worstYear}) to ensure consistent performance across all conditions.
                                         </p>
-                                    </>
+                                    </div>
                                 )}
                             </div>
                         </div>
                     </div>
                 )}
             </div>
-        </div >
+        </div>
         </main >
     );
 }
