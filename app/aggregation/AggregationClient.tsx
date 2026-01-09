@@ -454,8 +454,8 @@ export default function AggregationPage() {
         financials.rec_price,
         financials.market_price_avg,
         historicalPrices,
-        JSON.stringify(Object.keys(allHubPrices)),
-        JSON.stringify(Object.keys(genProfiles))
+        allHubPrices,
+        genProfiles
     ]);
 
     // Save portfolio to localStorage when simulation completes
