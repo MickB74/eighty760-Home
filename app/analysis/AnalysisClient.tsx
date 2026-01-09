@@ -179,7 +179,7 @@ export default function AnalysisPage() {
                 }
             }, 500); // Small delay to ensure emissions data is loaded
         }
-    }, [emissionsData]);
+    }, [emissionsData, region]); // Added region dependency
 
     // Run Simulation
     const handleRun = () => {
