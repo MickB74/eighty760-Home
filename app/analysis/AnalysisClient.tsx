@@ -10,6 +10,7 @@ import { loadPortfolio, SharedPortfolio } from '@/lib/shared/portfolioStore';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { SimulationResult as AggResult } from '@/lib/aggregation/types';
 import Link from 'next/link';
+import ResultsHeatmap from '@/components/aggregation/ResultsHeatmap';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -232,11 +233,20 @@ export default function AnalysisPage() {
                     fill: true,
                     pointRadius: 0,
                     stack: 'gen'
+                }
+            ]
+        };
+    }, [simResult]);
+
+    const monthlyChartData = useMemo(() => {
+        if (!analysisData) return null;
+        return {
+            labels: analysisData.monthlyStats.map(m => m.name),
+            datasets: [
                 { label: 'Solar', data: analysisData.monthlyStats.map(m => m.solar), backgroundColor: '#F59E0B', stack: 'stack1' },
                 { label: 'Wind', data: analysisData.monthlyStats.map(m => m.wind), backgroundColor: '#3B82F6', stack: 'stack1' },
                 { label: 'Battery', data: analysisData.monthlyStats.map(m => m.battery), backgroundColor: '#10B981', stack: 'stack1' },
                 { label: 'Grid Import', data: analysisData.monthlyStats.map(m => m.grid), backgroundColor: '#64748B', stack: 'stack1' },
-                // Load line
                 {
                     label: 'Load',
                     data: analysisData.monthlyStats.map(m => m.load),
@@ -466,29 +476,16 @@ export default function AnalysisPage() {
                         </div>
 
                         {/* 3. Heatmap */}
-                        <div className="bg-navy-950 rounded-2xl overflow-hidden border border-white/10">
-                            {/* We need to import ResultsHeatmap dynamically or use it if available. Assumed imported as dynamic or top level. */}
-                            {/* Using the component logic assuming it's available. If not imported, we need to add import. */}
-                            {/* I will assume ResultsHeatmap is imported. If not, I'll need to fix in next step. */}
-                            {/* Oh wait, I haven't added the import yet in this replacement. I should have. */}
-                            {/* I will add a dynamic import or assume I'll fix imports in a separate tool call to be safe. */}
-                            {/* Actually, I am replacing lines 240-522. The imports are above. I need to add import at top. */}
-                            {/* I will skip the heatmap render here if I can't verify import, BUT the plan said to use it. */}
-                            {/* I'll use a placeholder or assume I added the import. I will add the import in a separate tool call to be safe. */}
-                            {/* Actually, let's render standard custom heatmap logic here if strictly needed, OR just a placeholder until I add import? */}
-                            {/* No, I should do it right. I will view the file again to add import first? No, I am mid-task. */}
-                            {/* I'll assume I can render it. */}
-                            <div className="p-6">
-                                <h3 className="text-lg font-bold text-white mb-4">Hourly CFE Performance (8760)</h3>
-                                {/* 
-                                   Since I haven't imported ResultsHeatmap in this edit (it's at top of file),
-                                   I will render a simple version or just text until I fix imports. 
-                                   Wait, I can use the existing 'InfoTooltip' import style if I had edit access to top.
-                                */}
-                                <div className="text-center py-12 text-gray-500">
-                                    (Heatmap Component Loading...)
-                                </div>
-                            </div>
+                        <div className="mt-8">
+                            {simResult?.df && (
+                                <ResultsHeatmap
+                                    data={simResult.df.map(d => d.CFE_Score || 0)}
+                                    title="Hourly CFE Performance (Low = Poor Match, High = Exact Match)"
+                                    min={0}
+                                    max={1.0}
+                                    unit="Score"
+                                />
+                            )}
                         </div>
 
                         {/* 4. Detailed Monthly Table */}
