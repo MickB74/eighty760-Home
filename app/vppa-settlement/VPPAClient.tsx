@@ -49,12 +49,13 @@ export default function VPPAClient() {
             const calculatedResults: VPPAResult[] = [];
 
             for (const scenario of scenarios) {
-                // Load price data
-                const priceResponse = await fetch(`/data/prices/ercot_rtm_${scenario.year}.json`);
+                // Load price data - files are named ercot_YEAR_hubs.json
+                const priceResponse = await fetch(`/data/prices/ercot_${scenario.year}_hubs.json`);
                 const priceData = await priceResponse.json();
 
-                // Get prices for the specified hub
-                const marketPrices = priceData[scenario.hub] || priceData['North'];
+                // Get prices for the specified hub - keys are like "HB_NORTH", "HB_HOUSTON"
+                const hubKey = `HB_${scenario.hub.toUpperCase()}`;
+                const marketPrices = priceData[hubKey] || priceData['HB_NORTH'];
 
                 // Load generation profile - files are named like Solar_North_2025.json
                 const techName = scenario.tech.replace(' ', '_'); // Convert "CCS Gas" to "CCS_Gas"
