@@ -250,6 +250,28 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                     </g>
                 )}
 
+                {/* Excess Generation (below battery) */}
+                {surplus > 0 && (
+                    <g id="excess">
+                        <circle cx="370" cy="340" r="25" fill="#fbbf24" opacity="0.2" stroke="#fbbf24" strokeWidth="2" />
+                        <text x="370" y="345" textAnchor="middle" fill="white" fontSize="20">⚡</text>
+                        <text x="370" y="380" textAnchor="middle" fill="#fbbf24" fontSize="12" fontWeight="bold">
+                            Excess: {surplus.toFixed(0)} MWh
+                        </text>
+
+                        {/* Battery to Excess  path */}
+                        <path
+                            d="M 370 230 L 370 315"
+                            stroke="#fbbf24"
+                            strokeWidth="3"
+                            fill="none"
+                            opacity="0.5"
+                            strokeDasharray="5,5"
+                        />
+                    </g>
+                )}
+
+
                 {/* Paths */}
                 <g id="paths" opacity="0.3">
                     {/* Solar to Battery */}
