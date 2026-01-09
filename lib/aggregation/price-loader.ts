@@ -55,7 +55,8 @@ export async function loadHubPrices(year: number, location: string): Promise<num
 }
 
 export function getAvailableYears(): number[] {
-    return [2020, 2021, 2022, 2023, 2024, 2025];
+    // Historical pricing data available 2010-2025
+    return Array.from({ length: 16 }, (_, i) => 2010 + i);
 }
 
 export function getYearLabel(year: number | 'Synthetic' | 'Average'): string {

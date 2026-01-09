@@ -367,7 +367,9 @@ export default function AggregationPage() {
     useEffect(() => {
         const loadPrices = async () => {
             if (selectedYear === 'Average') {
-                const prices = await loadAveragePriceProfile([2020, 2021, 2022, 2023, 2024, 2025]);
+                // Use all available years for average: 2010-2025
+                const allYears = Array.from({ length: 16 }, (_, i) => 2010 + i);
+                const prices = await loadAveragePriceProfile(allYears);
                 setHistoricalPrices(prices);
 
                 // Calculate and update average price

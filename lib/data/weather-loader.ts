@@ -59,7 +59,8 @@ export async function loadWindProfile(location: string, year: number): Promise<n
 
 // Available years for comparison
 export function getAvailableYears(): number[] {
-    return [2020, 2021, 2022, 2023, 2024, 2025];
+    // Historical weather data available 2000-2025
+    return Array.from({ length: 26 }, (_, i) => 2000 + i);
 }
 
 // Run simulation for a specific year using actual weather data
