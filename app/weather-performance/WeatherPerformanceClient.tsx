@@ -95,6 +95,42 @@ export default function WeatherPerformanceClient() {
         return getWeatherStatistics(yearlyResults);
     }, [yearlyResults]);
 
+    // Auto-load portfolio from Aggregation on mount
+    useEffect(() => {
+        const saved = loadPortfolio();
+        if (saved) {
+            // Map participants to total load
+            const totalLoad = saved.participants.reduce((sum, p) => sum + p.load_mwh, 0);
+            if (totalLoad > 0) {
+                setAnnualLoad(totalLoad);
+                // Use first participant's type as building type
+                if (saved.participants[0]) {
+                    setBuildingType(saved.participants[0].type);
+                }
+            }
+
+            // Map assets to capacities
+            const totalSolar = saved.assets.filter(a => a.type === 'Solar').reduce((sum, a) => sum + a.capacity_mw, 0);
+            const totalWind = saved.assets.filter(a => a.type === 'Wind').reduce((sum, a) => sum + a.capacity_mw, 0);
+
+            if (totalSolar > 0) setSolarCapacity(totalSolar);
+            if (totalWind > 0) setWindCapacity(totalWind);
+
+            // Map battery
+            if (saved.battery.mw > 0) {
+                setBatteryCapacity(saved.battery.mw * saved.battery.hours);
+            }
+
+            // Map financials
+            setBaseRecPrice(saved.financials.rec_price);
+
+            // Map location (use solar hub as primary location)
+            if (saved.solarHub) {
+                setLocation(saved.solarHub);
+            }
+        }
+    }, []); // Run once on mount
+
 
 
     return (
@@ -530,6 +566,6 @@ export default function WeatherPerformanceClient() {
                 )}
             </div>
         </div>
-        </main>
+        </main >
     );
 }
