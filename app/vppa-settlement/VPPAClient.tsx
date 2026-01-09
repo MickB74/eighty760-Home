@@ -56,8 +56,9 @@ export default function VPPAClient() {
                 // Get prices for the specified hub
                 const marketPrices = priceData[scenario.hub] || priceData['North'];
 
-                // Load generation profile
-                const genResponse = await fetch(`/data/generation/${scenario.tech.toLowerCase()}_${scenario.year}_${scenario.hub.toLowerCase()}.json`);
+                // Load generation profile - files are named like Solar_North_2025.json
+                const techName = scenario.tech.replace(' ', '_'); // Convert "CCS Gas" to "CCS_Gas"
+                const genResponse = await fetch(`/data/profiles/${techName}_${scenario.hub}_${scenario.year}.json`);
                 let generationProfile: number[];
 
                 if (genResponse.ok) {
