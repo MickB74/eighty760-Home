@@ -13,6 +13,7 @@ interface EnergyFlowProps {
     battery: number;
     load: number;
     gridDeficit: number;
+    surplus?: number; // Excess generation
 }
 
 interface Particle {
@@ -21,7 +22,7 @@ interface Particle {
     progress: number;
 }
 
-export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geothermal, ccs, battery, load, gridDeficit }: EnergyFlowProps) {
+export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geothermal, ccs, battery, load, gridDeficit, surplus = 0 }: EnergyFlowProps) {
     const [particles, setParticles] = useState<Particle[]>([]);
     const [particleId, setParticleId] = useState(0);
 
@@ -169,7 +170,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                     <text x="80" y="170" textAnchor="middle" fill="#3b82f6" fontSize="12" fontWeight="600">
                         Wind
                     </text>
-                    <text x="80" y="245" textAnchor="middle" fill="#3b82f6" fontSize="14" fontWeight="bold">
+                    <text x="80" y="245" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
                         {wind.toFixed(0)} MWh
                     </text>
 

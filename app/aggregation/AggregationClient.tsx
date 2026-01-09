@@ -927,6 +927,7 @@ export default function AggregationPage() {
                                     battery={result.battery_discharge[currentHour] || 0}
                                     load={result.load_profile[currentHour] || 0}
                                     gridDeficit={Math.max(0, (result.load_profile[currentHour] || 0) - (result.matched_profile[currentHour] || 0))}
+                                    surplus={result.surplus_profile[currentHour] || 0}
                                 />
                             </div>
 
