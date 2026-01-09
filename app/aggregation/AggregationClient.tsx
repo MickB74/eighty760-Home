@@ -29,7 +29,7 @@ import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
-import { savePortfolio } from '@/lib/shared/portfolioStore';
+import { loadPortfolio, savePortfolio } from '@/lib/shared/portfolioStore';
 import Link from 'next/link';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
