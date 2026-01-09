@@ -432,9 +432,9 @@ export default function AnalysisPage() {
                                     />
                                     <MetricCard
                                         label="Net REC Cost"
-                                        value={`$${simResult?.results.net_rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}`}
+                                        value={`$${simResult?.results.net_rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}`}
                                         sub="Revenue - Cost"
-                                        color={simResult.results.net_rec_cost > 0 ? "text-green-500" : "text-red-500"}
+                                        color={(simResult?.results.net_rec_cost || 0) > 0 ? "text-green-500" : "text-red-500"}
                                     />
                                 </div>
                             </div>
