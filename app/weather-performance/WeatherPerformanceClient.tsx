@@ -53,7 +53,7 @@ export default function WeatherPerformanceClient() {
     // Results
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0);
-    const [yearlyResults, setYearlyResults] = useState<YearlyPerformance[]>([]);
+    const [yearlyResults, setYearlyResults] = useState([] as YearlyPerformance[]);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [expandedYear, setExpandedYear] = useState<number | null>(null);
 
@@ -566,6 +566,6 @@ export default function WeatherPerformanceClient() {
                 )}
             </div>
         </div>
-        </main>
+        </main >
     );
 }
