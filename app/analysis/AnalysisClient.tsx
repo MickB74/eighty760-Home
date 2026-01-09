@@ -181,6 +181,54 @@ export default function AnalysisPage() {
         }, 100);
     };
 
+    // --- Data Processing (Memoized) ---
+    const analysisData = useMemo(() => {
+        if (!simResult) return null;
+
+        const df = simResult.df;
+        const monthlyStats: any[] = [];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+        // 1. Monthly Aggregation
+        for (let m = 0; m < 12; m++) {
+            const monthRows = df.filter(row => new Date(row.timestamp).getMonth() === m);
+
+            if (monthRows.length === 0) continue;
+
+            const totalLoad = monthRows.reduce((a, b) => a + b.Load_Actual, 0);
+            const totalSolar = monthRows.reduce((a, b) => a + b.Solar_Gen, 0);
+            const totalWind = monthRows.reduce((a, b) => a + b.Wind_Gen, 0);
+            const totalBattery = monthRows.reduce((a, b) => a + b.Battery_Discharge, 0);
+            const totalClean = totalSolar + totalWind + totalBattery;
+            const totalGrid = monthRows.reduce((a, b) => a + b.Grid_Consumption, 0);
+            const totalExcess = monthRows.reduce((a, b) => a + b.Overgeneration, 0);
+
+            // CFE Calculation: Energy Matched / Energy Load
+            const matchedEnergy = totalClean - totalExcess;
+            const cfeAvg = (matchedEnergy / totalLoad) * 100;
+
+            monthlyStats.push({
+                name: months[m],
+                load: totalLoad,
+                generation: totalClean,
+                solar: totalSolar,
+                wind: totalWind,
+                battery: totalBattery,
+                grid: totalGrid,
+                excess: totalExcess,
+                cfe: cfeAvg
+            });
+        }
+
+        // 2. Load Duration Curve (Net Load = Load - VRE)
+        const sortedNetLoad = [...df].map(row => row.Load_Actual - (row.Solar_Gen + row.Wind_Gen)).sort((a, b) => b - a);
+
+        // Downsample for chart (every 10th point)
+        const durationCurvePoints = sortedNetLoad.filter((_, i) => i % 10 === 0);
+
+        return { monthlyStats, durationCurvePoints };
+    }, [simResult]);
+
     // --- Charts ---
     const chartData = useMemo(() => {
         if (!simResult) return null;
@@ -246,7 +294,7 @@ export default function AnalysisPage() {
                 { label: 'Solar', data: analysisData.monthlyStats.map(m => m.solar), backgroundColor: '#F59E0B', stack: 'stack1' },
                 { label: 'Wind', data: analysisData.monthlyStats.map(m => m.wind), backgroundColor: '#3B82F6', stack: 'stack1' },
                 { label: 'Battery', data: analysisData.monthlyStats.map(m => m.battery), backgroundColor: '#10B981', stack: 'stack1' },
-                { label: 'Grid Import', data: analysisData.monthlyStats.map(m => m.grid), backgroundColor: '#64748B', stack: 'stack1' },
+                { label: 'Grid', data: analysisData.monthlyStats.map(m => m.grid), backgroundColor: '#64748B', stack: 'stack1' },
                 {
                     label: 'Load',
                     data: analysisData.monthlyStats.map(m => m.load),
@@ -442,7 +490,7 @@ export default function AnalysisPage() {
                             <div className="lg:col-span-2 bg-white dark:bg-white/5 backdrop-blur-md p-6 rounded-2xl border border-gray-200 dark:border-white/10 flex flex-col">
                                 <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4">Monthly Energy Balance</h3>
                                 <div className="flex-1 min-h-0 relative">
-                                    {monthlyChartData && <Bar data={monthlyChartData} options={{
+                                    {monthlyChartData && <Bar data={monthlyChartData as any} options={{
                                         responsive: true,
                                         maintainAspectRatio: false,
                                         scales: {
@@ -479,7 +527,7 @@ export default function AnalysisPage() {
                         <div className="mt-8">
                             {simResult?.df && (
                                 <ResultsHeatmap
-                                    data={simResult.df.map(d => d.CFE_Score || 0)}
+                                    data={simResult.df.map(d => d.Hourly_CFE_Ratio || 0)}
                                     title="Hourly CFE Performance (Low = Poor Match, High = Exact Match)"
                                     min={0}
                                     max={1.0}
