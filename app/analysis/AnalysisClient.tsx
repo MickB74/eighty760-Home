@@ -142,7 +142,7 @@ export default function AnalysisPage() {
                 wind: totalWind,
                 nuclear: totalNuclear,
                 geo: totalGeo,
-                hydro: totalHydro,
+                hydro: totalCCS,  // Analysis uses 'hydro' field for CCS Gas from Aggregation
                 battery: stored.battery.mw * stored.battery.hours
             });
             setFinancials({
@@ -168,7 +168,7 @@ export default function AnalysisPage() {
                         wind_capacity: totalWind,
                         nuclear_capacity: totalNuclear,
                         geothermal_capacity: totalGeo,
-                        hydro_capacity: totalHydro,
+                        hydro_capacity: totalCCS,  // Passing CCS as hydro capacity for Analysis engine
                         battery_capacity_mwh: stored.battery.mw * stored.battery.hours,
                         base_rec_price: stored.financials.rec_price,
                         use_rec_scaling: stored.financials.use_scarcity || false,
