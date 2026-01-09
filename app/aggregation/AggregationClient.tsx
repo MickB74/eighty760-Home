@@ -429,6 +429,11 @@ export default function AggregationPage() {
         loadPrices();
     }, [selectedYear, loadHub]);
 
+    // Memoize active assets key to avoid complex dependency warning
+    const activeAssetsKey = useMemo(() => {
+        return JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location })));
+    }, [activeAssets]);
+
     // Run sim when key inputs change (debounced to avoid excessive re-renders)
     useEffect(() => {
         if (participants.length === 0) {
@@ -441,7 +446,7 @@ export default function AggregationPage() {
         }, 300); // 300ms debounce
 
         return () => clearTimeout(timeoutId);
-    }, [participants.length, JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location }))), capacities.Battery_MW, capacities.Battery_Hours, financials.solar_price, financials.wind_price, financials.geo_price, financials.nuc_price, financials.ccs_price, financials.rec_price, financials.market_price_avg, historicalPrices, allHubPrices, genProfiles, runSimulation]);
+    }, [participants.length, activeAssetsKey, capacities.Battery_MW, capacities.Battery_Hours, financials.solar_price, financials.wind_price, financials.geo_price, financials.nuc_price, financials.ccs_price, financials.rec_price, financials.market_price_avg, historicalPrices, allHubPrices, genProfiles, runSimulation]);
 
     // Save portfolio to localStorage when simulation completes
     useEffect(() => {

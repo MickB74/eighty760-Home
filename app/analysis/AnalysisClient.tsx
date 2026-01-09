@@ -422,12 +422,12 @@ export default function AnalysisPage() {
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                     <MetricCard
                                         label="Grid Emissions"
-                                        value={simResult?.results.grid_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        value={simResult?.results.grid_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}
                                         sub="Metric Tons CO2e"
                                     />
                                     <MetricCard
                                         label="Avoided Emissions"
-                                        value={simResult?.results.avoided_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                        value={simResult?.results.avoided_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}
                                         sub="Metric Tons CO2e"
                                     />
                                     <MetricCard
