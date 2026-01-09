@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Navigation from '@/components/Navigation';
+import { loadPortfolio } from '@/lib/shared/portfolioStore';
 import {
     compareYearlyPerformance,
     getAvailableYears,
