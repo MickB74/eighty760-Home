@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Chart } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -317,7 +317,7 @@ export default function AggregationPage() {
         loadProfiles();
     }, [selectedYear, activeAssets, useTMY]);
 
-    const runSimulation = () => {
+    const runSimulation = useCallback(() => {
         setLoading(true);
         setTimeout(() => {
             // Filter excluded techs (zero out capacity) - DISABLED temporarily as we move to AssetEditor
@@ -363,7 +363,7 @@ export default function AggregationPage() {
 
             setLoading(false);
         }, 50);
-    };
+    }, [participants, activeAssets, financials, historicalPrices, capacities.Battery_MW, capacities.Battery_Hours, allHubPrices, genProfiles, batteryParams]);
 
     // Load historical price data when year changes
     useEffect(() => {
@@ -441,22 +441,7 @@ export default function AggregationPage() {
         }, 300); // 300ms debounce
 
         return () => clearTimeout(timeoutId);
-    }, [
-        participants.length,
-        JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location }))),
-        capacities.Battery_MW,
-        capacities.Battery_Hours,
-        financials.solar_price,
-        financials.wind_price,
-        financials.geo_price,
-        financials.nuc_price,
-        financials.ccs_price,
-        financials.rec_price,
-        financials.market_price_avg,
-        historicalPrices,
-        allHubPrices,
-        genProfiles
-    ]);
+    }, [participants.length, JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location }))), capacities.Battery_MW, capacities.Battery_Hours, financials.solar_price, financials.wind_price, financials.geo_price, financials.nuc_price, financials.ccs_price, financials.rec_price, financials.market_price_avg, historicalPrices, allHubPrices, genProfiles, runSimulation]);
 
     // Save portfolio to localStorage when simulation completes
     useEffect(() => {

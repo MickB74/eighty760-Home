@@ -353,7 +353,7 @@ export default function AnalysisPage() {
                             {/* Header */}
                             <div>
                                 <h1 className="text-3xl font-bold brand-text">Simulation Results</h1>
-                                <p className="text-gray-700 dark:text-gray-300">Region: {region} | Total Load: {simResult.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</p>
+                                <p className="text-gray-700 dark:text-gray-300">Region: {region} | Total Load: {simResult?.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 }) || 0} MWh</p>
                             </div>
 
                             {/* Operational Analysis */}
