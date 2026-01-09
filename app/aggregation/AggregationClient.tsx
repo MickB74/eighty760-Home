@@ -1063,100 +1063,142 @@ export default function AggregationPage() {
                                 <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm overflow-x-auto mt-8">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-lg font-semibold">Asset Financial Breakdown</h3>
-                                        <button
-                                            onClick={() => {
-                                                // Generate CSV with hourly interval data
-                                                const csvRows: string[] = [];
+                                        <div className="flex gap-2">
+                                            {/* Portfolio-Level CSV */}
+                                            <button
+                                                onClick={() => {
+                                                    const csvRows: string[] = [];
 
-                                                // Header with REC and Load columns
-                                                csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Hourly Load (MWh),Matched Gen (MWh),Grid Deficit (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($),REC Price ($/MWh),REC Revenue ($)');
+                                                    // Header for portfolio-level metrics
+                                                    csvRows.push('Timestamp,Hour,Load (MWh),Matched (MWh),Grid Deficit (MWh),Surplus (MWh),Solar Gen (MWh),Wind Gen (MWh),Nuclear Gen (MWh),Geothermal Gen (MWh),CCS Gen (MWh),Battery Discharge (MWh),Market Price ($/MWh),REC Price ($/MWh)');
 
-                                                // For each hour
-                                                for (let h = 0; h < 8760; h++) {
-                                                    const timestamp = `Hour ${h + 1}`;
-                                                    const hourlyLoad = result.load_profile[h] || 0;
-                                                    const hourlyMatched = result.matched_profile[h] || 0;
-                                                    const hourlyDeficit = hourlyLoad - hourlyMatched;
-
-                                                    // For each asset
-                                                    result.asset_details.forEach(asset => {
-                                                        // Get the hourly generation based on asset type
-                                                        let hourlyGen = 0;
-                                                        const techMap: Record<string, number[]> = {
-                                                            'Solar': result.solar_profile,
-                                                            'Wind': result.wind_profile,
-                                                            'Geothermal': result.geo_profile,
-                                                            'Nuclear': result.nuc_profile,
-                                                            'CCS Gas': result.ccs_profile
-                                                        };
-
-                                                        const profile = techMap[asset.type];
-                                                        if (profile && profile[h] !== undefined) {
-                                                            // Calculate this asset's share of the total tech generation
-                                                            const totalTechGen = profile[h];
-                                                            const assetShare = asset.capacity_mw / result.asset_details
-                                                                .filter(a => a.type === asset.type)
-                                                                .reduce((sum, a) => sum + a.capacity_mw, 0);
-                                                            hourlyGen = totalTechGen * assetShare;
-                                                        }
-
-                                                        const marketPrice = result.market_price_profile[h] || 0;
-                                                        const hourlyRevenue = hourlyGen * marketPrice;
-
-                                                        // Get PPA strike price
-                                                        const ppaPriceMap: Record<string, number> = {
-                                                            'Solar': financials.solar_price,
-                                                            'Wind': financials.wind_price,
-                                                            'Geothermal': financials.geo_price,
-                                                            'Nuclear': financials.nuc_price,
-                                                            'CCS Gas': financials.ccs_price
-                                                        };
-                                                        const ppaStrike = ppaPriceMap[asset.type] || 0;
-                                                        const hourlyCost = hourlyGen * ppaStrike;
-                                                        const hourlySettlement = hourlyRevenue - hourlyCost;
-
-                                                        // Calculate REC price and revenue
-                                                        const recPrice = result.rec_price_profile ? result.rec_price_profile[h] || 0 : 0;
-                                                        const recRevenue = hourlyGen * recPrice;
-
+                                                    // One row per hour
+                                                    for (let h = 0; h < 8760; h++) {
+                                                        const timestamp = `Hour ${h + 1}`;
                                                         csvRows.push([
                                                             timestamp,
                                                             h.toString(),
-                                                            asset.name,
-                                                            asset.type,
-                                                            asset.location,
-                                                            asset.capacity_mw.toFixed(2),
-                                                            hourlyGen.toFixed(4),
-                                                            hourlyLoad.toFixed(4),
-                                                            hourlyMatched.toFixed(4),
-                                                            hourlyDeficit.toFixed(4),
-                                                            marketPrice.toFixed(2),
-                                                            hourlyRevenue.toFixed(2),
-                                                            ppaStrike.toFixed(2),
-                                                            hourlyCost.toFixed(2),
-                                                            hourlySettlement.toFixed(2),
-                                                            recPrice.toFixed(2),
-                                                            recRevenue.toFixed(2)
+                                                            (result.load_profile[h] || 0).toFixed(4),
+                                                            (result.matched_profile[h] || 0).toFixed(4),
+                                                            (result.deficit_profile[h] || 0).toFixed(4),
+                                                            (result.surplus_profile[h] || 0).toFixed(4),
+                                                            (result.solar_profile[h] || 0).toFixed(4),
+                                                            (result.wind_profile[h] || 0).toFixed(4),
+                                                            (result.nuc_profile[h] || 0).toFixed(4),
+                                                            (result.geo_profile[h] || 0).toFixed(4),
+                                                            (result.ccs_profile[h] || 0).toFixed(4),
+                                                            (result.battery_discharge[h] || 0).toFixed(4),
+                                                            (result.market_price_profile[h] || 0).toFixed(2),
+                                                            (result.rec_price_profile ? result.rec_price_profile[h] || 0 : 0).toFixed(2)
                                                         ].join(','));
-                                                    });
-                                                }
+                                                    }
 
-                                                // Download CSV
-                                                const csvContent = csvRows.join('\n');
-                                                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                                                const link = document.createElement('a');
-                                                const url = URL.createObjectURL(blob);
-                                                link.setAttribute('href', url);
-                                                link.setAttribute('download', `asset_financial_breakdown_${selectedYear}_hourly.csv`);
-                                                link.style.visibility = 'hidden';
-                                                document.body.appendChild(link);
-                                                link.click();
-                                                document.body.removeChild(link);
-                                            }}
-                                            className="px-4 py-2 bg-energy-green text-navy-950 text-sm rounded-md hover:opacity-90 transition-opacity"
-                                        >
-                                            📥 Download CSV (Hourly Data)
-                                        </button>
+                                                    // Download
+                                                    const csvContent = csvRows.join('\n');
+                                                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                                    const link = document.createElement('a');
+                                                    const url = URL.createObjectURL(blob);
+                                                    link.setAttribute('href', url);
+                                                    link.setAttribute('download', `portfolio_hourly_${selectedYear}.csv`);
+                                                    link.style.visibility = 'hidden';
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                }}
+                                                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:opacity-90 transition-opacity"
+                                            >
+                                                📊 Portfolio CSV
+                                            </button>
+
+                                            {/* Asset-Level CSV */}
+                                            <button
+                                                onClick={() => {
+                                                    const csvRows: string[] = [];
+
+                                                    // Header for asset-level data
+                                                    csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($),REC Price ($/MWh),REC Revenue ($)');
+
+                                                    // For each hour
+                                                    for (let h = 0; h < 8760; h++) {
+                                                        const timestamp = `Hour ${h + 1}`;
+
+                                                        // For each asset
+                                                        result.asset_details.forEach(asset => {
+                                                            // Get the hourly generation based on asset type
+                                                            let hourlyGen = 0;
+                                                            const techMap: Record<string, number[]> = {
+                                                                'Solar': result.solar_profile,
+                                                                'Wind': result.wind_profile,
+                                                                'Geothermal': result.geo_profile,
+                                                                'Nuclear': result.nuc_profile,
+                                                                'CCS Gas': result.ccs_profile
+                                                            };
+
+                                                            const profile = techMap[asset.type];
+                                                            if (profile && profile[h] !== undefined) {
+                                                                // Calculate this asset's share of the total tech generation
+                                                                const totalTechGen = profile[h];
+                                                                const assetShare = asset.capacity_mw / result.asset_details
+                                                                    .filter(a => a.type === asset.type)
+                                                                    .reduce((sum, a) => sum + a.capacity_mw, 0);
+                                                                hourlyGen = totalTechGen * assetShare;
+                                                            }
+
+                                                            const marketPrice = result.market_price_profile[h] || 0;
+                                                            const hourlyRevenue = hourlyGen * marketPrice;
+
+                                                            // Get PPA strike price
+                                                            const ppaPriceMap: Record<string, number> = {
+                                                                'Solar': financials.solar_price,
+                                                                'Wind': financials.wind_price,
+                                                                'Geothermal': financials.geo_price,
+                                                                'Nuclear': financials.nuc_price,
+                                                                'CCS Gas': financials.ccs_price
+                                                            };
+                                                            const ppaStrike = ppaPriceMap[asset.type] || 0;
+                                                            const hourlyCost = hourlyGen * ppaStrike;
+                                                            const hourlySettlement = hourlyRevenue - hourlyCost;
+
+                                                            // Calculate REC price and revenue
+                                                            const recPrice = result.rec_price_profile ? result.rec_price_profile[h] || 0 : 0;
+                                                            const recRevenue = hourlyGen * recPrice;
+
+                                                            csvRows.push([
+                                                                timestamp,
+                                                                h.toString(),
+                                                                asset.name,
+                                                                asset.type,
+                                                                asset.location,
+                                                                asset.capacity_mw.toFixed(2),
+                                                                hourlyGen.toFixed(4),
+                                                                marketPrice.toFixed(2),
+                                                                hourlyRevenue.toFixed(2),
+                                                                ppaStrike.toFixed(2),
+                                                                hourlyCost.toFixed(2),
+                                                                hourlySettlement.toFixed(2),
+                                                                recPrice.toFixed(2),
+                                                                recRevenue.toFixed(2)
+                                                            ].join(','));
+                                                        });
+                                                    }
+
+                                                    // Download CSV
+                                                    const csvContent = csvRows.join('\n');
+                                                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                                                    const link = document.createElement('a');
+                                                    const url = URL.createObjectURL(blob);
+                                                    link.setAttribute('href', url);
+                                                    link.setAttribute('download', `assets_hourly_${selectedYear}.csv`);
+                                                    link.style.visibility = 'hidden';
+                                                    document.body.appendChild(link);
+                                                    link.click();
+                                                    document.body.removeChild(link);
+                                                }}
+                                                className="px-4 py-2 bg-energy-green text-navy-950 text-sm rounded-md hover:opacity-90 transition-opacity"
+                                            >
+                                                🏭 Assets CSV
+                                            </button>
+                                        </div>
                                     </div>
                                     <table className="w-full text-sm text-left">
                                         <thead>
