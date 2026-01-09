@@ -46,7 +46,7 @@ export default function Navigation() {
         // Tools Section
         { name: 'Aggregation', path: '/aggregation', section: 'tools' },
         { name: 'Analysis', path: '/analysis', section: 'tools' },
-        { name: 'VPPA Settlement', path: '/vppa-settlement', section: 'tools' },
+
         // Learn Section
         { name: 'Resources', path: '/blog', section: 'learn' },
         { name: 'Methodology', path: '/whitepaper', section: 'learn' },
