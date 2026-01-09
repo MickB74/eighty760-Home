@@ -350,92 +350,118 @@ export default function AnalysisPage() {
                         </div>
                     ) : (
                         <div className="space-y-8 animate-in fade-in duration-500">
-                            {/* Header */}
-                            <div>
-                                <h1 className="text-3xl font-bold brand-text">Simulation Results</h1>
-                                <p className="text-gray-700 dark:text-gray-300">Region: {region} | Total Load: {simResult?.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 }) || 0} MWh</p>
-                            </div>
+                            {/* 1. Performance Summary Card (Hero) */}
+                            {(() => {
+                                const cfe = simResult?.results.cfe_percent || 0;
 
-                            {/* Operational Analysis */}
-                            <div>
-                                <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Operational Analysis</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                                    <MetricCard
-                                        label="Total Electricity Usage"
-                                        value={`${simResult?.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
-                                        sub=""
-                                    />
-                                    <MetricCard
-                                        label="Clean Energy Generation"
-                                        value={`${simResult?.results.total_clean_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
-                                        sub=""
-                                        tooltip="Total raw generation from all clean energy sources before battery charging or curtailment."
-                                    />
-                                    <MetricCard
-                                        label="CFE Score (24/7)"
-                                        value={`${simResult?.results.cfe_percent.toFixed(1)}%`}
-                                        sub=""
-                                        tooltip="Percentage of total load matched with carbon-free energy on an hourly basis."
-                                    />
-                                    <MetricCard
-                                        label="Annual Clean Energy / Annual Load"
-                                        value={`${simResult?.results.clean_load_ratio.toFixed(1)}%`}
-                                        sub=""
-                                        tooltip="Ratio of total clean generation to total load. >100% means you generated more than you consumed annually."
-                                    />
-                                    <MetricCard
-                                        label="Battery Discharge"
-                                        value={`${simResult?.results.battery_discharge.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
-                                        sub=""
-                                        tooltip="Total energy discharged from batteries to serve load."
-                                    />
-                                    <MetricCard
-                                        label="MW Match Productivity"
-                                        value={`${simResult?.results.mw_match_productivity.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh/MW`}
-                                        sub=""
-                                        tooltip="Efficiency metric: MWh matched per MW of installed clean capacity."
-                                    />
-                                    <MetricCard
-                                        label="Loss of Green Hours"
-                                        value={`${simResult?.results.loss_of_green_hours.toFixed(1)}%`}
-                                        sub=""
-                                        tooltip="Percentage of hours where clean generation + battery storage was insufficient to meet 100% of load."
-                                    />
-                                    <MetricCard
-                                        label="Grid Consumption"
-                                        value={`${simResult?.results.grid_consumption.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
-                                        sub=""
-                                        tooltip="Total energy imported from the grid when local clean generation was insufficient."
-                                    />
-                                    <MetricCard
-                                        label="Excess Generation"
-                                        value={`${simResult?.results.excess_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh`}
-                                        sub=""
-                                        tooltip="Clean energy generated but not used by load or batteries (surplus)."
-                                    />
-                                </div>
-                            </div>
+                                // Determine grade & color (matching Weather Performance logic)
+                                let gradeIcon = '🟡';
+                                let gradeText = 'Good';
+                                let gradientClass = 'from-yellow-500/20 to-orange-500/20';
 
-                            {/* Financial & Environmental (kept separate or merged? Design only showed Operational. Keeping legacy metrics below for now but labelled) */}
+                                if (cfe >= 80) {
+                                    gradeIcon = '🟢';
+                                    gradeText = 'Excellent';
+                                    gradientClass = 'from-green-500/20 to-emerald-500/20';
+                                } else if (cfe >= 60) {
+                                    gradeIcon = '🟢';
+                                    gradeText = 'Very Good';
+                                    gradientClass = 'from-lime-500/20 to-green-500/20';
+                                } else if (cfe < 40) {
+                                    gradeIcon = '🔴';
+                                    gradeText = 'Needs Improvement';
+                                    gradientClass = 'from-red-500/20 to-orange-500/20';
+                                }
+
+                                return (
+                                    <div className={`bg-gradient-to-br ${gradientClass} rounded-2xl border border-gray-200 dark:border-white/10 relative overflow-hidden shadow-lg`}>
+                                        <div className="absolute inset-0 bg-white/40 dark:bg-black/5 backdrop-blur-sm" />
+                                        <div className="relative z-10 p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+
+                                            {/* Left: Grade & Score */}
+                                            <div className="flex items-center gap-6">
+                                                <span className="text-6xl filter drop-shadow-md">{gradeIcon}</span>
+                                                <div>
+                                                    <div className="flex items-baseline gap-2">
+                                                        <span className="text-6xl font-extrabold text-navy-950 dark:text-white tracking-tight">
+                                                            {cfe.toFixed(1)}
+                                                        </span>
+                                                        <span className="text-2xl font-bold text-navy-950 dark:text-white">%</span>
+                                                    </div>
+                                                    <div className="text-lg font-medium text-navy-900/70 dark:text-white/70 uppercase tracking-wide">
+                                                        24/7 Match Score
+                                                    </div>
+                                                    <div className="mt-1 inline-flex px-3 py-1 rounded-full bg-white/50 dark:bg-black/20 text-sm font-semibold text-navy-950 dark:text-white backdrop-blur-md">
+                                                        {gradeText} Performance
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Right: Key Stats Summary */}
+                                            <div className="grid grid-cols-2 gap-x-8 gap-y-4 text-right border-l border-navy-900/10 dark:border-white/10 pl-8">
+                                                <div>
+                                                    <div className="text-xs uppercase tracking-wider text-navy-900/60 dark:text-white/60 font-semibold">
+                                                        Total Load
+                                                    </div>
+                                                    <div className="text-2xl font-bold text-navy-950 dark:text-white">
+                                                        {simResult?.results.total_annual_load.toLocaleString(undefined, { maximumFractionDigits: 0 }) || 0}
+                                                        <span className="text-sm font-normal ml-1 opacity-70">MWh</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs uppercase tracking-wider text-navy-900/60 dark:text-white/60 font-semibold">
+                                                        Clean Gen
+                                                    </div>
+                                                    <div className="text-2xl font-bold text-navy-950 dark:text-white">
+                                                        {simResult?.results.total_clean_generation.toLocaleString(undefined, { maximumFractionDigits: 0 }) || 0}
+                                                        <span className="text-sm font-normal ml-1 opacity-70">MWh</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs uppercase tracking-wider text-navy-900/60 dark:text-white/60 font-semibold">
+                                                        Grid Emis.
+                                                    </div>
+                                                    <div className="text-2xl font-bold text-navy-950 dark:text-white">
+                                                        {simResult?.results.grid_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}
+                                                        <span className="text-sm font-normal ml-1 opacity-70">MT</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs uppercase tracking-wider text-navy-900/60 dark:text-white/60 font-semibold">
+                                                        Net Cost
+                                                    </div>
+                                                    <div className={`text-2xl font-bold ${(simResult?.results.net_rec_cost || 0) < 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}>
+                                                        ${Math.abs(simResult?.results.net_rec_cost || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+
+                            {/* 2. Detailed Metrics (Both Operational & Financial) */}
                             <div>
-                                <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Financial & Environmental</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                    <MetricCard
-                                        label="Grid Emissions"
-                                        value={simResult?.results.grid_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}
-                                        sub="Metric Tons CO2e"
-                                    />
-                                    <MetricCard
-                                        label="Avoided Emissions"
-                                        value={simResult?.results.avoided_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}
-                                        sub="Metric Tons CO2e"
-                                    />
-                                    <MetricCard
-                                        label="Net REC Cost"
-                                        value={`$${simResult?.results.net_rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}`}
-                                        sub="Revenue - Cost"
-                                        color={(simResult?.results.net_rec_cost || 0) > 0 ? "text-green-500" : "text-red-500"}
-                                    />
+                                <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white flex items-center gap-2">
+                                    <span className="opacity-70">⚡</span> Operational & Financial Metrics
+                                </h3>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {[
+                                        { label: "Clean / Load Ratio", value: `${simResult?.results.clean_load_ratio.toFixed(1)}%`, sub: ">100% is Surplus" },
+                                        { label: "Battery Discharge", value: `${simResult?.results.battery_discharge.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, sub: "MWh Served" },
+                                        { label: "Green Hours Lost", value: `${simResult?.results.loss_of_green_hours.toFixed(1)}%`, sub: "Unmatched Time" },
+                                        { label: "Grid Consumption", value: `${simResult?.results.grid_consumption.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, sub: "MWh Imported" },
+                                        { label: "Excess Generation", value: `${simResult?.results.excess_generation.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, sub: "MWh Surplus" },
+                                        { label: "Avoided Emissions", value: `${simResult?.results.avoided_emissions_mt.toLocaleString(undefined, { maximumFractionDigits: 0 }) || '0'}`, sub: "Metric Tons CO2e" },
+                                        { label: "Grid Deficit", value: `${((simResult?.results.grid_consumption || 0) / (simResult?.results.total_annual_load || 1) * 100).toFixed(1)}%`, sub: "% of Load" },
+                                        { label: "MW Productivity", value: `${simResult?.results.mw_match_productivity.toLocaleString(undefined, { maximumFractionDigits: 0 })}`, sub: "MWh/MW Capacity" },
+                                    ].map((m, i) => (
+                                        <div key={i} className="bg-white/80 dark:bg-white/5 backdrop-blur-md p-4 rounded-xl border border-gray-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 transition-colors">
+                                            <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">{m.label}</div>
+                                            <div className="text-2xl font-bold text-navy-950 dark:text-white mb-1">{m.value}</div>
+                                            <div className="text-xs text-gray-400 dark:text-gray-500">{m.sub}</div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
