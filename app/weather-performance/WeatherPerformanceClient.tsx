@@ -95,7 +95,40 @@ export default function WeatherPerformanceClient() {
         return getWeatherStatistics(yearlyResults);
     }, [yearlyResults]);
 
+    // Auto-load portfolio from Aggregation on mount
+    useEffect(() => {
+        const saved = loadPortfolio();
+        if (saved) {
+            // Map participants to total load
+            const totalLoad = saved.participants.reduce((sum, p) => sum + p.load_mwh, 0);
+            if (totalLoad > 0) {
+                setAnnualLoad(totalLoad);
+                if (saved.participants[0]) {
+                    setBuildingType(saved.participants[0].type);
+                }
+            }
 
+            // Map assets to capacities
+            const totalSolar = saved.assets.filter(a => a.type === 'Solar').reduce((sum, a) => sum + a.capacity_mw, 0);
+            const totalWind = saved.assets.filter(a => a.type === 'Wind').reduce((sum, a) => sum + a.capacity_mw, 0);
+
+            if (totalSolar > 0) setSolarCapacity(totalSolar);
+            if (totalWind > 0) setWindCapacity(totalWind);
+
+            // Map battery
+            if (saved.battery.mw > 0) {
+                setBatteryCapacity(saved.battery.mw * saved.battery.hours);
+            }
+
+            // Map financials
+            setBaseRecPrice(saved.financials.rec_price);
+
+            // Map location (use solar hub as primary location)
+            if (saved.solarHub) {
+                setLocation(saved.solarHub);
+            }
+        }
+    }, []);
 
     return (
         <main className="min-h-screen bg-gray-50 dark:bg-navy-950 transition-colors duration-300">
@@ -214,7 +247,7 @@ export default function WeatherPerformanceClient() {
 
                         {/* Compare Button */}
                         <button
-                            onClick={handleCompareYears}
+                            onClick={() => { handleCompareYears(); setIsSidebarOpen(false); }}
                             disabled={loading}
                             className="w-full py-3 bg-energy-green text-navy-950 rounded font-bold hover:opacity-90 disabled:opacity-50 transition-all"
                         >
@@ -231,16 +264,33 @@ export default function WeatherPerformanceClient() {
                         )}
                     </div>
                 </div>
+            </div>
+            )}
+
+            {/* Main Content - Full Width */}
+            <div className="max-w-7xl mx-auto px-6 lg:px-10 py-8">
+                {/* Header with Configure Button */}
+                <div className="flex justify-between items-center mb-8">
+                    <div>
+                        <h1 className="text-4xl font-bold brand-text">Weather Performance</h1>
+                        <p className="text-gray-600 dark:text-gray-400 mt-2">Compare project performance across historical weather years</p>
+                    </div>
+                    <button
+                        onClick={() => setIsSidebarOpen(true)}
+                        className="px-4 py-2 bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded-lg hover:bg-gray-50 dark:hover:bg-navy-800 transition-colors font-medium text-gray-700 dark:text-gray-200"
+                    >
+                        ⚙️ Configure
+                    </button>
+                </div>
 
                 {/* Main Content */}
-                <div className="flex-1 p-6 lg:p-10 overflow-y-auto">
+                <div>
                     {yearlyResults.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
+                        <div className="flex flex-col items-center justify-center py-32 text-gray-500 dark:text-gray-400">
                             <div className="text-6xl mb-4">🌤️</div>
                             <h2 className="text-2xl font-bold mb-2">Weather Performance Analysis</h2>
                             <p className="text-center max-w-md">
-                                Configure your project on the left and click "Compare All Years" to see how different
-                                weather conditions (2020-2025) affect your renewable energy performance.
+                                Click "Configure" to set up your project, then compare how different weather conditions (2020-2025) affect performance.
                             </p>
                         </div>
                     ) : (
