@@ -29,6 +29,8 @@ import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
+import { savePortfolio } from '@/lib/shared/portfolioStore';
+import Link from 'next/link';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
 function aggregateTo12x24(data: number[]): number[][] {
@@ -455,6 +457,26 @@ export default function AggregationPage() {
         JSON.stringify(Object.keys(allHubPrices)),
         JSON.stringify(Object.keys(genProfiles))
     ]);
+
+    // Save portfolio to localStorage when simulation completes
+    useEffect(() => {
+        if (result && participants.length > 0) {
+            savePortfolio({
+                participants,
+                assets: activeAssets,
+                battery: { mw: capacities.Battery_MW, hours: capacities.Battery_Hours },
+                financials,
+                year: selectedYear,
+                loadHub,
+                solarHub,
+                windHub,
+                nuclearHub,
+                geothermalHub,
+                ccsHub,
+                timestamp: Date.now()
+            });
+        }
+    }, [result, participants, activeAssets, capacities, financials, selectedYear, loadHub, solarHub, windHub, nuclearHub, geothermalHub, ccsHub]);
 
     // --- Render ---
 
@@ -904,6 +926,16 @@ export default function AggregationPage() {
                                 <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
                                 <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
                                 <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
+                            </div>
+
+                            {/* View in Analysis Button */}
+                            <div className="flex justify-end">
+                                <Link
+                                    href="/analysis"
+                                    className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg font-semibold transition-all inline-flex items-center gap-2"
+                                >
+                                    View Detailed Analysis →
+                                </Link>
                             </div>
 
                             {/* Interactive Visualizations */}

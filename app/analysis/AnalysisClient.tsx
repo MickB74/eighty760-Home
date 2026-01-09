@@ -6,6 +6,10 @@ import { runSimulation } from '@/lib/simulation/engine';
 import { SimulationResult, BuildingPortfolioItem } from '@/lib/simulation/types';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import Papa from 'papaparse';
+import { loadPortfolio, SharedPortfolio } from '@/lib/shared/portfolioStore';
+import { runAggregationSimulation } from '@/lib/aggregation/engine';
+import { SimulationResult as AggResult } from '@/lib/aggregation/types';
+import Link from 'next/link';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -76,6 +80,9 @@ export default function AnalysisPage() {
 
     // Results
     const [simResult, setSimResult] = useState<SimulationResult | null>(null);
+    const [aggregationResult, setAggregationResult] = useState<AggResult | null>(null);
+    const [portfolio, setPortfolio] = useState<SharedPortfolio | null>(null);
+    const [loadedFromAggregation, setLoadedFromAggregation] = useState(false);
 
     // --- Effects ---
 
@@ -94,6 +101,18 @@ export default function AnalysisPage() {
                 setCsvLoading(false);
             }
         });
+    }, []);
+
+    // Load portfolio from Aggregation on mount
+    useEffect(() => {
+        const stored = loadPortfolio();
+        if (stored) {
+            setPortfolio(stored);
+            setLoadedFromAggregation(true);
+            // Auto-run Aggregation simulation with loaded portfolio
+            // Note: We'd need to load prices + profiles, similar to Aggregation page
+            // For simplicity, show portfolio info but keep manual simulation for now
+        }
     }, []);
 
     // Run Simulation
@@ -302,11 +321,32 @@ export default function AnalysisPage() {
 
                 {/* Content */}
                 <div className="flex-1 p-6 lg:p-10 overflow-y-auto">
-                    {!simResult ? (
+                    {!simResult && !loadedFromAggregation ? (
                         <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
                             <div className="text-6xl mb-4">⚡</div>
                             <h2 className="text-2xl font-bold mb-2">Ready to Simulate</h2>
                             <p>Configure your portfolio on the left and click Generate.</p>
+                        </div>
+                    ) : !simResult && loadedFromAggregation ? (
+                        <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400 max-w-2xl mx-auto text-center">
+                            <div className="text-6xl mb-4">🔗</div>
+                            <h2 className="text-2xl font-bold mb-2">Portfolio Loaded from Aggregation</h2>
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 mb-6 text-left w-full">
+                                <h3 className="font-semibold mb-3">Portfolio Summary:</h3>
+                                <div className="space-y-2 text-sm">
+                                    <div><span className="text-slate-400">Participants:</span> <span className="text-white font-mono">{portfolio?.participants.length || 0}</span></div>
+                                    <div><span className="text-slate-400">Assets:</span> <span className="text-white font-mono">{portfolio?.assets.length || 0}</span></div>
+                                    <div><span className="text-slate-400">Battery:</span> <span className="text-white font-mono">{portfolio?.battery.mw} MW × {portfolio?.battery.hours}h</span></div>
+                                    <div><span className="text-slate-400">Year:</span> <span className="text-white font-mono">{portfolio?.year}</span></div>
+                                </div>
+                            </div>
+                            <p className="mb-4">Your Aggregation portfolio has been loaded. Use the configuration panel to run detailed analysis, or</p>
+                            <Link
+                                href="/aggregation"
+                                className="px-6 py-3 bg-energy-green text-navy-950 rounded-lg font-bold hover:opacity-90 transition-opacity inline-flex items-center gap-2"
+                            >
+                                ← Back to Aggregation
+                            </Link>
                         </div>
                     ) : (
                         <div className="space-y-8 animate-in fade-in duration-500">
