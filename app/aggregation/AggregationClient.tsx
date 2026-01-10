@@ -29,7 +29,8 @@ import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
-import AnalysisTab from '@/components/aggregation/AnalysisTab'; // Import new tab component
+import AnalysisTab from '@/components/aggregation/AnalysisTab';
+import ScenarioComparisonTab from '@/components/aggregation/ScenarioComparisonTab';
 import {
     loadPortfolio,
     savePortfolio,
@@ -1313,73 +1314,56 @@ export default function AggregationPage() {
 
                     {activeTab === 'scenarios' && (
                         <div className="animate-in fade-in duration-300">
-                            <div className="flex justify-between items-center mb-6">
-                                <h3 className="text-xl font-bold text-white">Saved Scenarios</h3>
-                                {scenarios.length > 0 && (
-                                    <button
-                                        onClick={() => {
-                                            if (confirm('Are you sure you want to clear all scenarios? This cannot be undone.')) {
-                                                clearScenarios();
-                                                setScenarios([]);
-                                            }
-                                        }}
-                                        className="text-sm text-red-400 hover:text-red-300 border border-red-400/30 px-3 py-1 rounded hover:bg-red-400/10 transition"
-                                    >
-                                        Clear All
-                                    </button>
-                                )}
-                            </div>
-
-                            {scenarios.length === 0 ? (
-                                <div className="text-center py-20 text-gray-500 border-2 border-dashed border-white/10 rounded-xl">
-                                    No saved scenarios yet. Configure a portfolio and click &quot;Save Scenario&quot;.
-                                </div>
-                            ) : (
-                                <div className="grid gap-4">
-                                    {scenarios.map(scen => (
-                                        <div key={scen.id} className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/20 transition-colors">
-                                            <div className="flex justify-between items-start">
-                                                <div>
-                                                    <h4 className="text-lg font-bold text-white mb-2">{scen.name}</h4>
-                                                    <div className="flex gap-4 text-sm text-gray-400 mb-4">
-                                                        <span>{getYearLabel(scen.year as any)}</span>
-                                                        <span>{scen.participants.length} Participants</span>
-                                                        <span>{scen.assets.length} Assets</span>
-                                                    </div>
-                                                    <button
-                                                        onClick={() => {
-                                                            setParticipants(scen.participants);
-                                                            setSelectedYear(scen.year as any);
-                                                            setFinancials(scen.financials);
-                                                            setLoadHub(scen.loadHub);
-                                                            setAssets(scen.assets); // Assuming we migrate to AssetEditor fully, but this updates 'assets' state
-                                                            // We also need to update 'capacities' state for legacy support if needed, but assets state drives AssetEditor
-                                                            setUseAdvancedAssets(true);
-                                                            setActiveTab('dashboard');
-                                                        }}
-                                                        className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                                                    >
-                                                        Load Scenario
-                                                    </button>
-                                                </div>
-                                                <button
-                                                    onClick={() => {
-                                                        deleteScenario(scen.id);
-                                                        setScenarios(getScenarios());
-                                                    }}
-                                                    className="text-red-400 hover:text-red-300 text-sm"
-                                                >
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
+                            <ScenarioComparisonTab
+                                scenarios={scenarios}
+                                onLoadScenario={(s) => {
+                                    handleLoadScenario(s);
+                                    setActiveTab('dashboard');
+                                }}
+                            />
                         </div>
                     )}
+
+                    <span>{getYearLabel(scen.year as any)}</span>
+                    <span>{scen.participants.length} Participants</span>
+                    <span>{scen.assets.length} Assets</span>
                 </div>
+                <button
+                    onClick={() => {
+                        setParticipants(scen.participants);
+                        setSelectedYear(scen.year as any);
+                        setFinancials(scen.financials);
+                        setLoadHub(scen.loadHub);
+                        setAssets(scen.assets); // Assuming we migrate to AssetEditor fully, but this updates 'assets' state
+                        // We also need to update 'capacities' state for legacy support if needed, but assets state drives AssetEditor
+                        setUseAdvancedAssets(true);
+                        setActiveTab('dashboard');
+                    }}
+                    className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                >
+                    Load Scenario
+                </button>
             </div>
+            <button
+                onClick={() => {
+                    deleteScenario(scen.id);
+                    setScenarios(getScenarios());
+                }}
+                className="text-red-400 hover:text-red-300 text-sm"
+            >
+                Delete
+            </button>
+        </div>
+                        </div >
+                    ))
+}
+                </div >
+            )}
+        </div >
+    )
+}
+                </div >
+            </div >
         </main >
     );
 }
