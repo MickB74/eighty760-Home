@@ -961,17 +961,15 @@ export default function AggregationPage() {
                         </button>
                         <button
                             onClick={() => setActiveTab('monthly')}
-                            className={`pb-4 px-4 font-medium transition-colors relative ${activeTab === 'monthly' ? 'text-brand dark:text-brand-light' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Monthly Analysis
-                            {activeTab === 'monthly' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand dark:bg-brand-light" />}
                         </button>
                         <button
                             onClick={() => setActiveTab('analysis')}
-                            className={`pb-4 px-4 font-medium transition-colors relative ${activeTab === 'analysis' ? 'text-brand dark:text-brand-light' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'analysis' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Advanced Analysis
-                            {activeTab === 'analysis' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand dark:bg-brand-light" />}
                         </button>
                         <button
                             onClick={() => setActiveTab('scenarios')}
