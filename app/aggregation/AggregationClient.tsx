@@ -1500,27 +1500,60 @@ function MonthlyProductionChart({ result }: { result: SimulationResult }) {
 
     // Aggregation Logic
     const monthlyLoad = new Array(12).fill(0);
-    const monthlyGen = new Array(12).fill(0);
-    const monthlyDeficit = new Array(12).fill(0);
-    const monthlySurplus = new Array(12).fill(0);
+    const monthlySolar = new Array(12).fill(0);
+    const monthlyWind = new Array(12).fill(0);
+    const monthlyNuc = new Array(12).fill(0);
+    const monthlyGeo = new Array(12).fill(0);
+    const monthlyCcs = new Array(12).fill(0);
+    const monthlyBattery = new Array(12).fill(0);
 
     for (let i = 0; i < 8760; i++) {
         // Simple approximation: 30.4 days per month * 24 = ~730 hours
         const month = Math.min(11, Math.floor(i / 730));
         monthlyLoad[month] += result.load_profile[i] || 0;
-        monthlyGen[month] += (result.solar_profile[i] + result.wind_profile[i] + result.nuc_profile[i] + result.geo_profile[i] + result.ccs_profile[i] + result.battery_discharge[i]);
-        monthlyDeficit[month] += result.deficit_profile[i] || 0;
-        monthlySurplus[month] += result.surplus_profile[i] || 0;
+
+        monthlySolar[month] += result.solar_profile[i] || 0;
+        monthlyWind[month] += result.wind_profile[i] || 0;
+        monthlyNuc[month] += result.nuc_profile[i] || 0;
+        monthlyGeo[month] += result.geo_profile[i] || 0;
+        monthlyCcs[month] += result.ccs_profile[i] || 0;
+        monthlyBattery[month] += result.battery_discharge[i] || 0;
     }
 
     const data = {
         labels: months,
         datasets: [
-            { label: 'Load', data: monthlyLoad, backgroundColor: '#374151' },
-            { label: 'Generation', data: monthlyGen, backgroundColor: '#10b981' },
-            { label: 'Deficit', data: monthlyDeficit, backgroundColor: '#ef4444' },
-            { label: 'Surplus', data: monthlySurplus, backgroundColor: '#f59e0b' },
+            {
+                type: 'line' as const,
+                label: 'Load',
+                data: monthlyLoad,
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                pointRadius: 2,
+                tension: 0.1,
+                order: 0
+            },
+            { label: 'Solar', data: monthlySolar, backgroundColor: '#facc15', stack: 'gen' },
+            { label: 'Wind', data: monthlyWind, backgroundColor: '#3b82f6', stack: 'gen' },
+            { label: 'Nuclear', data: monthlyNuc, backgroundColor: '#ec4899', stack: 'gen' },
+            { label: 'Geothermal', data: monthlyGeo, backgroundColor: '#f97316', stack: 'gen' },
+            { label: 'CCS Gas', data: monthlyCcs, backgroundColor: '#a8a29e', stack: 'gen' },
+            { label: 'Battery', data: monthlyBattery, backgroundColor: '#818cf8', stack: 'gen' },
         ]
+    };
+
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            x: { stacked: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } },
+            y: { stacked: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' }, title: { display: true, text: 'Energy (MWh)', color: '#9ca3af' } }
+        },
+        plugins: {
+            legend: { labels: { color: '#e5e7eb' }, position: 'top' as const, align: 'end' as const },
+            tooltip: { mode: 'index' as const, intersect: false }
+        },
+        interaction: { mode: 'nearest' as const, axis: 'x' as const, intersect: false }
     };
 
     return <Chart type="bar" data={data} options={{ responsive: true, maintainAspectRatio: false }} />;
