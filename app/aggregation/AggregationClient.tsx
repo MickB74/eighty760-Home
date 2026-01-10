@@ -944,7 +944,7 @@ export default function AggregationPage() {
                             </button>
                             <button
                                 onClick={handleInstantDemo}
-                                className="px-4 py-2 bg-energy-green text-navy-950 rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
+                                className="px-4 py-2 bg-energy-green dark:bg-energy-green text-navy-950 rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
                             >
                                 ⚡ Load Demo
                             </button>
@@ -955,25 +955,25 @@ export default function AggregationPage() {
                     <div className="flex border-b border-gray-200 dark:border-white/10 mb-8">
                         <button
                             onClick={() => setActiveTab('dashboard')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'dashboard' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'dashboard' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Dashboard
                         </button>
                         <button
                             onClick={() => setActiveTab('monthly')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Monthly Analysis
                         </button>
                         <button
                             onClick={() => setActiveTab('analysis')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'analysis' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Advanced Analysis
                         </button>
                         <button
                             onClick={() => setActiveTab('scenarios')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'scenarios' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'scenarios' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Scenario Comparison
                         </button>

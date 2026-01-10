@@ -86,8 +86,8 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`font-medium transition duration-200 ${isActive(link.path)
-                                    ? 'text-energy-green'
-                                    : 'text-gray-700 dark:text-slate-300 hover:text-energy-green'
+                                    ? 'text-energy-green-dark dark:text-energy-green'
+                                    : 'text-gray-700 dark:text-slate-300 hover:text-energy-green-dark dark:hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}
@@ -155,8 +155,8 @@ export default function Navigation() {
                                 key={link.path}
                                 href={link.path}
                                 className={`block px-4 py-3 rounded-lg text-base font-medium transition duration-200 ${isActive(link.path)
-                                    ? 'bg-emerald-50 dark:bg-energy-green/10 text-emerald-700 dark:text-energy-green border border-emerald-200 dark:border-energy-green/20'
-                                    : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-emerald-700 dark:hover:text-energy-green'
+                                    ? 'bg-emerald-50 dark:bg-energy-green/10 text-energy-green-dark dark:text-energy-green border border-emerald-200 dark:border-energy-green/20'
+                                    : 'text-gray-600 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 hover:text-energy-green-dark dark:hover:text-energy-green'
                                     }`}
                             >
                                 {link.name}

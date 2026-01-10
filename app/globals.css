@@ -46,7 +46,7 @@ body:not(.dark) {
 
 /* Light mode override for brand text (darker green for contrast) */
 :not(.dark) .brand-text {
-    @apply text-emerald-700 font-medium;
+    @apply text-energy-green-dark font-medium;
 }
 
 /* Chart Container */
