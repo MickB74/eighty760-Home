@@ -177,37 +177,37 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
     const currentData = hoveredHour !== null ? hourlyData[hoveredHour] : hourlyData[selectedHour];
 
     return (
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
+        <div className="bg-white dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl p-6 transition-colors duration-300 shadow-sm">
             <div className="mb-4">
-                <h3 className="text-lg font-semibold text-white mb-1">8760-Hour Timeline Explorer</h3>
-                <p className="text-sm text-slate-400">Hover to explore any hour of the year. Click to lock position.</p>
+                <h3 className="text-lg font-semibold text-navy-950 dark:text-white mb-1">8760-Hour Timeline Explorer</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400">Hover to explore any hour of the year. Click to lock position.</p>
             </div>
 
             {/* Stats Panel */}
-            <div className="bg-navy-950/50 border border-energy-green/20 rounded-xl p-4 mb-4">
+            <div className="bg-gray-50 dark:bg-navy-950/50 border border-gray-200 dark:border-energy-green/20 rounded-xl p-4 mb-4 transition-colors duration-300">
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-3">
                     <div>
-                        <div className="text-xs text-slate-500">Hour</div>
-                        <div className="text-lg font-bold text-energy-green">{currentData.hour.toLocaleString()}</div>
-                        <div className="text-xs text-slate-400">{currentData.timestamp}</div>
+                        <div className="text-xs text-gray-500 dark:text-slate-500">Hour</div>
+                        <div className="text-lg font-bold text-energy-green-dark dark:text-energy-green">{currentData.hour.toLocaleString()}</div>
+                        <div className="text-xs text-gray-400 dark:text-slate-400">{currentData.timestamp}</div>
                     </div>
                     <div>
-                        <div className="text-xs text-slate-500">Load</div>
-                        <div className="text-lg font-bold text-white">{currentData.load.toFixed(1)} MWh</div>
+                        <div className="text-xs text-gray-500 dark:text-slate-500">Load</div>
+                        <div className="text-lg font-bold text-navy-950 dark:text-white">{currentData.load.toFixed(1)} MWh</div>
                     </div>
                     <div>
-                        <div className="text-xs text-slate-500">Matched</div>
-                        <div className="text-lg font-bold text-green-500">{currentData.matched.toFixed(1)} MWh</div>
+                        <div className="text-xs text-gray-500 dark:text-slate-500">Matched</div>
+                        <div className="text-lg font-bold text-green-600 dark:text-green-500">{currentData.matched.toFixed(1)} MWh</div>
                     </div>
                     <div>
-                        <div className="text-xs text-slate-500">Grid Deficit</div>
-                        <div className={`text-lg font-bold ${currentData.deficit > 0 ? 'text-red-500' : 'text-green-500'}`}>
+                        <div className="text-xs text-gray-500 dark:text-slate-500">Grid Deficit</div>
+                        <div className={`text-lg font-bold ${currentData.deficit > 0 ? 'text-red-500' : 'text-green-600 dark:text-green-500'}`}>
                             {currentData.deficit.toFixed(1)} MWh
                         </div>
                     </div>
                     <div>
-                        <div className="text-xs text-slate-500">Overgeneration</div>
-                        <div className={`text-lg font-bold ${currentData.overgeneration > 0 ? 'text-cyan-500' : 'text-slate-500'}`}>
+                        <div className="text-xs text-gray-500 dark:text-slate-500">Overgeneration</div>
+                        <div className={`text-lg font-bold ${currentData.overgeneration > 0 ? 'text-cyan-600 dark:text-cyan-500' : 'text-gray-400 dark:text-slate-500'}`}>
                             {currentData.overgeneration?.toFixed(1) || '0.0'} MWh
                         </div>
                     </div>
@@ -218,25 +218,25 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
                     {currentData.solar > 0 && (
                         <div className="flex items-center gap-1">
                             <span>☀️</span>
-                            <span className="text-slate-400">{currentData.solar.toFixed(0)} MWh</span>
+                            <span className="text-gray-600 dark:text-slate-400">{currentData.solar.toFixed(0)} MWh</span>
                         </div>
                     )}
                     {currentData.wind > 0 && (
                         <div className="flex items-center gap-1">
                             <span>💨</span>
-                            <span className="text-slate-400">{currentData.wind.toFixed(0)} MWh</span>
+                            <span className="text-gray-600 dark:text-slate-400">{currentData.wind.toFixed(0)} MWh</span>
                         </div>
                     )}
                     {currentData.nuclear > 0 && (
                         <div className="flex items-center gap-1">
                             <span>⚛️</span>
-                            <span className="text-slate-400">{currentData.nuclear.toFixed(0)} MWh</span>
+                            <span className="text-gray-600 dark:text-slate-400">{currentData.nuclear.toFixed(0)} MWh</span>
                         </div>
                     )}
                     {currentData.battery > 0 && (
                         <div className="flex items-center gap-1">
                             <span>🔋</span>
-                            <span className="text-slate-400">{currentData.battery.toFixed(0)} MWh</span>
+                            <span className="text-gray-600 dark:text-slate-400">{currentData.battery.toFixed(0)} MWh</span>
                         </div>
                     )}
                 </div>
@@ -248,14 +248,14 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
                     ref={canvasRef}
                     width={1200}
                     height={140}
-                    className="w-full h-32 cursor-crosshair rounded-lg border border-white/10"
+                    className="w-full h-32 cursor-crosshair rounded-lg border border-gray-200 dark:border-white/10"
                     onMouseMove={handleMouseMove}
                     onMouseLeave={() => setHoveredHour(null)}
                     onClick={handleClick}
                 />
 
                 {/* Month Labels */}
-                <div className="flex justify-between text-xs text-slate-500 mt-2">
+                <div className="flex justify-between text-xs text-gray-400 dark:text-slate-500 mt-2">
                     <span>Jan</span>
                     <span>Mar</span>
                     <span>May</span>
@@ -267,7 +267,7 @@ export default function Timeline8760({ loadProfile, matchedProfile, solarGen, wi
             </div>
 
             {/* Legend */}
-            <div className="flex items-center justify-center gap-6 text-xs text-slate-400 mt-4">
+            <div className="flex items-center justify-center gap-6 text-xs text-gray-500 dark:text-slate-400 mt-4">
                 <div className="flex items-center gap-2">
                     <div className="w-4 h-4 bg-green-500 rounded"></div>
                     <span>High CFE</span>

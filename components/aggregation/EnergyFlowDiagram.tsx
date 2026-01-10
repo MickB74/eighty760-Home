@@ -136,10 +136,10 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
     };
 
     return (
-        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6">
+        <div className="bg-white dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-2xl p-6 transition-colors duration-300 shadow-sm">
             <div className="mb-4">
-                <h3 className="text-lg font-semibold text-white mb-1">Live Energy Flow</h3>
-                <p className="text-sm text-slate-400">Real-time visualization of power sources to load</p>
+                <h3 className="text-lg font-semibold text-navy-950 dark:text-white mb-1">Live Energy Flow</h3>
+                <p className="text-sm text-gray-500 dark:text-slate-400">Real-time visualization of power sources to load</p>
             </div>
 
             {/* SVG Diagram */}
@@ -156,7 +156,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                 <g id="sources">
                     {/* Solar */}
                     <circle cx="80" cy="80" r="30" fill="#fbbf24" opacity="0.2" />
-                    <text x="80" y="85" textAnchor="middle" fill="white" fontSize="24">☀️</text>
+                    <text x="80" y="85" textAnchor="middle" fontSize="24" className="fill-navy-950 dark:fill-white">☀️</text>
                     <text x="80" y="50" textAnchor="middle" fill="#fbbf24" fontSize="12" fontWeight="600">
                         Solar
                     </text>
@@ -166,18 +166,18 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
 
                     {/* Wind */}
                     <circle cx="80" cy="200" r="30" fill="#3b82f6" opacity="0.2" />
-                    <text x="80" y="205" textAnchor="middle" fill="white" fontSize="24">💨</text>
+                    <text x="80" y="205" textAnchor="middle" fontSize="24" className="fill-navy-950 dark:fill-white">💨</text>
                     <text x="80" y="170" textAnchor="middle" fill="#3b82f6" fontSize="12" fontWeight="600">
                         Wind
                     </text>
-                    <text x="80" y="245" textAnchor="middle" fill="white" fontSize="16" fontWeight="bold">
+                    <text x="80" y="245" textAnchor="middle" fontSize="16" fontWeight="bold" className="fill-navy-950 dark:fill-white">
                         {wind.toFixed(0)} MWh
                     </text>
 
                     {/* Nuclear */}
                     <circle cx="80" cy="280" r="30" fill="#8b5cf6" opacity="0.2" />
-                    <text x="80" y="285" textAnchor="middle" fill="white" fontSize="24">⚛️</text>
-                    <text x="80" y="250" textAnchor="middle" fill="white" fontSize="12" fontWeight="600">
+                    <text x="80" y="285" textAnchor="middle" fontSize="24" className="fill-navy-950 dark:fill-white">⚛️</text>
+                    <text x="80" y="250" textAnchor="middle" fontSize="12" fontWeight="600" className="fill-navy-950 dark:fill-white">
                         Nuclear
                     </text>
                     <text x="80" y="325" textAnchor="middle" fill="#8b5cf6" fontSize="14" fontWeight="bold">
@@ -186,7 +186,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
 
                     {/* Geothermal */}
                     <circle cx="200" cy="80" r="30" fill="#f97316" opacity="0.2" />
-                    <text x="200" y="85" textAnchor="middle" fill="white" fontSize="24">🌋</text>
+                    <text x="200" y="85" textAnchor="middle" fontSize="24" className="fill-navy-950 dark:fill-white">🌋</text>
                     <text x="200" y="50" textAnchor="middle" fill="#f97316" fontSize="12" fontWeight="600">
                         Geothermal
                     </text>
@@ -196,7 +196,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
 
                     {/* CCS Gas */}
                     <circle cx="200" cy="280" r="30" fill="#a78bfa" opacity="0.2" />
-                    <text x="200" y="285" textAnchor="middle" fill="white" fontSize="24">🏭</text>
+                    <text x="200" y="285" textAnchor="middle" fontSize="24" className="fill-navy-950 dark:fill-white">🏭</text>
                     <text x="200" y="250" textAnchor="middle" fill="#a78bfa" fontSize="12" fontWeight="600">
                         CCS Gas
                     </text>
@@ -208,7 +208,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                 {/* Battery (Middle) */}
                 <g id="battery">
                     <rect x="330" y="170" width="80" height="60" rx="10" fill="#10b981" opacity="0.2" stroke="#10b981" strokeWidth="2" />
-                    <text x="370" y="210" textAnchor="middle" fill="white" fontSize="32">🔋</text>
+                    <text x="370" y="210" textAnchor="middle" fontSize="32" className="fill-navy-950 dark:fill-white">🔋</text>
                     <text x="370" y="150" textAnchor="middle" fill="#10b981" fontSize="12" fontWeight="600">
                         Battery
                     </text>
@@ -220,11 +220,11 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                 {/* Load (Right) */}
                 <g id="load">
                     <rect x="630" y="170" width="90" height="60" rx="10" fill="#22c55e" opacity="0.2" stroke="#22c55e" strokeWidth="2" />
-                    <text x="675" y="210" textAnchor="middle" fill="white" fontSize="32">🏭</text>
+                    <text x="675" y="210" textAnchor="middle" fontSize="32" className="fill-navy-950 dark:fill-white">🏭</text>
                     <text x="675" y="150" textAnchor="middle" fill="#22c55e" fontSize="12" fontWeight="600">
                         Load
                     </text>
-                    <text x="675" y="260" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">
+                    <text x="675" y="260" textAnchor="middle" fontSize="14" fontWeight="bold" className="fill-navy-950 dark:fill-white">
                         {load.toFixed(0)} MWh
                     </text>
                 </g>
@@ -233,7 +233,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                 {gridDeficit > 0 && (
                     <g id="grid">
                         <circle cx="675" cy="340" r="25" fill="#ef4444" opacity="0.2" stroke="#ef4444" strokeWidth="2" />
-                        <text x="675" y="345" textAnchor="middle" fill="white" fontSize="20">⚡</text>
+                        <text x="675" y="345" textAnchor="middle" fontSize="20" className="fill-navy-950 dark:fill-white">⚡</text>
                         <text x="675" y="380" textAnchor="middle" fill="#ef4444" fontSize="12" fontWeight="bold">
                             Grid: {gridDeficit.toFixed(0)} MWh
                         </text>
@@ -254,7 +254,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                 {surplus > 0 && (
                     <g id="excess">
                         <circle cx="370" cy="340" r="25" fill="#fbbf24" opacity="0.2" stroke="#fbbf24" strokeWidth="2" />
-                        <text x="370" y="345" textAnchor="middle" fill="white" fontSize="20">⚡</text>
+                        <text x="370" y="345" textAnchor="middle" fontSize="20" className="fill-navy-950 dark:fill-white">⚡</text>
                         <text x="370" y="380" textAnchor="middle" fill="#fbbf24" fontSize="12" fontWeight="bold">
                             Excess: {surplus.toFixed(0)} MWh
                         </text>
@@ -338,13 +338,13 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
 
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 mt-4 text-sm">
-                <div className="bg-navy-950/50 rounded-lg p-3">
-                    <div className="text-slate-400 text-xs mb-1">Clean Generation</div>
-                    <div className="text-energy-green font-bold">{(solar + wind + nuclear + geothermal + ccs).toFixed(1)} MWh</div>
+                <div className="bg-gray-50 dark:bg-navy-950/50 border border-gray-200 dark:border-white/5 rounded-lg p-3 transition-colors duration-300">
+                    <div className="text-gray-500 dark:text-slate-400 text-xs mb-1">Clean Generation</div>
+                    <div className="text-energy-green-dark dark:text-energy-green font-bold">{(solar + wind + nuclear + geothermal + ccs).toFixed(1)} MWh</div>
                 </div>
-                <div className="bg-navy-950/50 rounded-lg p-3">
-                    <div className="text-slate-400 text-xs mb-1">CFE Match Rate</div>
-                    <div className={`font-bold ${gridDeficit === 0 ? 'text-green-500' : 'text-yellow-500'}`}>
+                <div className="bg-gray-50 dark:bg-navy-950/50 border border-gray-200 dark:border-white/5 rounded-lg p-3 transition-colors duration-300">
+                    <div className="text-gray-500 dark:text-slate-400 text-xs mb-1">CFE Match Rate</div>
+                    <div className={`font-bold ${gridDeficit === 0 ? 'text-green-600 dark:text-green-500' : 'text-yellow-600 dark:text-yellow-500'}`}>
                         {load > 0 ? ((load - gridDeficit) / load * 100).toFixed(1) : 0}%
                     </div>
                 </div>
