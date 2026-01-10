@@ -41,6 +41,9 @@ import {
     type Scenario
 } from '@/lib/shared/portfolioStore';
 import Link from 'next/link';
+import Papa from 'papaparse';
+import { useSession, signIn } from 'next-auth/react';
+import { generatePDFReport } from '@/lib/reporting/pdf-generator';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
 function aggregateTo12x24(data: number[]): number[][] {
@@ -195,13 +198,16 @@ export default function AggregationPage() {
     }, []); // Run once on mount
 
 
+    // Auth State
+    const { data: session } = useSession();
+
     // 7. UI State
     const [isLoadCollapsed, setIsLoadCollapsed] = useState(false);
 
     const [cvtaResult, setCvtaResult] = useState<BatteryCVTAResult | null>(null);
 
     // Tab State
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'reports'>('dashboard');
     const [scenarios, setScenarios] = useState<Scenario[]>([]);
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [scenarioName, setScenarioName] = useState('');
@@ -551,6 +557,52 @@ export default function AggregationPage() {
             });
         }
     }, [result, participants, activeAssets, capacities, financials, selectedYear, loadHub, solarHub, windHub, nuclearHub, geothermalHub, ccsHub]);
+
+    // --- Export Handlers ---
+
+    const handleDownloadCSV = () => {
+        if (!session) {
+            alert("Please sign in to download data.");
+            return;
+        }
+        if (!result) return;
+
+        // Flatten data for CSV
+        const rows = result.load_profile.map((load, i) => ({
+            Hour: i,
+            Load: load,
+            Matched_Gen: result.matched_profile[i],
+            Grid_Deficit: Math.max(0, load - (result.matched_profile[i] || 0)),
+            Overgeneration: result.surplus_profile[i],
+            Solar: result.solar_profile[i],
+            Wind: result.wind_profile[i],
+            Nuclear: result.nuc_profile[i],
+            Geothermal: result.geo_profile[i],
+            CCS: result.ccs_profile[i],
+            Battery_Discharge: result.battery_discharge[i],
+            Battery_Charge: result.battery_charge[i],
+            Price: result.market_price_profile[i]
+        }));
+
+        const csv = Papa.unparse(rows);
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `eighty760_simulation_results_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        window.URL.revokeObjectURL(url);
+    };
+
+    const handleDownloadPDF = async () => {
+        if (!session) {
+            alert("Please sign in to generate reports.");
+            return;
+        }
+        if (!result) return;
+
+        await generatePDFReport('Current Scenario', result, selectedYear, {});
+    };
 
     // --- Render ---
 
@@ -1004,6 +1056,12 @@ export default function AggregationPage() {
                         >
                             Scenario Comparison
                         </button>
+                        <button
+                            onClick={() => setActiveTab('reports')}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'reports' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                        >
+                            Reports & export
+                        </button>
                     </div>
 
                     {/* Save Scenario Modal */}
@@ -1209,7 +1267,6 @@ export default function AggregationPage() {
                                         <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm overflow-x-auto mt-8">
                                             <div className="flex justify-between items-center mb-4">
                                                 <h3 className="text-lg font-semibold">Asset Financial Breakdown</h3>
-                                                {/* CSV Buttons code here... */}
                                             </div>
                                             {/* Asset Table code here... */}
                                             <table className="w-full text-sm text-left">
@@ -1350,268 +1407,355 @@ export default function AggregationPage() {
                         </div>
                     )}
 
-                </div>
-            </div>
-        </main>
-    );
-}
+                    {activeTab === 'reports' && (
+                        <div className="animate-in fade-in duration-300">
+                            <div className="max-w-4xl mx-auto space-y-8">
+                                <div className="text-center mb-8">
+                                    <h2 className="text-2xl font-bold text-navy-950 dark:text-white mb-2">Reports & Exports</h2>
+                                    <p className="text-gray-600 dark:text-gray-400">Download simulation data and generate professional PDF reports.</p>
+                                </div>
+
+                                {!session ? (
+                                    <div className="bg-white dark:bg-navy-950 border border-gray-200 dark:border-white/10 rounded-2xl p-10 text-center shadow-lg max-w-md mx-auto">
+                                        <div className="mb-6 text-6xl">🔒</div>
+                                        <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Sign In Required</h3>
+                                        <p className="text-gray-600 dark:text-gray-400 mb-8">
+                                            Please sign in with your Google account to access advanced reporting features and export functionality.
+                                        </p>
+                                        <button
+                                            onClick={() => signIn('google')}
+                                            className="px-8 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all shadow-sm flex items-center gap-3 mx-auto"
+                                        >
+                                            <svg className="w-5 h-5" viewBox="0 0 24 24">
+                                                <path
+                                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                                    fill="#4285F4"
+                                                />
+                                                <path
+                                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                                    fill="#34A853"
+                                                />
+                                                <path
+                                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                                    fill="#FBBC05"
+                                                />
+                                                <path
+                                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                                    fill="#EA4335"
+                                                />
+                                            </svg>
+                                            Sign in with Google
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="grid md:grid-cols-2 gap-6">
+                                        {/* PDF Report Card */}
+                                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="p-3 bg-red-500/10 rounded-lg text-red-500 text-2xl group-hover:scale-110 transition-transform">
+                                                    📄
+                                                </div>
+                                            </div>
+                                            <h3 className="text-lg font-bold text-white mb-2">Simulation Report (PDF)</h3>
+                                            <p className="text-gray-400 text-sm mb-6">
+                                                Generate a professional PDF report containing scenario metrics, charts, and financial analysis. Ideal for stakeholder presentations.
+                                            </p>
+                                            <button
+                                                onClick={handleDownloadPDF}
+                                                disabled={!result}
+                                                className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                                            >
+                                                {!result ? 'Run Simulation First' : 'Generate PDF Report'}
+                                            </button>
+                                        </div>
+
+                                        {/* CSV Data Card */}
+                                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
+                                            <div className="flex items-start justify-between mb-4">
+                                                <div className="p-3 bg-green-500/10 rounded-lg text-green-500 text-2xl group-hover:scale-110 transition-transform">
+                                                    📊
+                                                </div>
+                                            </div>
+                                            <h3 className="text-lg font-bold text-white mb-2">Raw Data Export (CSV)</h3>
+                                            <p className="text-gray-400 text-sm mb-6">
+                                                Download the full 8760-hourly dataset including load, generation profiles, and financial settlements for custom analysis.
+                                            </p>
+                                            <button
+                                                onClick={handleDownloadCSV}
+                                                disabled={!result}
+                                                className="w-full py-3 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                            >
+                                                {!result ? 'Run Simulation First' : 'Download CSV Data'}
+                                            </button>
+                                        </div>
+
+                                        {!result && (
+                                            <div className="md:col-span-2 text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm">
+                                                ⚠️ Please run a simulation on the Dashboard to generate data for reports.
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
 // --- Subcomponents ---
 
-function KPICard({ label, value, sub }: { label: string, value: string, sub: string }) {
+                    function KPICard({label, value, sub}: {label: string, value: string, sub: string }) {
     return (
-        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-4 shadow-sm">
-            <div className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">{label}</div>
-            <div className="text-2xl font-bold text-energy-green mb-1">{value}</div>
-            <div className="text-xs text-slate-400">{sub}</div>
-        </div>
-    );
+                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-4 shadow-sm">
+                        <div className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">{label}</div>
+                        <div className="text-2xl font-bold text-energy-green mb-1">{value}</div>
+                        <div className="text-xs text-slate-400">{sub}</div>
+                    </div>
+                    );
 }
 
-function LoadChart({ result }: { result: SimulationResult }) {
+                    function LoadChart({result}: {result: SimulationResult }) {
     // Sample first week (168 hours)
-    const hours = Array.from({ length: 168 }, (_, i) => i);
-    const data = {
-        labels: hours,
-        datasets: [{
-            label: 'Total Load',
-            data: result.load_profile.slice(0, 168),
-            borderColor: '#285477',
-            backgroundColor: 'rgba(40, 84, 119, 0.1)',
-            fill: true,
-            tension: 0.4
+    const hours = Array.from({length: 168 }, (_, i) => i);
+                    const data = {
+                        labels: hours,
+                    datasets: [{
+                        label: 'Total Load',
+                    data: result.load_profile.slice(0, 168),
+                    borderColor: '#285477',
+                    backgroundColor: 'rgba(40, 84, 119, 0.1)',
+                    fill: true,
+                    tension: 0.4
         }]
     };
-    return <Chart type='line' data={data} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, elements: { point: { radius: 0 } } }} />;
+                    return <Chart type='line' data={data} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, elements: { point: { radius: 0 } } }} />;
 }
 
-function GenChart({ result }: { result: SimulationResult, capacities: TechCapacity }) {
+                    function GenChart({result}: {result: SimulationResult, capacities: TechCapacity }) {
     // Aggregate hourly data to daily averages for full year visualization
     const aggregateToDaily = (hourlyData: number[]) => {
         const daily: number[] = [];
-        for (let day = 0; day < 365; day++) {
+                    for (let day = 0; day < 365; day++) {
             const startHour = day * 24;
-            const endHour = Math.min(startHour + 24, hourlyData.length);
+                    const endHour = Math.min(startHour + 24, hourlyData.length);
             const dayTotal = hourlyData.slice(startHour, endHour).reduce((a, b) => a + b, 0);
-            daily.push(dayTotal / (endHour - startHour)); // Average MW for the day
+                    daily.push(dayTotal / (endHour - startHour)); // Average MW for the day
         }
-        return daily;
+                    return daily;
     };
 
-    const days = Array.from({ length: 365 }, (_, i) => i + 1);
+                    const days = Array.from({length: 365 }, (_, i) => i + 1);
 
-    // Aggregate each technology to daily averages
-    const solar = aggregateToDaily(result.solar_profile);
-    const wind = aggregateToDaily(result.wind_profile);
-    const geo = aggregateToDaily(result.geo_profile);
-    const nuc = aggregateToDaily(result.nuc_profile);
-    const ccs = aggregateToDaily(result.ccs_profile);
-    const battery = aggregateToDaily(result.battery_discharge);
-    const deficit = aggregateToDaily(result.deficit_profile);
+                    // Aggregate each technology to daily averages
+                    const solar = aggregateToDaily(result.solar_profile);
+                    const wind = aggregateToDaily(result.wind_profile);
+                    const geo = aggregateToDaily(result.geo_profile);
+                    const nuc = aggregateToDaily(result.nuc_profile);
+                    const ccs = aggregateToDaily(result.ccs_profile);
+                    const battery = aggregateToDaily(result.battery_discharge);
+                    const deficit = aggregateToDaily(result.deficit_profile);
 
-    const data = {
-        labels: days,
-        datasets: [
-            {
-                label: 'Solar',
-                data: solar,
-                backgroundColor: '#fbbf24', // Amber/Gold
-                fill: true,
-                pointRadius: 0
+                    const data = {
+                        labels: days,
+                    datasets: [
+                    {
+                        label: 'Solar',
+                    data: solar,
+                    backgroundColor: '#fbbf24', // Amber/Gold
+                    fill: true,
+                    pointRadius: 0
             },
-            {
-                label: 'Wind',
-                data: wind,
-                backgroundColor: '#60a5fa', // Sky Blue
-                fill: true,
-                pointRadius: 0
+                    {
+                        label: 'Wind',
+                    data: wind,
+                    backgroundColor: '#60a5fa', // Sky Blue
+                    fill: true,
+                    pointRadius: 0
             },
-            {
-                label: 'CCS Gas',
-                data: ccs,
-                backgroundColor: '#a78bfa', // Purple
-                fill: true,
-                pointRadius: 0
+                    {
+                        label: 'CCS Gas',
+                    data: ccs,
+                    backgroundColor: '#a78bfa', // Purple
+                    fill: true,
+                    pointRadius: 0
             },
-            {
-                label: 'Geothermal',
-                data: geo,
-                backgroundColor: '#f97316', // Orange
-                fill: true,
-                pointRadius: 0
+                    {
+                        label: 'Geothermal',
+                    data: geo,
+                    backgroundColor: '#f97316', // Orange
+                    fill: true,
+                    pointRadius: 0
             },
-            {
-                label: 'Nuclear',
-                data: nuc,
-                backgroundColor: '#22c55e', // Green
-                fill: true,
-                pointRadius: 0
+                    {
+                        label: 'Nuclear',
+                    data: nuc,
+                    backgroundColor: '#22c55e', // Green
+                    fill: true,
+                    pointRadius: 0
             },
-            {
-                label: 'Battery Discharge',
-                data: battery,
-                backgroundColor: '#3b82f6', // Blue
-                fill: true,
-                pointRadius: 0
+                    {
+                        label: 'Battery Discharge',
+                    data: battery,
+                    backgroundColor: '#3b82f6', // Blue
+                    fill: true,
+                    pointRadius: 0
             },
-            {
-                label: 'Grid Deficit',
-                data: deficit,
-                backgroundColor: '#ef4444', // Red
-                fill: true,
-                pointRadius: 0
+                    {
+                        label: 'Grid Deficit',
+                    data: deficit,
+                    backgroundColor: '#ef4444', // Red
+                    fill: true,
+                    pointRadius: 0
             }
-        ]
+                    ]
     };
 
-    return <Chart type='line' data={data} options={{
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            y: {
-                stacked: true,
-                title: { display: true, text: 'Average MW' }
-            },
-            x: {
-                title: { display: true, text: 'Day of Year' },
-                ticks: { maxTicksLimit: 12 }
-            }
-        },
-        elements: { line: { borderWidth: 0 } },
-        layout: {
-            padding: {
-                top: 0,
-                bottom: 20,
-                left: 0,
-                right: 0
-            }
-        },
-        plugins: {
-            tooltip: { mode: 'index', intersect: false },
-            legend: {
-                display: true,
-                position: 'top',
-                align: 'end',
-                labels: {
-                    boxWidth: 12,
-                    font: { size: 11 },
-                    padding: 15,
-                    color: '#9ca3af' // gray-400
-                }
-            }
-        }
-    }} />;
+                    return <Chart type='line' data={data} options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                stacked: true,
+                                title: { display: true, text: 'Average MW' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Day of Year' },
+                                ticks: { maxTicksLimit: 12 }
+                            }
+                        },
+                        elements: { line: { borderWidth: 0 } },
+                        layout: {
+                            padding: {
+                                top: 0,
+                                bottom: 20,
+                                left: 0,
+                                right: 0
+                            }
+                        },
+                        plugins: {
+                            tooltip: { mode: 'index', intersect: false },
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                align: 'end',
+                                labels: {
+                                    boxWidth: 12,
+                                    font: { size: 11 },
+                                    padding: 15,
+                                    color: '#9ca3af' // gray-400
+                                }
+                            }
+                        }
+                    }} />;
 }
 
 
 
-function MonthlyProductionChart({ result }: { result: SimulationResult }) {
+                    function MonthlyProductionChart({result}: {result: SimulationResult }) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Aggregation Logic
-    const monthlyLoad = new Array(12).fill(0);
-    const monthlySolar = new Array(12).fill(0);
-    const monthlyWind = new Array(12).fill(0);
-    const monthlyNuc = new Array(12).fill(0);
-    const monthlyGeo = new Array(12).fill(0);
-    const monthlyCcs = new Array(12).fill(0);
-    const monthlyBattery = new Array(12).fill(0);
+                    // Aggregation Logic
+                    const monthlyLoad = new Array(12).fill(0);
+                    const monthlySolar = new Array(12).fill(0);
+                    const monthlyWind = new Array(12).fill(0);
+                    const monthlyNuc = new Array(12).fill(0);
+                    const monthlyGeo = new Array(12).fill(0);
+                    const monthlyCcs = new Array(12).fill(0);
+                    const monthlyBattery = new Array(12).fill(0);
 
-    for (let i = 0; i < 8760; i++) {
+                    for (let i = 0; i < 8760; i++) {
         // Simple approximation: 30.4 days per month * 24 = ~730 hours
         const month = Math.min(11, Math.floor(i / 730));
-        monthlyLoad[month] += result.load_profile[i] || 0;
+                    monthlyLoad[month] += result.load_profile[i] || 0;
 
-        monthlySolar[month] += result.solar_profile[i] || 0;
-        monthlyWind[month] += result.wind_profile[i] || 0;
-        monthlyNuc[month] += result.nuc_profile[i] || 0;
-        monthlyGeo[month] += result.geo_profile[i] || 0;
-        monthlyCcs[month] += result.ccs_profile[i] || 0;
-        monthlyBattery[month] += result.battery_discharge[i] || 0;
+                    monthlySolar[month] += result.solar_profile[i] || 0;
+                    monthlyWind[month] += result.wind_profile[i] || 0;
+                    monthlyNuc[month] += result.nuc_profile[i] || 0;
+                    monthlyGeo[month] += result.geo_profile[i] || 0;
+                    monthlyCcs[month] += result.ccs_profile[i] || 0;
+                    monthlyBattery[month] += result.battery_discharge[i] || 0;
     }
 
-    const data = {
-        labels: months,
-        datasets: [
-            {
-                type: 'line' as const,
-                label: 'Load',
-                data: monthlyLoad,
-                borderColor: '#ffffff',
-                borderWidth: 2,
-                pointRadius: 2,
-                tension: 0.1,
-                order: 0
+                    const data = {
+                        labels: months,
+                    datasets: [
+                    {
+                        type: 'line' as const,
+                    label: 'Load',
+                    data: monthlyLoad,
+                    borderColor: '#ffffff',
+                    borderWidth: 2,
+                    pointRadius: 2,
+                    tension: 0.1,
+                    order: 0
             },
-            { label: 'Solar', data: monthlySolar, backgroundColor: '#facc15', stack: 'gen' },
-            { label: 'Wind', data: monthlyWind, backgroundColor: '#3b82f6', stack: 'gen' },
-            { label: 'Nuclear', data: monthlyNuc, backgroundColor: '#ec4899', stack: 'gen' },
-            { label: 'Geothermal', data: monthlyGeo, backgroundColor: '#f97316', stack: 'gen' },
-            { label: 'CCS Gas', data: monthlyCcs, backgroundColor: '#a8a29e', stack: 'gen' },
-            { label: 'Battery', data: monthlyBattery, backgroundColor: '#818cf8', stack: 'gen' },
-        ]
+                    {label: 'Solar', data: monthlySolar, backgroundColor: '#facc15', stack: 'gen' },
+                    {label: 'Wind', data: monthlyWind, backgroundColor: '#3b82f6', stack: 'gen' },
+                    {label: 'Nuclear', data: monthlyNuc, backgroundColor: '#ec4899', stack: 'gen' },
+                    {label: 'Geothermal', data: monthlyGeo, backgroundColor: '#f97316', stack: 'gen' },
+                    {label: 'CCS Gas', data: monthlyCcs, backgroundColor: '#a8a29e', stack: 'gen' },
+                    {label: 'Battery', data: monthlyBattery, backgroundColor: '#818cf8', stack: 'gen' },
+                    ]
     };
 
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-            x: { stacked: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' } },
-            y: { stacked: true, grid: { color: 'rgba(255,255,255,0.1)' }, ticks: { color: '#9ca3af' }, title: { display: true, text: 'Energy (MWh)', color: '#9ca3af' } }
+                    const options = {
+                        responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {stacked: true, grid: {color: 'rgba(255,255,255,0.1)' }, ticks: {color: '#9ca3af' } },
+                    y: {stacked: true, grid: {color: 'rgba(255,255,255,0.1)' }, ticks: {color: '#9ca3af' }, title: {display: true, text: 'Energy (MWh)', color: '#9ca3af' } }
         },
-        plugins: {
-            legend: { labels: { color: '#e5e7eb' }, position: 'top' as const, align: 'end' as const },
-            tooltip: { mode: 'index' as const, intersect: false }
+                    plugins: {
+                        legend: {labels: {color: '#e5e7eb' }, position: 'top' as const, align: 'end' as const },
+                    tooltip: {mode: 'index' as const, intersect: false }
         },
-        interaction: { mode: 'nearest' as const, axis: 'x' as const, intersect: false }
+                    interaction: {mode: 'nearest' as const, axis: 'x' as const, intersect: false }
     };
 
-    return <Chart type="bar" data={data} options={{ responsive: true, maintainAspectRatio: false }} />;
+                    return <Chart type="bar" data={data} options={{ responsive: true, maintainAspectRatio: false }} />;
 }
 
-function MonthlyFinancialChart({ result }: { result: SimulationResult }) {
+                    function MonthlyFinancialChart({result}: {result: SimulationResult }) {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Aggregation Logic
-    const monthlyCost = new Array(12).fill(0);
-    const monthlySettlement = new Array(12).fill(0);
+                    // Aggregation Logic
+                    const monthlyCost = new Array(12).fill(0);
+                    const monthlySettlement = new Array(12).fill(0);
 
-    // This requires calculating costs hourly again if valid profiles aren't available in result for monthly.
-    // Result object usually aggregates totals. The asset_details has some breakdown but not monthly.
-    // Ideally we'd do this in the engine, but we can approximate here by re-running the row-math if needed, 
-    // or just assume uniform distribution if we are lazy (bad).
-    // Let's use the provided profiles in result.
+                    // This requires calculating costs hourly again if valid profiles aren't available in result for monthly.
+                    // Result object usually aggregates totals. The asset_details has some breakdown but not monthly.
+                    // Ideally we'd do this in the engine, but we can approximate here by re-running the row-math if needed, 
+                    // or just assume uniform distribution if we are lazy (bad).
+                    // Let's use the provided profiles in result.
 
-    for (let i = 0; i < 8760; i++) {
+                    for (let i = 0; i < 8760; i++) {
         const month = Math.min(11, Math.floor(i / 730));
 
-        // Market Purchase Cost
-        const load = result.load_profile[i] || 0;
-        const price = result.market_price_profile[i] || 0; // Load Hub Price
-        monthlyCost[month] += load * price;
+                    // Market Purchase Cost
+                    const load = result.load_profile[i] || 0;
+                    const price = result.market_price_profile[i] || 0; // Load Hub Price
+                    monthlyCost[month] += load * price;
 
-        // Settlement Value (Gen * (Hub - Strike))
-        // We need asset level details to be accurate, but simple approx:
-        // Let's approximate using total Gen * (Market Average - Strike Average) -- too inaccurate.
-        // We'll skip complex settlement aggregation here for now and just show Load Cost vs Market Value of Generation.
+                    // Settlement Value (Gen * (Hub - Strike))
+                    // We need asset level details to be accurate, but simple approx:
+                    // Let's approximate using total Gen * (Market Average - Strike Average) -- too inaccurate.
+                    // We'll skip complex settlement aggregation here for now and just show Load Cost vs Market Value of Generation.
 
-        // Actually, we can sum up the asset settlement if we had hourly profiles for all assets.
-        // But we DO have result.asset_details which has total stats.
-        // We can't restart the loop easily.
+                    // Actually, we can sum up the asset settlement if we had hourly profiles for all assets.
+                    // But we DO have result.asset_details which has total stats.
+                    // We can't restart the loop easily.
 
-        // Let's just visualize Load Cost vs REC Cost for now as a placeholder.
-        const deficit = result.deficit_profile[i] || 0;
-        const recPrice = result.rec_price_profile ? result.rec_price_profile[i] || 0 : 0;
-        monthlySettlement[month] += deficit * recPrice; // Using this as REC Cost
+                    // Let's just visualize Load Cost vs REC Cost for now as a placeholder.
+                    const deficit = result.deficit_profile[i] || 0;
+                    const recPrice = result.rec_price_profile ? result.rec_price_profile[i] || 0 : 0;
+                    monthlySettlement[month] += deficit * recPrice; // Using this as REC Cost
     }
 
-    const data = {
-        labels: months,
-        datasets: [
-            { label: 'Load Cost (Market)', data: monthlyCost, backgroundColor: '#ef4444' },
-            { label: 'REC Cost (Deficit)', data: monthlySettlement, backgroundColor: '#f97316' },
-        ]
+                    const data = {
+                        labels: months,
+                    datasets: [
+                    {label: 'Load Cost (Market)', data: monthlyCost, backgroundColor: '#ef4444' },
+                    {label: 'REC Cost (Deficit)', data: monthlySettlement, backgroundColor: '#f97316' },
+                    ]
     };
 
-    return <Chart type="bar" data={data} options={{ responsive: true, maintainAspectRatio: false }} />;
+                    return <Chart type="bar" data={data} options={{ responsive: true, maintainAspectRatio: false }} />;
 }

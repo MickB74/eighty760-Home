@@ -32,3 +32,5 @@ next-env.d.ts
 
 # Data
 *.parquet
+.env.local
+user_log.csv
