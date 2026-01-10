@@ -288,6 +288,32 @@ export default function AggregationPage() {
         }, 100);
     };
 
+    const handleLoadScenario = (scen: Scenario) => {
+        setParticipants(scen.participants);
+        setSelectedYear(scen.year);
+        setFinancials(scen.financials);
+        setLoadHub(scen.loadHub);
+        setSolarHub(scen.solarHub || 'West'); // Fallback if missing in old saves
+        setWindHub(scen.windHub || 'Panhandle');
+        setNuclearHub(scen.nuclearHub || 'North');
+        setGeothermalHub(scen.geothermalHub || 'West');
+        setCcsHub(scen.ccsHub || 'Houston');
+
+        setAssets(scen.assets);
+        if (scen.assets.length > 0) {
+            setUseAdvancedAssets(true);
+        }
+
+        // Restore battery capacities
+        if (scen.battery) {
+            setCapacities(prev => ({
+                ...prev,
+                Battery_MW: scen.battery.mw,
+                Battery_Hours: scen.battery.hours
+            }));
+        }
+    };
+
     // Derived state for active assets, considering both simple sliders and advanced editor
     const activeAssets = useMemo(() => {
         if (useAdvancedAssets) {
@@ -1324,47 +1350,9 @@ export default function AggregationPage() {
                         </div>
                     )}
 
-                    <span>{getYearLabel(scen.year as any)}</span>
-                    <span>{scen.participants.length} Participants</span>
-                    <span>{scen.assets.length} Assets</span>
                 </div>
-                <button
-                    onClick={() => {
-                        setParticipants(scen.participants);
-                        setSelectedYear(scen.year as any);
-                        setFinancials(scen.financials);
-                        setLoadHub(scen.loadHub);
-                        setAssets(scen.assets); // Assuming we migrate to AssetEditor fully, but this updates 'assets' state
-                        // We also need to update 'capacities' state for legacy support if needed, but assets state drives AssetEditor
-                        setUseAdvancedAssets(true);
-                        setActiveTab('dashboard');
-                    }}
-                    className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
-                >
-                    Load Scenario
-                </button>
             </div>
-            <button
-                onClick={() => {
-                    deleteScenario(scen.id);
-                    setScenarios(getScenarios());
-                }}
-                className="text-red-400 hover:text-red-300 text-sm"
-            >
-                Delete
-            </button>
-        </div>
-                        </div >
-                    ))
-}
-                </div >
-            )}
-        </div >
-    )
-}
-                </div >
-            </div >
-        </main >
+        </main>
     );
 }
 
