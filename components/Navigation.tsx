@@ -5,10 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useSession, signIn, signOut } from 'next-auth/react';
 
 export default function Navigation() {
-    const { data: session } = useSession();
     const [darkMode, setDarkMode] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -115,59 +113,7 @@ export default function Navigation() {
                             )}
                         </button>
 
-                        {/* User Menu / Sign In */}
-                        {session ? (
-                            <div className="relative">
-                                <button
-                                    onClick={() => setIsProfileOpen(!isProfileOpen)}
-                                    className="flex items-center gap-2 focus:outline-none"
-                                >
-                                    {session.user?.image ? (
-                                        <div className="relative w-8 h-8 rounded-full overflow-hidden border border-energy-green/50">
-                                            <Image
-                                                src={session.user.image}
-                                                alt={session.user.name || 'User'}
-                                                fill
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    ) : (
-                                        <div className="w-8 h-8 rounded-full bg-energy-green/20 flex items-center justify-center text-energy-green font-bold">
-                                            {session.user?.name?.[0] || 'U'}
-                                        </div>
-                                    )}
-                                </button>
-
-                                <AnimatePresence>
-                                    {isProfileOpen && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 10 }}
-                                            className="absolute right-0 mt-2 w-48 bg-white dark:bg-navy-950 rounded-lg shadow-xl border border-gray-200 dark:border-white/10 py-1 overflow-hidden"
-                                        >
-                                            <div className="px-4 py-2 border-b border-gray-100 dark:border-white/5">
-                                                <p className="text-sm font-medium text-navy-950 dark:text-white truncate">{session.user?.name}</p>
-                                                <p className="text-xs text-gray-500 dark:text-slate-400 truncate">{session.user?.email}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => signOut()}
-                                                className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                                            >
-                                                Sign Out
-                                            </button>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </div>
-                        ) : (
-                            <button
-                                onClick={() => signIn('google')}
-                                className="hidden md:block text-sm font-medium text-gray-700 dark:text-slate-300 hover:text-energy-green-dark dark:hover:text-energy-green transition-colors"
-                            >
-                                Sign In
-                            </button>
-                        )}
+                        {/* User Profile Removed */}
 
 
                         {/* High-contrast CTA */}
@@ -181,18 +127,7 @@ export default function Navigation() {
 
                     {/* Mobile Menu Button */}
                     <div className="md:hidden flex items-center gap-4">
-                        {/* Mobile User Icon (if logged in) */}
-                        {session && (
-                            <div className="w-8 h-8 rounded-full bg-energy-green/20 flex items-center justify-center text-energy-green font-bold">
-                                {session.user?.image ? (
-                                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-energy-green/50">
-                                        <Image src={session.user.image} alt="User" fill className="object-cover" />
-                                    </div>
-                                ) : (
-                                    session.user?.name?.[0] || 'U'
-                                )}
-                            </div>
-                        )}
+
 
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -235,22 +170,7 @@ export default function Navigation() {
                             </Link>
                         ))}
 
-                        {/* Mobile Auth Actions */}
-                        {session ? (
-                            <button
-                                onClick={() => signOut()}
-                                className="w-full text-left px-4 py-3 rounded-lg text-base font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-                            >
-                                Sign Out ({session.user?.name})
-                            </button>
-                        ) : (
-                            <button
-                                onClick={() => signIn('google')}
-                                className="w-full text-left px-4 py-3 rounded-lg text-base font-medium text-gray-700 dark:text-slate-300 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
-                            >
-                                Sign In
-                            </button>
-                        )}
+
 
                         {/* Theme Toggle Mobile */}
                         <button

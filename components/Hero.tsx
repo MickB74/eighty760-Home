@@ -2,11 +2,9 @@
 
 import HeroSimulator from './home/HeroSimulator';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 export default function Hero() {
-    const scrollToMethodology = () => {
-        document.getElementById('methodology')?.scrollIntoView({ behavior: 'smooth' });
-    };
 
     return (
         <header className="min-h-screen relative overflow-hidden gradient-mesh flex items-center">
@@ -32,12 +30,12 @@ export default function Hero() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4">
-                            <button
-                                onClick={scrollToMethodology}
-                                className="px-8 py-4 text-lg font-bold bg-energy-green text-navy-950 rounded-lg shadow-lg transition hover:bg-energy-green/90 hover:scale-105 transform"
+                            <Link
+                                href="/aggregation"
+                                className="px-8 py-4 text-lg font-bold bg-energy-green text-navy-950 rounded-lg shadow-lg transition hover:bg-energy-green/90 hover:scale-105 transform text-center"
                             >
                                 Start Analysis →
-                            </button>
+                            </Link>
                             <button
                                 onClick={() => document.getElementById('methodology')?.scrollIntoView({ behavior: 'smooth' })}
                                 className="px-8 py-4 text-lg font-semibold text-navy-950 dark:text-white bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 backdrop-blur-md rounded-lg hover:bg-white/60 dark:hover:bg-white/10 transition"

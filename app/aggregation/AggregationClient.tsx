@@ -42,7 +42,6 @@ import {
 } from '@/lib/shared/portfolioStore';
 import Link from 'next/link';
 import Papa from 'papaparse';
-import { useSession, signIn } from 'next-auth/react';
 import { generatePDFReport } from '@/lib/reporting/pdf-generator';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
@@ -103,7 +102,7 @@ const HISTORICAL_REC_PRICES: Record<number, number> = {
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    // activeTab removed (layout change)
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'reports' | 'config'>('dashboard');
     const [loading, setLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -198,16 +197,30 @@ export default function AggregationPage() {
     }, []); // Run once on mount
 
 
-    // Auth State
-    const { data: session } = useSession();
+    // 7. UI State / Helpers
+    const addAsset = () => {
+        const newAsset: GenerationAsset = {
+            id: crypto.randomUUID(),
+            name: `New Asset ${assets.length + 1}`,
+            type: 'Solar',
+            capacity_mw: 100,
+            location: 'West'
+        };
+        setAssets([...assets, newAsset]);
+    };
 
-    // 7. UI State
+    const removeAsset = (id: string) => {
+        setAssets(assets.filter(a => a.id !== id));
+    };
+
+    const updateAsset = (id: string, updates: Partial<GenerationAsset>) => {
+        setAssets(assets.map(a => (a.id === id ? { ...a, ...updates } : a)));
+    };
     const [isLoadCollapsed, setIsLoadCollapsed] = useState(false);
 
     const [cvtaResult, setCvtaResult] = useState<BatteryCVTAResult | null>(null);
 
-    // Tab State
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'reports'>('dashboard');
+
     const [scenarios, setScenarios] = useState<Scenario[]>([]);
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [scenarioName, setScenarioName] = useState('');
@@ -561,10 +574,6 @@ export default function AggregationPage() {
     // --- Export Handlers ---
 
     const handleDownloadCSV = () => {
-        if (!session) {
-            alert("Please sign in to download data.");
-            return;
-        }
         if (!result) return;
 
         // Flatten data for CSV
@@ -595,14 +604,11 @@ export default function AggregationPage() {
     };
 
     const handleDownloadPDF = async () => {
-        if (!session) {
-            alert("Please sign in to generate reports.");
-            return;
-        }
         if (!result) return;
 
         await generatePDFReport('Current Scenario', result, selectedYear, {});
     };
+
 
     // --- Render ---
 
@@ -1031,40 +1037,46 @@ export default function AggregationPage() {
                     </div>
 
                     {/* Tab Navigation */}
-                    <div className="flex border-b border-gray-200 dark:border-white/10 mb-8">
+                    <div className="flex border-b border-gray-200 dark:border-white/10 mb-8 overflow-x-auto">
+                        <button
+                            onClick={() => setActiveTab('config')}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'config' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                        >
+                            Configuration
+                        </button>
                         <button
                             onClick={() => setActiveTab('dashboard')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'dashboard' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'dashboard' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Dashboard
                         </button>
                         <button
                             onClick={() => setActiveTab('monthly')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'monthly' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Monthly Analysis
                         </button>
                         <button
                             onClick={() => setActiveTab('analysis')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Advanced Analysis
                         </button>
                         <button
                             onClick={() => setActiveTab('scenarios')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'scenarios' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'scenarios' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Scenario Comparison
                         </button>
                         <button
                             onClick={() => setActiveTab('reports')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'reports' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'reports' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                         >
                             Reports & export
                         </button>
                     </div>
 
-                    {/* Save Scenario Modal */}
+                    {/* Save Scenario Modal (Preserved) */}
                     {showSaveModal && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                             <div className="bg-white dark:bg-navy-950 p-6 rounded-xl border border-white/10 shadow-2xl w-full max-w-md">
@@ -1114,39 +1126,281 @@ export default function AggregationPage() {
                         </div>
                     )}
 
-                    {/* Content Views */}
-                    {activeTab === 'dashboard' && (
-                        <>
-                            {/* Participant Editor (Collapsible or Card) */}
-                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm mb-8">
-                                <div className="flex justify-between items-center mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <button
-                                            onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}
-                                            className="p-1 hover:bg-gray-50 dark:hover:bg-slate-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                                        >
-                                            <span className={`transform transition-transform inline-block ${isLoadCollapsed ? '-rotate-90' : 'rotate-0'}`}>
-                                                ▼
-                                            </span>
-                                        </button>
-                                        <h3 className="text-lg font-semibold cursor-pointer" onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}>Load Aggregation</h3>
-                                    </div>
-                                    <span className="text-sm text-gray-700 dark:text-gray-300">
-                                        Total Load: <span className="font-bold text-gray-900 dark:text-gray-100">{(participants.reduce((a, b) => a + b.load_mwh, 0)).toLocaleString()} MWh</span>
+                    {/* CONFIGURATION TAB CONTENT */}
+                    {activeTab === 'config' && (
+                        <div className="animate-in fade-in duration-300 space-y-8">
+
+                            {/* 1. LOAD CONFIGURATION */}
+                            <div className="bg-white dark:bg-navy-900/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-bold text-navy-950 dark:text-white flex items-center gap-2">
+                                        <span className="p-2 bg-blue-500/10 text-blue-500 rounded-lg">1</span>
+                                        Load Configuration
+                                    </h3>
+                                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                                        Total Load: <span className="text-navy-950 dark:text-white font-bold ml-1">{(participants.reduce((a, b) => a + b.load_mwh, 0)).toLocaleString()} MWh</span>
                                     </span>
                                 </div>
 
-                                {!isLoadCollapsed && (
-                                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                                        <ParticipantEditor
-                                            participants={participants}
-                                            onChange={setParticipants}
-                                        />
+                                <ParticipantEditor
+                                    participants={participants}
+                                    onChange={setParticipants}
+                                />
+                            </div>
+
+                            {/* 2. REGIONAL SETTINGS */}
+                            <div className="bg-white dark:bg-navy-900/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
+                                <h3 className="text-xl font-bold text-navy-950 dark:text-white mb-6 flex items-center gap-2">
+                                    <span className="p-2 bg-purple-500/10 text-purple-500 rounded-lg">2</span>
+                                    Region & Pricing
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Simulated Year</label>
+                                        <select
+                                            value={selectedYear}
+                                            onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-navy-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-energy-green"
+                                        >
+                                            <option value={2020}>2020 (Historical)</option>
+                                            <option value={2021}>2021 (Historical - Volatile)</option>
+                                            <option value={2022}>2022 (Historical - High Gas)</option>
+                                            <option value={2023}>2023 (Historical)</option>
+                                            <option value={2024}>2024 (Current)</option>
+                                            <option value={2025}>2025 (Forecast)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Load Zone (Price Hub)</label>
+                                        <select
+                                            value={loadHub}
+                                            onChange={(e) => setLoadHub(e.target.value)}
+                                            className="w-full p-3 rounded-lg bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-navy-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-energy-green"
+                                        >
+                                            <option value="HB_NORTH">North Hub</option>
+                                            <option value="HB_SOUTH">South Hub</option>
+                                            <option value="HB_WEST">West Hub</option>
+                                            <option value="HB_HOUSTON">Houston Hub</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* 3. ASSET CONFIGURATION */}
+                            <div className="bg-white dark:bg-navy-900/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
+                                <div className="flex justify-between items-center mb-6">
+                                    <h3 className="text-xl font-bold text-navy-950 dark:text-white flex items-center gap-2">
+                                        <span className="p-2 bg-energy-green/10 text-energy-green-dark dark:text-energy-green rounded-lg">3</span>
+                                        Asset Portfolio
+                                    </h3>
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Mode:</span>
+                                        <div className="flex bg-gray-100 dark:bg-black/20 rounded-lg p-1">
+                                            <button
+                                                onClick={() => setUseAdvancedAssets(false)}
+                                                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${!useAdvancedAssets ? 'bg-white dark:bg-white/10 shadow text-navy-950 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                                            >
+                                                Simple
+                                            </button>
+                                            <button
+                                                onClick={() => setUseAdvancedAssets(true)}
+                                                className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${useAdvancedAssets ? 'bg-white dark:bg-white/10 shadow text-navy-950 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                                            >
+                                                Advanced
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {!useAdvancedAssets ? (
+                                    <div className="space-y-8">
+                                        {/* Simple Sliders */}
+                                        <div>
+                                            <div className="flex justify-between mb-2">
+                                                <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
+                                                    ☀️ Solar Capacity
+                                                    <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_WEST</span>
+                                                </label>
+                                                <span className="font-mono text-energy-green dark:text-energy-green font-bold">{capacities.Solar} MW</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="5000"
+                                                step="10"
+                                                value={capacities.Solar}
+                                                onChange={(e) => setCapacities(p => ({ ...p, Solar: parseInt(e.target.value) }))}
+                                                className="w-full accent-energy-green"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <div className="flex justify-between mb-2">
+                                                <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
+                                                    💨 Wind Capacity
+                                                    <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_SOUTH</span>
+                                                </label>
+                                                <span className="font-mono text-blue-500 font-bold">{capacities.Wind} MW</span>
+                                            </div>
+                                            <input
+                                                type="range"
+                                                min="0"
+                                                max="5000"
+                                                step="10"
+                                                value={capacities.Wind}
+                                                onChange={(e) => setCapacities(p => ({ ...p, Wind: parseInt(e.target.value) }))}
+                                                className="w-full accent-blue-500"
+                                            />
+                                        </div>
+
+                                        <div className="p-4 bg-gray-50 dark:bg-black/20 rounded-lg border border-gray-200 dark:border-white/5">
+                                            <div className="flex justify-between mb-4">
+                                                <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
+                                                    🔋 Battery Storage
+                                                    <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">Co-located</span>
+                                                </label>
+                                                <div className="text-right">
+                                                    <div className="font-mono text-purple-500 font-bold">{capacities.Battery_MW} MW</div>
+                                                    <div className="text-xs text-gray-500">{capacities.Battery_Hours} Hour Duration</div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4">
+                                                <input
+                                                    type="range"
+                                                    min="0"
+                                                    max="2000"
+                                                    step="10"
+                                                    value={capacities.Battery_MW}
+                                                    onChange={(e) => setCapacities(p => ({ ...p, Battery_MW: parseInt(e.target.value) }))}
+                                                    className="w-full accent-purple-500"
+                                                />
+                                                <div className="flex gap-2 justify-end">
+                                                    {[2, 4, 8].map(h => (
+                                                        <button
+                                                            key={h}
+                                                            onClick={() => setCapacities(p => ({ ...p, Battery_Hours: h }))}
+                                                            className={`px-3 py-1 text-xs rounded border transition-colors ${capacities.Battery_Hours === h ? 'bg-purple-500 text-white border-purple-500' : 'border-gray-300 dark:border-white/20 text-gray-500 hover:border-purple-500'}`}
+                                                        >
+                                                            {h}h
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-4 flex items-center gap-2">
+                                            <span className="text-amber-500">ℹ️</span>
+                                            Advanced mode allows mixing multiple assets with different locations and types.
+                                        </div>
+
+                                        {/* Advanced Asset List */}
+                                        <div className="space-y-3">
+                                            {assets.map(asset => (
+                                                <div key={asset.id} className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 dark:bg-black/20 rounded-lg border border-gray-200 dark:border-white/5">
+                                                    <div className="flex-1 min-w-[150px]">
+                                                        <input
+                                                            type="text"
+                                                            value={asset.name}
+                                                            onChange={(e) => updateAsset(asset.id, { name: e.target.value })}
+                                                            className="w-full bg-transparent border-none focus:ring-0 font-medium text-navy-950 dark:text-white placeholder-gray-400"
+                                                            placeholder="Asset Name"
+                                                        />
+                                                    </div>
+                                                    <select
+                                                        value={asset.type}
+                                                        onChange={(e) => updateAsset(asset.id, { type: e.target.value as any })}
+                                                        className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm"
+                                                    >
+                                                        <option value="Solar">Solar</option>
+                                                        <option value="Wind">Wind</option>
+                                                        <option value="Nuclear">Nuclear</option>
+                                                        <option value="Geothermal">Geothermal</option>
+                                                        <option value="CCS">Gas + CCS</option>
+                                                    </select>
+                                                    <select
+                                                        value={asset.location}
+                                                        onChange={(e) => updateAsset(asset.id, { location: e.target.value as any })}
+                                                        className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm w-32"
+                                                    >
+                                                        <option value="North">North</option>
+                                                        <option value="South">South</option>
+                                                        <option value="West">West</option>
+                                                        <option value="Houston">Houston</option>
+                                                        <option value="Panhandle">Panhandle</option>
+                                                    </select>
+                                                    <div className="flex items-center gap-1">
+                                                        <input
+                                                            type="number"
+                                                            value={asset.capacity_mw}
+                                                            onChange={(e) => updateAsset(asset.id, { capacity_mw: Number(e.target.value) })}
+                                                            className="w-20 bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm text-right"
+                                                        />
+                                                        <span className="text-xs text-gray-500">MW</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeAsset(asset.id)}
+                                                        className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                                        title="Remove Asset"
+                                                    >
+                                                        ✕
+                                                    </button>
+                                                </div>
+                                            ))}
+
+                                            <button
+                                                onClick={addAsset}
+                                                className="w-full py-2 border-2 border-dashed border-gray-300 dark:border-white/10 rounded-lg text-gray-500 hover:border-energy-green hover:text-energy-green transition-colors text-sm font-medium"
+                                            >
+                                                + Add Asset
+                                            </button>
+                                        </div>
+
+                                        {/* Advanced Battery Separate */}
+                                        <div className="mt-6 pt-6 border-t border-gray-200 dark:border-white/10">
+                                            <h4 className="font-semibold text-navy-950 dark:text-white mb-4">Battery Storage</h4>
+                                            <div className="flex gap-4 items-center">
+                                                <div className="flex-1">
+                                                    <label className="text-xs text-gray-500 uppercase tracking-wide">Capacity</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <input
+                                                            type="number"
+                                                            value={capacities.Battery_MW}
+                                                            onChange={(e) => setCapacities(p => ({ ...p, Battery_MW: parseInt(e.target.value) }))}
+                                                            className="w-full bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-3 py-2"
+                                                        />
+                                                        <span className="text-sm font-medium">MW</span>
+                                                    </div>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label className="text-xs text-gray-500 uppercase tracking-wide">Duration</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <select
+                                                            value={capacities.Battery_Hours}
+                                                            onChange={(e) => setCapacities(p => ({ ...p, Battery_Hours: parseInt(e.target.value) }))}
+                                                            className="w-full bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-3 py-2"
+                                                        >
+                                                            <option value={1}>1 Hour</option>
+                                                            <option value={2}>2 Hours</option>
+                                                            <option value={4}>4 Hours</option>
+                                                            <option value={8}>8 Hours</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
 
-                            {/* Results Section */}
+                        </div>
+                    )}
+
+
+                    {/* DASHBOARD CONTENT */}
+                    {activeTab === 'dashboard' && (
+                        <>
                             {result ? (
                                 <div className="space-y-8 animate-in fade-in duration-500">
                                     {/* KPI Grid */}
@@ -1157,16 +1411,6 @@ export default function AggregationPage() {
                                         <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
                                         <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
                                         <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
-                                    </div>
-
-                                    {/* View in Analysis Button */}
-                                    <div className="flex justify-end">
-                                        <Link
-                                            href="/analysis"
-                                            className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg font-semibold transition-all inline-flex items-center gap-2"
-                                        >
-                                            View Detailed Analysis →
-                                        </Link>
                                     </div>
 
                                     {/* Interactive Visualizations */}
@@ -1203,6 +1447,7 @@ export default function AggregationPage() {
                                     {/* Financial Summary Table */}
                                     <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
                                         <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
+                                        {/* Table Content */}
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-sm">
                                                 <tbody>
@@ -1261,104 +1506,8 @@ export default function AggregationPage() {
 
                                         </div>
                                     </div>
-
-                                    {/* Detailed Asset Breakdown Table */}
-                                    {result.asset_details && result.asset_details.length > 0 && (
-                                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm overflow-x-auto mt-8">
-                                            <div className="flex justify-between items-center mb-4">
-                                                <h3 className="text-lg font-semibold">Asset Financial Breakdown</h3>
-                                            </div>
-                                            {/* Asset Table code here... */}
-                                            <table className="w-full text-sm text-left">
-                                                <thead>
-                                                    <tr className="border-b border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300">
-                                                        <th className="py-2 pr-4">Asset Name</th>
-                                                        <th className="py-2 pr-4">Type</th>
-                                                        <th className="py-2 pr-4">Hub</th>
-                                                        <th className="py-2 pr-4 text-right">Capacity</th>
-                                                        <th className="py-2 pr-4 text-right">Generation</th>
-                                                        <th className="py-2 pr-4 text-right">Revenue (Basis)</th>
-                                                        <th className="py-2 pr-4 text-right">PPA Cost</th>
-                                                        <th className="py-2 text-right">Settlement</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {result.asset_details.map((asset, idx) => (
-                                                        <tr key={idx} className="border-b border-gray-200 dark:border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
-                                                            <td className="py-3 pr-4 font-medium text-navy-950 dark:text-white">{asset.name}</td>
-                                                            <td className="py-3 pr-4 text-navy-950 dark:text-white">{asset.type}</td>
-                                                            <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">{asset.location}</td>
-                                                            <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.capacity_mw} MW</td>
-                                                            <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
-                                                            <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
-                                                                ${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                            </td>
-                                                            <td className="py-3 pr-4 text-right text-red-500">
-                                                                -${asset.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                            </td>
-                                                            <td className={`py-3 text-right font-medium ${asset.settlement_value >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                                                {asset.settlement_value >= 0 ? '+' : ''}${asset.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                                <tfoot>
-                                                    <tr className="border-t-2 border-gray-200 dark:border-slate-600 font-bold bg-gray-50 dark:bg-slate-700/50 text-navy-950 dark:text-white">
-                                                        <td className="py-3 pr-4" colSpan={3}>Total</td>
-                                                        <td className="py-3 pr-4 text-right">
-                                                            {result.asset_details.reduce((sum, a) => sum + a.capacity_mw, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MW
-                                                        </td>
-                                                        <td className="py-3 pr-4 text-right">
-                                                            {result.asset_details.reduce((sum, a) => sum + a.total_gen_mwh, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
-                                                        </td>
-                                                        <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
-                                                            ${result.asset_details.reduce((sum, a) => sum + a.total_revenue, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                        </td>
-                                                        <td className="py-3 pr-4 text-right text-red-500">
-                                                            -${result.asset_details.reduce((sum, a) => sum + a.total_cost, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                        </td>
-                                                        <td className={`py-3 text-right ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                            {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                        </td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    )}
-
-                                    {/* Hourly Data Heatmaps */}
-                                    <div className="space-y-6 mt-8">
-                                        <ResultsHeatmap
-                                            data={result.load_profile.map((load, i) => {
-                                                const gen = result.matched_profile[i] || 0;
-                                                return load > 0 ? (gen / load) * 100 : 0;
-                                            })}
-                                            title="Hourly Matching Rate"
-                                            min={0}
-                                            max={100}
-                                            unit="%"
-                                        />
-
-                                        <ResultsHeatmap
-                                            data={result.load_profile.map((load, i) => {
-                                                const matched = result.matched_profile[i] || 0;
-                                                return load - matched;
-                                            })}
-                                            title="Grid Deficit (Hourly)"
-                                            min={0}
-                                            unit="MWh"
-                                        />
-
-                                        {result.rec_price_profile && (
-                                            <ResultsHeatmap
-                                                data={result.rec_price_profile}
-                                                title="REC Price (Hourly)"
-                                                min={0}
-                                                unit="$/MWh"
-                                            />
-                                        )}
-                                    </div>
                                 </div>
+
                             ) : (
                                 <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-white/10 rounded-xl">
                                     <div className="text-5xl mb-4">📊</div>
@@ -1415,94 +1564,61 @@ export default function AggregationPage() {
                                     <p className="text-gray-600 dark:text-gray-400">Download simulation data and generate professional PDF reports.</p>
                                 </div>
 
-                                {!session ? (
-                                    <div className="bg-white dark:bg-navy-950 border border-gray-200 dark:border-white/10 rounded-2xl p-10 text-center shadow-lg max-w-md mx-auto">
-                                        <div className="mb-6 text-6xl">🔒</div>
-                                        <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Sign In Required</h3>
-                                        <p className="text-gray-600 dark:text-gray-400 mb-8">
-                                            Please sign in with your Google account to access advanced reporting features and export functionality.
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {/* PDF Report Card */}
+                                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="p-3 bg-red-500/10 rounded-lg text-red-500 text-2xl group-hover:scale-110 transition-transform">
+                                                📄
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-white mb-2">Simulation Report (PDF)</h3>
+                                        <p className="text-gray-400 text-sm mb-6">
+                                            Generate a professional PDF report containing scenario metrics, charts, and financial analysis. Ideal for stakeholder presentations.
                                         </p>
                                         <button
-                                            onClick={() => signIn('google')}
-                                            className="px-8 py-3 bg-white border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all shadow-sm flex items-center gap-3 mx-auto"
+                                            onClick={handleDownloadPDF}
+                                            disabled={!result}
+                                            className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                                         >
-                                            <svg className="w-5 h-5" viewBox="0 0 24 24">
-                                                <path
-                                                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                                                    fill="#4285F4"
-                                                />
-                                                <path
-                                                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                                                    fill="#34A853"
-                                                />
-                                                <path
-                                                    d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                                                    fill="#FBBC05"
-                                                />
-                                                <path
-                                                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                                                    fill="#EA4335"
-                                                />
-                                            </svg>
-                                            Sign in with Google
+                                            {!result ? 'Run Simulation First' : 'Generate PDF Report'}
                                         </button>
                                     </div>
-                                ) : (
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        {/* PDF Report Card */}
-                                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
-                                            <div className="flex items-start justify-between mb-4">
-                                                <div className="p-3 bg-red-500/10 rounded-lg text-red-500 text-2xl group-hover:scale-110 transition-transform">
-                                                    📄
-                                                </div>
-                                            </div>
-                                            <h3 className="text-lg font-bold text-white mb-2">Simulation Report (PDF)</h3>
-                                            <p className="text-gray-400 text-sm mb-6">
-                                                Generate a professional PDF report containing scenario metrics, charts, and financial analysis. Ideal for stakeholder presentations.
-                                            </p>
-                                            <button
-                                                onClick={handleDownloadPDF}
-                                                disabled={!result}
-                                                className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                                            >
-                                                {!result ? 'Run Simulation First' : 'Generate PDF Report'}
-                                            </button>
-                                        </div>
 
-                                        {/* CSV Data Card */}
-                                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
-                                            <div className="flex items-start justify-between mb-4">
-                                                <div className="p-3 bg-green-500/10 rounded-lg text-green-500 text-2xl group-hover:scale-110 transition-transform">
-                                                    📊
-                                                </div>
+                                    {/* CSV Data Card */}
+                                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="p-3 bg-green-500/10 rounded-lg text-green-500 text-2xl group-hover:scale-110 transition-transform">
+                                                📊
                                             </div>
-                                            <h3 className="text-lg font-bold text-white mb-2">Raw Data Export (CSV)</h3>
-                                            <p className="text-gray-400 text-sm mb-6">
-                                                Download the full 8760-hourly dataset including load, generation profiles, and financial settlements for custom analysis.
-                                            </p>
-                                            <button
-                                                onClick={handleDownloadCSV}
-                                                disabled={!result}
-                                                className="w-full py-3 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                {!result ? 'Run Simulation First' : 'Download CSV Data'}
-                                            </button>
                                         </div>
-
-                                        {!result && (
-                                            <div className="md:col-span-2 text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm">
-                                                ⚠️ Please run a simulation on the Dashboard to generate data for reports.
-                                            </div>
-                                        )}
+                                        <h3 className="text-lg font-bold text-white mb-2">Raw Data Export (CSV)</h3>
+                                        <p className="text-gray-400 text-sm mb-6">
+                                            Download the full 8760-hourly dataset including load, generation profiles, and financial settlements for custom analysis.
+                                        </p>
+                                        <button
+                                            onClick={handleDownloadCSV}
+                                            disabled={!result}
+                                            className="w-full py-3 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {!result ? 'Run Simulation First' : 'Download CSV Data'}
+                                        </button>
                                     </div>
-                                )}
+
+                                    {!result && (
+                                        <div className="md:col-span-2 text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm">
+                                            ⚠️ Please run a simulation on the Dashboard to generate data for reports.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     )}
 
                 </div>
+
             </div>
-        </main>
+        </main >
     );
 }
 
