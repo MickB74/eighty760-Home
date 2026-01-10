@@ -105,15 +105,15 @@ export default function HeroSimulator() {
     };
 
     return (
-        <div className="bg-white/10 dark:bg-black/20 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-700 delay-200">
+        <div className="bg-[#0f1218] border border-white/5 rounded-2xl p-6 shadow-2xl animate-in slide-in-from-bottom duration-700">
             {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h3 className="text-xl font-bold text-navy-950 dark:text-white">Live Simulator</h3>
-                    <p className="text-xs text-navy-900/60 dark:text-white/60">Adjust capacity to match 24h load</p>
+                    <h3 className="text-xl font-bold text-white">Live Simulator</h3>
+                    <p className="text-xs text-gray-400">Adjust capacity to match 24h load</p>
                 </div>
-                <div className="flex gap-3 text-[10px] font-mono uppercase tracking-wider text-navy-900/60 dark:text-white/60">
-                    <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-white border border-gray-400"></div>Load</div>
+                <div className="flex gap-3 text-[10px] font-mono uppercase tracking-wider text-gray-500">
+                    <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-white/20"></div>Load</div>
                     <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500"></div>Solar</div>
                     <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500"></div>Wind</div>
                 </div>
@@ -150,9 +150,9 @@ export default function HeroSimulator() {
 function CompactInput({ label, value, setValue, max, unit, color }: any) {
     return (
         <div>
-            <div className="flex justify-between text-xs mb-1">
-                <span className="font-semibold text-navy-900 dark:text-gray-300">{label}</span>
-                <span className="font-mono text-navy-950 dark:text-white opacity-80">{value}</span>
+            <div className="flex justify-between text-xs mb-2">
+                <span className="font-semibold text-gray-300">{label}</span>
+                <span className="font-mono text-white opacity-80">{value}</span>
             </div>
             <input
                 type="range"
@@ -160,31 +160,31 @@ function CompactInput({ label, value, setValue, max, unit, color }: any) {
                 max={max}
                 value={value}
                 onChange={(e) => setValue(parseInt(e.target.value))}
-                className={`w-full h-1 bg-gray-200 dark:bg-white/20 rounded-lg appearance-none cursor-pointer ${color}`}
+                className={`w-full h-1 bg-white/10 rounded-lg appearance-none cursor-pointer ${color}`}
             />
         </div>
     );
 }
 
 function KPICard({ label, value, unit, good, inverse, neutral }: any) {
-    let colorClass = "text-navy-950 dark:text-white";
+    let colorClass = "text-white";
     if (!neutral) {
         if (inverse) {
             // Lower is better (Deficit)
-            colorClass = value === 0 ? "text-emerald-500" : "text-amber-500";
-            if (value > 100) colorClass = "text-red-500";
+            colorClass = value === 0 ? "text-emerald-400" : "text-amber-400";
+            if (value > 100) colorClass = "text-red-400";
         } else {
             // Higher is better (Score)
-            colorClass = good ? "text-emerald-500" : "text-amber-500";
-            if (value < 50) colorClass = "text-red-500";
+            colorClass = good ? "text-emerald-400" : "text-amber-400";
+            if (value < 50) colorClass = "text-red-400";
         }
     }
 
     return (
-        <div className="bg-white/5 rounded p-3 text-center border border-white/10">
-            <div className="text-[10px] uppercase tracking-wider text-navy-900/50 dark:text-white/40 font-bold mb-1">{label}</div>
+        <div className="bg-white/5 rounded p-3 text-center border border-white/5">
+            <div className="text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1">{label}</div>
             <div className={`text-xl font-bold font-mono ${colorClass}`}>
-                {Math.round(value).toLocaleString()} <span className="text-xs opacity-60 font-sans">{unit}</span>
+                {Math.round(value).toLocaleString()} <span className="text-xs opacity-60 font-sans text-gray-400">{unit}</span>
             </div>
         </div>
     )

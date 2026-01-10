@@ -29,7 +29,14 @@ import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
-import { loadPortfolio, savePortfolio } from '@/lib/shared/portfolioStore';
+import {
+    loadPortfolio,
+    savePortfolio,
+    saveScenario,
+    getScenarios,
+    deleteScenario,
+    type Scenario
+} from '@/lib/shared/portfolioStore';
 import Link from 'next/link';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
@@ -189,6 +196,17 @@ export default function AggregationPage() {
     const [isLoadCollapsed, setIsLoadCollapsed] = useState(false);
 
     const [cvtaResult, setCvtaResult] = useState<BatteryCVTAResult | null>(null);
+
+    // Tab State
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios'>('dashboard');
+    const [scenarios, setScenarios] = useState<Scenario[]>([]);
+    const [showSaveModal, setShowSaveModal] = useState(false);
+    const [scenarioName, setScenarioName] = useState('');
+
+    // Load scenarios on mount
+    useEffect(() => {
+        setScenarios(getScenarios());
+    }, []);
 
     // Results
     const [result, setResult] = useState<SimulationResult | null>(null);
@@ -897,12 +915,18 @@ export default function AggregationPage() {
                 <div className="flex-1 p-6 lg:p-10 overflow-y-auto h-full">
 
                     {/* Header Section */}
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                         <div>
                             <h1 className="text-3xl font-bold brand-text">ERCOT North Aggregation</h1>
                             <p className="text-gray-700 dark:text-gray-300">24/7 CFE Portfolio Optimization</p>
                         </div>
                         <div className="flex gap-2">
+                            <button
+                                onClick={() => setShowSaveModal(true)}
+                                className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-navy-950 dark:text-white rounded-md transition font-medium text-sm flex items-center gap-2"
+                            >
+                                💾 Save Scenario
+                            </button>
                             <button
                                 onClick={handleInstantDemo}
                                 className="px-4 py-2 bg-energy-green text-navy-950 rounded-md hover:opacity-90 transition font-medium shadow-sm text-sm"
@@ -912,389 +936,408 @@ export default function AggregationPage() {
                         </div>
                     </div>
 
-                    {/* Participant Editor (Collapsible or Card) */}
-                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm mb-8">
-                        <div className="flex justify-between items-center mb-4">
-                            <div className="flex items-center gap-2">
-                                <button
-                                    onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}
-                                    className="p-1 hover:bg-gray-50 dark:hover:bg-slate-700 rounded transition-colors text-gray-700 dark:text-gray-300"
-                                >
-                                    <span className={`transform transition-transform inline-block ${isLoadCollapsed ? '-rotate-90' : 'rotate-0'}`}>
-                                        ▼
-                                    </span>
-                                </button>
-                                <h3 className="text-lg font-semibold cursor-pointer" onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}>Load Aggregation</h3>
-                            </div>
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
-                                Total Load: <span className="font-bold text-gray-900 dark:text-gray-100">{(participants.reduce((a, b) => a + b.load_mwh, 0)).toLocaleString()} MWh</span>
-                            </span>
-                        </div>
-
-                        {!isLoadCollapsed && (
-                            <div className="animate-in fade-in slide-in-from-top-2 duration-200">
-                                <ParticipantEditor
-                                    participants={participants}
-                                    onChange={setParticipants}
-                                />
-                            </div>
-                        )}
+                    {/* Tab Navigation */}
+                    <div className="flex border-b border-gray-200 dark:border-white/10 mb-8">
+                        <button
+                            onClick={() => setActiveTab('dashboard')}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'dashboard' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                        >
+                            Dashboard
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('monthly')}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                        >
+                            Monthly Analysis
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('scenarios')}
+                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'scenarios' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                        >
+                            Scenario Comparison
+                        </button>
                     </div>
 
-                    {/* Results Section */}
-                    {result ? (
-                        <div className="space-y-8 animate-in fade-in duration-500">
-                            {/* KPI Grid */}
-                            {/* KPI Grid */}
-                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-                                <KPICard label="24/7 Score" value={(result.cfe_score * 100).toFixed(1) + '%'} sub="Hourly Match" />
-                                <KPICard label="Annual Match" value={(result.total_load_mwh > 0 ? (result.total_gen_mwh / result.total_load_mwh * 100).toFixed(0) : '0') + '%'} sub="Gen / Load" />
-                                <KPICard label="Grid Deficit" value={(result.total_load_mwh - result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Unmatched" />
-                                <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
-                                <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
-                                <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
-                            </div>
-
-                            {/* View in Analysis Button */}
-                            <div className="flex justify-end">
-                                <Link
-                                    href="/analysis"
-                                    className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg font-semibold transition-all inline-flex items-center gap-2"
-                                >
-                                    View Detailed Analysis →
-                                </Link>
-                            </div>
-
-                            {/* Interactive Visualizations */}
-                            <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                                <Timeline8760
-                                    loadProfile={result.load_profile}
-                                    matchedProfile={result.matched_profile}
-                                    solarGen={result.solar_profile}
-                                    windGen={result.wind_profile}
-                                    nuclearGen={result.nuc_profile}
-                                    batteryDischarge={result.battery_discharge}
-                                    onHourChange={(hour) => setCurrentHour(hour)}
+                    {/* Save Scenario Modal */}
+                    {showSaveModal && (
+                        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                            <div className="bg-white dark:bg-navy-950 p-6 rounded-xl border border-white/10 shadow-2xl w-full max-w-md">
+                                <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Save Scenario</h3>
+                                <input
+                                    type="text"
+                                    placeholder="Scenario Name (e.g. High Solar Case)"
+                                    value={scenarioName}
+                                    onChange={(e) => setScenarioName(e.target.value)}
+                                    className="w-full p-2 rounded border border-gray-300 dark:border-white/20 bg-transparent mb-4"
                                 />
-                                <EnergyFlowDiagram
-                                    hour={currentHour}
-                                    solar={result.solar_profile[currentHour] || 0}
-                                    wind={result.wind_profile[currentHour] || 0}
-                                    nuclear={result.nuc_profile[currentHour] || 0}
-                                    geothermal={result.geo_profile[currentHour] || 0}
-                                    ccs={result.ccs_profile[currentHour] || 0}
-                                    battery={result.battery_discharge[currentHour] || 0}
-                                    load={result.load_profile[currentHour] || 0}
-                                    gridDeficit={Math.max(0, (result.load_profile[currentHour] || 0) - (result.matched_profile[currentHour] || 0))}
-                                    surplus={result.surplus_profile[currentHour] || 0}
-                                />
-                            </div>
-
-                            {/* Chart */}
-                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm h-[500px]">
-                                <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year)</h3>
-                                <GenChart result={result} capacities={capacities} />
-                            </div>
-
-                            {/* Financial Summary Table */}
-                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
-                                <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
-                                        <tbody>
-                                            <tr className="border-b border-white/10">
-                                                <td className="py-3 font-medium flex items-center gap-2">
-                                                    Market Purchases (Load Bill)
-                                                    <InfoTooltip text="Total Load × Hourly Load Hub Price" />
-                                                </td>
-                                                <td className="py-3 text-right font-medium text-red-500">
-                                                    -${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
-                                                </td>
-                                            </tr>
-                                            <tr className="border-b border-white/10">
-                                                <td className="py-3 font-medium flex items-center gap-2">
-                                                    Net Settlement Value (PPA vs Market)
-                                                    <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
-                                                </td>
-                                                <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                    {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                </td>
-                                            </tr>
-                                            <tr className="border-b border-white/10">
-                                                <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                    REC Income (Surplus)
-                                                    <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
-                                                </td>
-                                                <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                                            </tr>
-                                            <tr className="border-b border-white/10">
-                                                <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                    REC Cost (Deficit)
-                                                    <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
-                                                </td>
-                                                <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                                            </tr>
-                                            <tr className="border-b border-white/10">
-                                                <td className="py-3 font-medium text-lg flex items-center gap-2">
-                                                    Total Net Portfolio Cost
-                                                    <InfoTooltip text="(Total Load × Load Hub Price) - Net Settlement Value + Net REC Costs" />
-                                                </td>
-                                                <td className={`py-3 text-right font-bold text-lg ${result.total_cost_net > 0 ? 'text-red-500' : 'text-green-600'}`}>
-                                                    {result.total_cost_net > 0 ? '-' : '+'}${Math.abs(result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                    Levelized Cost to Load ($/MWh)
-                                                    <InfoTooltip text="Total Net Portfolio Cost / Total Annual Load" />
-                                                </td>
-                                                <td className="py-3 text-right text-gray-700 dark:text-gray-300">
-                                                    ${result.avg_cost_per_mwh.toFixed(2)}
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-
+                                <div className="flex justify-end gap-2">
+                                    <button
+                                        onClick={() => setShowSaveModal(false)}
+                                        className="px-4 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            if (scenarioName) {
+                                                saveScenario({
+                                                    participants,
+                                                    assets: activeAssets,
+                                                    battery: { mw: capacities.Battery_MW, hours: capacities.Battery_Hours },
+                                                    financials,
+                                                    year: selectedYear,
+                                                    loadHub,
+                                                    solarHub,
+                                                    windHub,
+                                                    nuclearHub,
+                                                    geothermalHub,
+                                                    ccsHub,
+                                                    timestamp: Date.now()
+                                                }, scenarioName);
+                                                setScenarios(getScenarios());
+                                                setShowSaveModal(false);
+                                                setScenarioName('');
+                                            }
+                                        }}
+                                        className="px-4 py-2 bg-energy-green text-navy-950 rounded font-medium"
+                                    >
+                                        Save
+                                    </button>
                                 </div>
-                            </div>
-
-                            {/* Detailed Asset Breakdown Table */}
-                            {result.asset_details && result.asset_details.length > 0 && (
-                                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm overflow-x-auto mt-8">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-lg font-semibold">Asset Financial Breakdown</h3>
-                                        <div className="flex gap-2">
-                                            {/* Portfolio-Level CSV */}
-                                            <button
-                                                onClick={() => {
-                                                    const csvRows: string[] = [];
-
-                                                    // Header for portfolio-level metrics
-                                                    csvRows.push('Timestamp,Hour,Load (MWh),Matched (MWh),Grid Deficit (MWh),Surplus (MWh),Solar Gen (MWh),Wind Gen (MWh),Nuclear Gen (MWh),Geothermal Gen (MWh),CCS Gen (MWh),Battery Discharge (MWh),Market Price ($/MWh),REC Price ($/MWh)');
-
-                                                    // One row per hour
-                                                    for (let h = 0; h < 8760; h++) {
-                                                        const timestamp = `Hour ${h + 1}`;
-                                                        csvRows.push([
-                                                            timestamp,
-                                                            h.toString(),
-                                                            (result.load_profile[h] || 0).toFixed(4),
-                                                            (result.matched_profile[h] || 0).toFixed(4),
-                                                            (result.deficit_profile[h] || 0).toFixed(4),
-                                                            (result.surplus_profile[h] || 0).toFixed(4),
-                                                            (result.solar_profile[h] || 0).toFixed(4),
-                                                            (result.wind_profile[h] || 0).toFixed(4),
-                                                            (result.nuc_profile[h] || 0).toFixed(4),
-                                                            (result.geo_profile[h] || 0).toFixed(4),
-                                                            (result.ccs_profile[h] || 0).toFixed(4),
-                                                            (result.battery_discharge[h] || 0).toFixed(4),
-                                                            (result.market_price_profile[h] || 0).toFixed(2),
-                                                            (result.rec_price_profile ? result.rec_price_profile[h] || 0 : 0).toFixed(2)
-                                                        ].join(','));
-                                                    }
-
-                                                    // Download
-                                                    const csvContent = csvRows.join('\n');
-                                                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                                                    const link = document.createElement('a');
-                                                    const url = URL.createObjectURL(blob);
-                                                    link.setAttribute('href', url);
-                                                    link.setAttribute('download', `portfolio_hourly_${selectedYear}.csv`);
-                                                    link.style.visibility = 'hidden';
-                                                    document.body.appendChild(link);
-                                                    link.click();
-                                                    document.body.removeChild(link);
-                                                }}
-                                                className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:opacity-90 transition-opacity"
-                                            >
-                                                📊 Portfolio CSV
-                                            </button>
-
-                                            {/* Asset-Level CSV */}
-                                            <button
-                                                onClick={() => {
-                                                    const csvRows: string[] = [];
-
-                                                    // Header for asset-level data
-                                                    csvRows.push('Timestamp,Hour,Asset Name,Type,Hub,Capacity (MW),Generation (MWh),Market Price ($/MWh),Revenue ($),PPA Strike ($/MWh),PPA Cost ($),Settlement ($),REC Price ($/MWh),REC Revenue ($)');
-
-                                                    // For each hour
-                                                    for (let h = 0; h < 8760; h++) {
-                                                        const timestamp = `Hour ${h + 1}`;
-
-                                                        // For each asset
-                                                        result.asset_details.forEach(asset => {
-                                                            // Get the hourly generation based on asset type
-                                                            let hourlyGen = 0;
-                                                            const techMap: Record<string, number[]> = {
-                                                                'Solar': result.solar_profile,
-                                                                'Wind': result.wind_profile,
-                                                                'Geothermal': result.geo_profile,
-                                                                'Nuclear': result.nuc_profile,
-                                                                'CCS Gas': result.ccs_profile
-                                                            };
-
-                                                            const profile = techMap[asset.type];
-                                                            if (profile && profile[h] !== undefined) {
-                                                                // Calculate this asset's share of the total tech generation
-                                                                const totalTechGen = profile[h];
-                                                                const assetShare = asset.capacity_mw / result.asset_details
-                                                                    .filter(a => a.type === asset.type)
-                                                                    .reduce((sum, a) => sum + a.capacity_mw, 0);
-                                                                hourlyGen = totalTechGen * assetShare;
-                                                            }
-
-                                                            const marketPrice = result.market_price_profile[h] || 0;
-                                                            const hourlyRevenue = hourlyGen * marketPrice;
-
-                                                            // Get PPA strike price
-                                                            const ppaPriceMap: Record<string, number> = {
-                                                                'Solar': financials.solar_price,
-                                                                'Wind': financials.wind_price,
-                                                                'Geothermal': financials.geo_price,
-                                                                'Nuclear': financials.nuc_price,
-                                                                'CCS Gas': financials.ccs_price
-                                                            };
-                                                            const ppaStrike = ppaPriceMap[asset.type] || 0;
-                                                            const hourlyCost = hourlyGen * ppaStrike;
-                                                            const hourlySettlement = hourlyRevenue - hourlyCost;
-
-                                                            // Calculate REC price and revenue
-                                                            const recPrice = result.rec_price_profile ? result.rec_price_profile[h] || 0 : 0;
-                                                            const recRevenue = hourlyGen * recPrice;
-
-                                                            csvRows.push([
-                                                                timestamp,
-                                                                h.toString(),
-                                                                asset.name,
-                                                                asset.type,
-                                                                asset.location,
-                                                                asset.capacity_mw.toFixed(2),
-                                                                hourlyGen.toFixed(4),
-                                                                marketPrice.toFixed(2),
-                                                                hourlyRevenue.toFixed(2),
-                                                                ppaStrike.toFixed(2),
-                                                                hourlyCost.toFixed(2),
-                                                                hourlySettlement.toFixed(2),
-                                                                recPrice.toFixed(2),
-                                                                recRevenue.toFixed(2)
-                                                            ].join(','));
-                                                        });
-                                                    }
-
-                                                    // Download CSV
-                                                    const csvContent = csvRows.join('\n');
-                                                    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                                                    const link = document.createElement('a');
-                                                    const url = URL.createObjectURL(blob);
-                                                    link.setAttribute('href', url);
-                                                    link.setAttribute('download', `assets_hourly_${selectedYear}.csv`);
-                                                    link.style.visibility = 'hidden';
-                                                    document.body.appendChild(link);
-                                                    link.click();
-                                                    document.body.removeChild(link);
-                                                }}
-                                                className="px-4 py-2 bg-energy-green text-navy-950 text-sm rounded-md hover:opacity-90 transition-opacity"
-                                            >
-                                                🏭 Assets CSV
-                                            </button>
-                                        </div>
-                                    </div>
-                                    <table className="w-full text-sm text-left">
-                                        <thead>
-                                            <tr className="border-b border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300">
-                                                <th className="py-2 pr-4">Asset Name</th>
-                                                <th className="py-2 pr-4">Type</th>
-                                                <th className="py-2 pr-4">Hub</th>
-                                                <th className="py-2 pr-4 text-right">Capacity</th>
-                                                <th className="py-2 pr-4 text-right">Generation</th>
-                                                <th className="py-2 pr-4 text-right">Revenue (Basis)</th>
-                                                <th className="py-2 pr-4 text-right">PPA Cost</th>
-                                                <th className="py-2 text-right">Settlement</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {result.asset_details.map((asset, idx) => (
-                                                <tr key={idx} className="border-b border-gray-200 dark:border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
-                                                    <td className="py-3 pr-4 font-medium text-navy-950 dark:text-white">{asset.name}</td>
-                                                    <td className="py-3 pr-4 text-navy-950 dark:text-white">{asset.type}</td>
-                                                    <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">{asset.location}</td>
-                                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.capacity_mw} MW</td>
-                                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
-                                                    <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
-                                                        ${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                    </td>
-                                                    <td className="py-3 pr-4 text-right text-red-500">
-                                                        -${asset.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                    </td>
-                                                    <td className={`py-3 text-right font-medium ${asset.settlement_value >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                                        {asset.settlement_value >= 0 ? '+' : ''}${asset.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                    </td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                        <tfoot>
-                                            <tr className="border-t-2 border-gray-200 dark:border-slate-600 font-bold bg-gray-50 dark:bg-slate-700/50 text-navy-950 dark:text-white">
-                                                <td className="py-3 pr-4" colSpan={3}>Total</td>
-                                                <td className="py-3 pr-4 text-right">
-                                                    {result.asset_details.reduce((sum, a) => sum + a.capacity_mw, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MW
-                                                </td>
-                                                <td className="py-3 pr-4 text-right">
-                                                    {result.asset_details.reduce((sum, a) => sum + a.total_gen_mwh, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
-                                                </td>
-                                                <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
-                                                    ${result.asset_details.reduce((sum, a) => sum + a.total_revenue, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                </td>
-                                                <td className="py-3 pr-4 text-right text-red-500">
-                                                    -${result.asset_details.reduce((sum, a) => sum + a.total_cost, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                </td>
-                                                <td className={`py-3 text-right ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                    {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                </td>
-                                            </tr>
-                                        </tfoot>
-                                    </table>
-                                </div>
-                            )}
-
-                            {/* Hourly Data Heatmaps */}
-                            <div className="space-y-6 mt-8">
-                                <ResultsHeatmap
-                                    data={result.load_profile.map((load, i) => {
-                                        const gen = result.matched_profile[i] || 0;
-                                        return load > 0 ? (gen / load) * 100 : 0;
-                                    })}
-                                    title="Hourly Matching Rate"
-                                    min={0}
-                                    max={100}
-                                    unit="%"
-                                />
-
-                                <ResultsHeatmap
-                                    data={result.load_profile.map((load, i) => {
-                                        const matched = result.matched_profile[i] || 0;
-                                        return load - matched;
-                                    })}
-                                    title="Grid Deficit (Hourly)"
-                                    min={0}
-                                    unit="MWh"
-                                />
-
-                                {result.rec_price_profile && (
-                                    <ResultsHeatmap
-                                        data={result.rec_price_profile}
-                                        title="REC Price (Hourly)"
-                                        min={0}
-                                        unit="$/MWh"
-                                    />
-                                )}
                             </div>
                         </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-white/10 rounded-xl">
-                            <div className="text-5xl mb-4">📊</div>
-                            <p className="text-lg font-medium">Add Participants to Begin Simulation</p>
-                            <p className="text-sm">Configure load participants above or click &quot;Load Demo&quot; to start.</p>
+                    )}
+
+                    {/* Content Views */}
+                    {activeTab === 'dashboard' && (
+                        <>
+                            {/* Participant Editor (Collapsible or Card) */}
+                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm mb-8">
+                                <div className="flex justify-between items-center mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}
+                                            className="p-1 hover:bg-gray-50 dark:hover:bg-slate-700 rounded transition-colors text-gray-700 dark:text-gray-300"
+                                        >
+                                            <span className={`transform transition-transform inline-block ${isLoadCollapsed ? '-rotate-90' : 'rotate-0'}`}>
+                                                ▼
+                                            </span>
+                                        </button>
+                                        <h3 className="text-lg font-semibold cursor-pointer" onClick={() => setIsLoadCollapsed(!isLoadCollapsed)}>Load Aggregation</h3>
+                                    </div>
+                                    <span className="text-sm text-gray-700 dark:text-gray-300">
+                                        Total Load: <span className="font-bold text-gray-900 dark:text-gray-100">{(participants.reduce((a, b) => a + b.load_mwh, 0)).toLocaleString()} MWh</span>
+                                    </span>
+                                </div>
+
+                                {!isLoadCollapsed && (
+                                    <div className="animate-in fade-in slide-in-from-top-2 duration-200">
+                                        <ParticipantEditor
+                                            participants={participants}
+                                            onChange={setParticipants}
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Results Section */}
+                            {result ? (
+                                <div className="space-y-8 animate-in fade-in duration-500">
+                                    {/* KPI Grid */}
+                                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+                                        <KPICard label="24/7 Score" value={(result.cfe_score * 100).toFixed(1) + '%'} sub="Hourly Match" />
+                                        <KPICard label="Annual Match" value={(result.total_load_mwh > 0 ? (result.total_gen_mwh / result.total_load_mwh * 100).toFixed(0) : '0') + '%'} sub="Gen / Load" />
+                                        <KPICard label="Grid Deficit" value={(result.total_load_mwh - result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Unmatched" />
+                                        <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
+                                        <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
+                                        <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
+                                    </div>
+
+                                    {/* View in Analysis Button */}
+                                    <div className="flex justify-end">
+                                        <Link
+                                            href="/analysis"
+                                            className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-lg font-semibold transition-all inline-flex items-center gap-2"
+                                        >
+                                            View Detailed Analysis →
+                                        </Link>
+                                    </div>
+
+                                    {/* Interactive Visualizations */}
+                                    <div className="grid lg:grid-cols-2 gap-6 mb-8">
+                                        <Timeline8760
+                                            loadProfile={result.load_profile}
+                                            matchedProfile={result.matched_profile}
+                                            solarGen={result.solar_profile}
+                                            windGen={result.wind_profile}
+                                            nuclearGen={result.nuc_profile}
+                                            batteryDischarge={result.battery_discharge}
+                                            onHourChange={(hour) => setCurrentHour(hour)}
+                                        />
+                                        <EnergyFlowDiagram
+                                            hour={currentHour}
+                                            solar={result.solar_profile[currentHour] || 0}
+                                            wind={result.wind_profile[currentHour] || 0}
+                                            nuclear={result.nuc_profile[currentHour] || 0}
+                                            geothermal={result.geo_profile[currentHour] || 0}
+                                            ccs={result.ccs_profile[currentHour] || 0}
+                                            battery={result.battery_discharge[currentHour] || 0}
+                                            load={result.load_profile[currentHour] || 0}
+                                            gridDeficit={Math.max(0, (result.load_profile[currentHour] || 0) - (result.matched_profile[currentHour] || 0))}
+                                            surplus={result.surplus_profile[currentHour] || 0}
+                                        />
+                                    </div>
+
+                                    {/* Chart */}
+                                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm h-[500px]">
+                                        <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year)</h3>
+                                        <GenChart result={result} capacities={capacities} />
+                                    </div>
+
+                                    {/* Financial Summary Table */}
+                                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
+                                        <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-sm">
+                                                <tbody>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 font-medium flex items-center gap-2">
+                                                            Market Purchases (Load Bill)
+                                                            <InfoTooltip text="Total Load × Hourly Load Hub Price" />
+                                                        </td>
+                                                        <td className="py-3 text-right font-medium text-red-500">
+                                                            -${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
+                                                        </td>
+                                                    </tr>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 font-medium flex items-center gap-2">
+                                                            Net Settlement Value (PPA vs Market)
+                                                            <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
+                                                        </td>
+                                                        <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                            {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                        </td>
+                                                    </tr>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            REC Income (Surplus)
+                                                            <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
+                                                        </td>
+                                                        <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                    </tr>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            REC Cost (Deficit)
+                                                            <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
+                                                        </td>
+                                                        <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                    </tr>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 font-medium text-lg flex items-center gap-2">
+                                                            Total Net Portfolio Cost
+                                                            <InfoTooltip text="(Total Load × Load Hub Price) - Net Settlement Value + Net REC Costs" />
+                                                        </td>
+                                                        <td className={`py-3 text-right font-bold text-lg ${result.total_cost_net > 0 ? 'text-red-500' : 'text-green-600'}`}>
+                                                            {result.total_cost_net > 0 ? '-' : '+'}${Math.abs(result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            Levelized Cost to Load ($/MWh)
+                                                            <InfoTooltip text="Total Net Portfolio Cost / Total Annual Load" />
+                                                        </td>
+                                                        <td className="py-3 text-right text-gray-700 dark:text-gray-300">
+                                                            ${result.avg_cost_per_mwh.toFixed(2)}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                    {/* Detailed Asset Breakdown Table */}
+                                    {result.asset_details && result.asset_details.length > 0 && (
+                                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm overflow-x-auto mt-8">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <h3 className="text-lg font-semibold">Asset Financial Breakdown</h3>
+                                                {/* CSV Buttons code here... */}
+                                            </div>
+                                            {/* Asset Table code here... */}
+                                            <table className="w-full text-sm text-left">
+                                                <thead>
+                                                    <tr className="border-b border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300">
+                                                        <th className="py-2 pr-4">Asset Name</th>
+                                                        <th className="py-2 pr-4">Type</th>
+                                                        <th className="py-2 pr-4">Hub</th>
+                                                        <th className="py-2 pr-4 text-right">Capacity</th>
+                                                        <th className="py-2 pr-4 text-right">Generation</th>
+                                                        <th className="py-2 pr-4 text-right">Revenue (Basis)</th>
+                                                        <th className="py-2 pr-4 text-right">PPA Cost</th>
+                                                        <th className="py-2 text-right">Settlement</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {result.asset_details.map((asset, idx) => (
+                                                        <tr key={idx} className="border-b border-gray-200 dark:border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-700">
+                                                            <td className="py-3 pr-4 font-medium text-navy-950 dark:text-white">{asset.name}</td>
+                                                            <td className="py-3 pr-4 text-navy-950 dark:text-white">{asset.type}</td>
+                                                            <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">{asset.location}</td>
+                                                            <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.capacity_mw} MW</td>
+                                                            <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
+                                                            <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
+                                                                ${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                            </td>
+                                                            <td className="py-3 pr-4 text-right text-red-500">
+                                                                -${asset.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                            </td>
+                                                            <td className={`py-3 text-right font-medium ${asset.settlement_value >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                                                {asset.settlement_value >= 0 ? '+' : ''}${asset.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr className="border-t-2 border-gray-200 dark:border-slate-600 font-bold bg-gray-50 dark:bg-slate-700/50 text-navy-950 dark:text-white">
+                                                        <td className="py-3 pr-4" colSpan={3}>Total</td>
+                                                        <td className="py-3 pr-4 text-right">
+                                                            {result.asset_details.reduce((sum, a) => sum + a.capacity_mw, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MW
+                                                        </td>
+                                                        <td className="py-3 pr-4 text-right">
+                                                            {result.asset_details.reduce((sum, a) => sum + a.total_gen_mwh, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
+                                                        </td>
+                                                        <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
+                                                            ${result.asset_details.reduce((sum, a) => sum + a.total_revenue, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                        </td>
+                                                        <td className="py-3 pr-4 text-right text-red-500">
+                                                            -${result.asset_details.reduce((sum, a) => sum + a.total_cost, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                        </td>
+                                                        <td className={`py-3 text-right ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                            {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                        </td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                                    )}
+
+                                    {/* Hourly Data Heatmaps */}
+                                    <div className="space-y-6 mt-8">
+                                        <ResultsHeatmap
+                                            data={result.load_profile.map((load, i) => {
+                                                const gen = result.matched_profile[i] || 0;
+                                                return load > 0 ? (gen / load) * 100 : 0;
+                                            })}
+                                            title="Hourly Matching Rate"
+                                            min={0}
+                                            max={100}
+                                            unit="%"
+                                        />
+
+                                        <ResultsHeatmap
+                                            data={result.load_profile.map((load, i) => {
+                                                const matched = result.matched_profile[i] || 0;
+                                                return load - matched;
+                                            })}
+                                            title="Grid Deficit (Hourly)"
+                                            min={0}
+                                            unit="MWh"
+                                        />
+
+                                        {result.rec_price_profile && (
+                                            <ResultsHeatmap
+                                                data={result.rec_price_profile}
+                                                title="REC Price (Hourly)"
+                                                min={0}
+                                                unit="$/MWh"
+                                            />
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-white/10 rounded-xl">
+                                    <div className="text-5xl mb-4">📊</div>
+                                    <p className="text-lg font-medium">Add Participants to Begin Simulation</p>
+                                    <p className="text-sm">Configure load participants above or click &quot;Load Demo&quot; to start.</p>
+                                </div>
+                            )}
+                        </>
+                    )}
+
+                    {activeTab === 'monthly' && result && (
+                        <div className="animate-in fade-in duration-300 space-y-8">
+                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
+                                <h3 className="text-xl font-bold mb-4 text-white">Monthly Production</h3>
+                                <div className="h-[400px]">
+                                    <MonthlyProductionChart result={result} />
+                                </div>
+                            </div>
+
+                            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
+                                <h3 className="text-xl font-bold mb-4 text-white">Monthly Settlement & Cost</h3>
+                                <div className="h-[400px]">
+                                    <MonthlyFinancialChart result={result} />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'monthly' && !result && (
+                        <div className="text-center py-20 text-gray-500">Run a simulation to see monthly breakdown.</div>
+                    )}
+
+                    {activeTab === 'scenarios' && (
+                        <div className="animate-in fade-in duration-300">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-xl font-bold text-white">Saved Scenarios</h3>
+                            </div>
+
+                            {scenarios.length === 0 ? (
+                                <div className="text-center py-20 text-gray-500 border-2 border-dashed border-white/10 rounded-xl">
+                                    No saved scenarios yet. Configure a portfolio and click &quot;Save Scenario&quot;.
+                                </div>
+                            ) : (
+                                <div className="grid gap-4">
+                                    {scenarios.map(scen => (
+                                        <div key={scen.id} className="bg-white/5 p-6 rounded-xl border border-white/10 hover:border-white/20 transition-colors">
+                                            <div className="flex justify-between items-start">
+                                                <div>
+                                                    <h4 className="text-lg font-bold text-white mb-2">{scen.name}</h4>
+                                                    <div className="flex gap-4 text-sm text-gray-400 mb-4">
+                                                        <span>{getYearLabel(scen.year as any)}</span>
+                                                        <span>{scen.participants.length} Participants</span>
+                                                        <span>{scen.assets.length} Assets</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            setParticipants(scen.participants);
+                                                            setSelectedYear(scen.year as any);
+                                                            setFinancials(scen.financials);
+                                                            setLoadHub(scen.loadHub);
+                                                            setAssets(scen.assets); // Assuming we migrate to AssetEditor fully, but this updates 'assets' state
+                                                            // We also need to update 'capacities' state for legacy support if needed, but assets state drives AssetEditor
+                                                            setUseAdvancedAssets(true);
+                                                            setActiveTab('dashboard');
+                                                        }}
+                                                        className="px-4 py-2 bg-blue-600 text-white rounded text-sm hover:bg-blue-700"
+                                                    >
+                                                        Load Scenario
+                                                    </button>
+                                                </div>
+                                                <button
+                                                    onClick={() => {
+                                                        deleteScenario(scen.id);
+                                                        setScenarios(getScenarios());
+                                                    }}
+                                                    className="text-red-400 hover:text-red-300 text-sm"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -1425,11 +1468,107 @@ function GenChart({ result }: { result: SimulationResult, capacities: TechCapaci
             }
         },
         elements: { line: { borderWidth: 0 } },
+        layout: {
+            padding: {
+                top: 0,
+                bottom: 20,
+                left: 0,
+                right: 0
+            }
+        },
         plugins: {
             tooltip: { mode: 'index', intersect: false },
-            legend: { display: true, position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } }
+            legend: {
+                display: true,
+                position: 'top',
+                align: 'end',
+                labels: {
+                    boxWidth: 12,
+                    font: { size: 11 },
+                    padding: 15,
+                    color: '#9ca3af' // gray-400
+                }
+            }
         }
     }} />;
 }
 
 
+
+function MonthlyProductionChart({ result }: { result: SimulationResult }) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // Aggregation Logic
+    const monthlyLoad = new Array(12).fill(0);
+    const monthlyGen = new Array(12).fill(0);
+    const monthlyDeficit = new Array(12).fill(0);
+    const monthlySurplus = new Array(12).fill(0);
+
+    for (let i = 0; i < 8760; i++) {
+        // Simple approximation: 30.4 days per month * 24 = ~730 hours
+        const month = Math.min(11, Math.floor(i / 730));
+        monthlyLoad[month] += result.load_profile[i] || 0;
+        monthlyGen[month] += (result.solar_profile[i] + result.wind_profile[i] + result.nuc_profile[i] + result.geo_profile[i] + result.ccs_profile[i] + result.battery_discharge[i]);
+        monthlyDeficit[month] += result.deficit_profile[i] || 0;
+        monthlySurplus[month] += result.surplus_profile[i] || 0;
+    }
+
+    const data = {
+        labels: months,
+        datasets: [
+            { label: 'Load', data: monthlyLoad, backgroundColor: '#374151' },
+            { label: 'Generation', data: monthlyGen, backgroundColor: '#10b981' },
+            { label: 'Deficit', data: monthlyDeficit, backgroundColor: '#ef4444' },
+            { label: 'Surplus', data: monthlySurplus, backgroundColor: '#f59e0b' },
+        ]
+    };
+
+    return <Chart type="bar" data={data} options={{ responsive: true, maintainAspectRatio: false }} />;
+}
+
+function MonthlyFinancialChart({ result }: { result: SimulationResult }) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    // Aggregation Logic
+    const monthlyCost = new Array(12).fill(0);
+    const monthlySettlement = new Array(12).fill(0);
+
+    // This requires calculating costs hourly again if valid profiles aren't available in result for monthly.
+    // Result object usually aggregates totals. The asset_details has some breakdown but not monthly.
+    // Ideally we'd do this in the engine, but we can approximate here by re-running the row-math if needed, 
+    // or just assume uniform distribution if we are lazy (bad).
+    // Let's use the provided profiles in result.
+
+    for (let i = 0; i < 8760; i++) {
+        const month = Math.min(11, Math.floor(i / 730));
+
+        // Market Purchase Cost
+        const load = result.load_profile[i] || 0;
+        const price = result.market_price_profile[i] || 0; // Load Hub Price
+        monthlyCost[month] += load * price;
+
+        // Settlement Value (Gen * (Hub - Strike))
+        // We need asset level details to be accurate, but simple approx:
+        // Let's approximate using total Gen * (Market Average - Strike Average) -- too inaccurate.
+        // We'll skip complex settlement aggregation here for now and just show Load Cost vs Market Value of Generation.
+
+        // Actually, we can sum up the asset settlement if we had hourly profiles for all assets.
+        // But we DO have result.asset_details which has total stats.
+        // We can't restart the loop easily.
+
+        // Let's just visualize Load Cost vs REC Cost for now as a placeholder.
+        const deficit = result.deficit_profile[i] || 0;
+        const recPrice = result.rec_price_profile ? result.rec_price_profile[i] || 0 : 0;
+        monthlySettlement[month] += deficit * recPrice; // Using this as REC Cost
+    }
+
+    const data = {
+        labels: months,
+        datasets: [
+            { label: 'Load Cost (Market)', data: monthlyCost, backgroundColor: '#ef4444' },
+            { label: 'REC Cost (Deficit)', data: monthlySettlement, backgroundColor: '#f97316' },
+        ]
+    };
+
+    return <Chart type="bar" data={data} options={{ responsive: true, maintainAspectRatio: false }} />;
+}

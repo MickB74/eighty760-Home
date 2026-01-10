@@ -13,7 +13,7 @@ export default function Hero() {
             {/* Background overlay for depth */}
             <div className="absolute inset-0 bg-white/80 dark:bg-navy-950/80 transition-colors duration-300"></div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
                 <div className="grid lg:grid-cols-2 gap-12 items-center">
                     {/* Left: Messaging */}
                     <motion.div

@@ -17,10 +17,17 @@ export interface SharedPortfolio {
     timestamp: number;
 }
 
+export interface Scenario extends SharedPortfolio {
+    id: string;
+    name: string;
+    description?: string;
+}
+
 const STORAGE_KEY = 'eighty760_portfolio';
+const SCENARIOS_KEY = 'eighty760_scenarios';
 
 /**
- * Save portfolio configuration to localStorage
+ * Save portfolio configuration to localStorage (Quick Save)
  */
 export function savePortfolio(portfolio: SharedPortfolio): void {
     try {
@@ -63,4 +70,36 @@ export function hasPortfolio(): boolean {
     } catch {
         return false;
     }
+}
+
+// --- Scenario Management ---
+
+export function saveScenario(portfolio: SharedPortfolio, name: string, description?: string): Scenario {
+    const scenarios = getScenarios();
+    const newScenario: Scenario = {
+        ...portfolio,
+        id: crypto.randomUUID(),
+        name,
+        description,
+        timestamp: Date.now()
+    };
+
+    scenarios.push(newScenario);
+    localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
+    return newScenario;
+}
+
+export function getScenarios(): Scenario[] {
+    try {
+        const stored = localStorage.getItem(SCENARIOS_KEY);
+        return stored ? JSON.parse(stored) : [];
+    } catch (error) {
+        console.error('Failed to load scenarios:', error);
+        return [];
+    }
+}
+
+export function deleteScenario(id: string): void {
+    const scenarios = getScenarios().filter(s => s.id !== id);
+    localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
 }
