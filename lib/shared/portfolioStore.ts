@@ -103,3 +103,7 @@ export function deleteScenario(id: string): void {
     const scenarios = getScenarios().filter(s => s.id !== id);
     localStorage.setItem(SCENARIOS_KEY, JSON.stringify(scenarios));
 }
+
+export function clearScenarios(): void {
+    localStorage.removeItem(SCENARIOS_KEY);
+}

@@ -68,24 +68,68 @@ export function generateLoadProfile(annual_mwh: number, type: string): number[] 
         return new Array(HOURS).fill(avg_load);
     }
 
-    if (type === 'Data Center' || type === 'Manufacturing') {
-        // Flat with minor noise
-        const noiseLevel = type === 'Data Center' ? 0.05 : 0.10;
-        for (let i = 0; i < HOURS; i++) {
-            const noise = rng.normal(0, noiseLevel * avg_load);
-            profile[i] = Math.max(0, avg_load + noise);
+    if (type === 'Data Center') {
+        // High Load Factor (~95%), slight diurnal thermal load (cooling)
+        let total_unscaled = 0;
+        for (let h = 0; h < HOURS; h++) {
+            const hour = h % 24;
+            // Cooling load peaks in afternoon (14-17)
+            const cooling = 0.05 * Math.sin(Math.PI * (hour - 10) / 12);
+            // Base noise
+            const noise = rng.normal(0, 0.01);
+
+            // Base IT load (constant) + Variability
+            profile[h] = Math.max(0.1, 1.0 + (cooling > 0 ? cooling : 0) + noise);
+            total_unscaled += profile[h];
         }
-        return profile;
+        const scaler = annual_mwh / total_unscaled;
+        return profile.map(v => v * scaler);
+    }
+
+    if (type === 'Manufacturing') {
+        // 24/7 Operation but with weekend dips ( ~90% LF)
+        let total_unscaled = 0;
+        for (let h = 0; h < HOURS; h++) {
+            const day = Math.floor(h / 24) % 7; // 0=Sun, 1=Mon, ..., 6=Sat
+            const isWeekend = (day === 0 || day === 6);
+
+            // Weekdays: 1.0, Weekends: 0.8
+            const dayFactor = isWeekend ? 0.85 : 1.0;
+
+            // Minor shift changes / noise
+            const noise = rng.normal(0, 0.05);
+
+            profile[h] = Math.max(0, dayFactor + noise);
+            total_unscaled += profile[h];
+        }
+        const scaler = annual_mwh / total_unscaled;
+        return profile.map(v => v * scaler);
     }
 
     if (type === 'Office') {
-        // Day (8am-6pm) high, Night low
+        // Typical Commercial (Weekdays 8-6 high, Night low, Weekends low)
         let total_unscaled = 0;
-        for (let i = 0; i < HOURS; i++) {
-            const hour = i % 24;
-            const isDay = hour >= 8 && hour <= 18;
-            profile[i] = isDay ? 1.5 : 0.5;
-            total_unscaled += profile[i];
+        for (let h = 0; h < HOURS; h++) {
+            const hour = h % 24;
+            const day = Math.floor(h / 24) % 7; // 0=Sun ... 6=Sat
+            const isWeekend = (day === 0 || day === 6);
+
+            let shape = 0.2; // Base plug load / security / emergency lighting
+
+            if (!isWeekend) {
+                // Workday Ramp Up/Down
+                if (hour >= 6 && hour < 8) shape = 0.4 + (hour - 6) * 0.2; // Ramp up
+                else if (hour >= 8 && hour < 18) shape = 0.9 + rng.normal(0, 0.05); // Work hours high
+                else if (hour >= 18 && hour < 20) shape = 0.9 - (hour - 18) * 0.3; // Ramp down
+                else shape = 0.2; // Night
+            } else {
+                // Weekend (Low activity)
+                if (hour >= 9 && hour < 17) shape = 0.3 + rng.normal(0, 0.02); // Minimal usage
+                else shape = 0.2;
+            }
+
+            profile[h] = Math.max(0.1, shape);
+            total_unscaled += profile[h];
         }
         const scaler = annual_mwh / total_unscaled;
         return profile.map(v => v * scaler);

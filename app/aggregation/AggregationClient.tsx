@@ -29,12 +29,14 @@ import AssetEditor from '@/components/aggregation/AssetEditor';
 import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
+import AnalysisTab from '@/components/aggregation/AnalysisTab'; // Import new tab component
 import {
     loadPortfolio,
     savePortfolio,
     saveScenario,
     getScenarios,
     deleteScenario,
+    clearScenarios,
     type Scenario
 } from '@/lib/shared/portfolioStore';
 import Link from 'next/link';
@@ -198,7 +200,7 @@ export default function AggregationPage() {
     const [cvtaResult, setCvtaResult] = useState<BatteryCVTAResult | null>(null);
 
     // Tab State
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis'>('dashboard');
     const [scenarios, setScenarios] = useState<Scenario[]>([]);
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [scenarioName, setScenarioName] = useState('');
@@ -565,11 +567,11 @@ export default function AggregationPage() {
                                             <select
                                                 value={selectedYear}
                                                 onChange={(e) => setSelectedYear(e.target.value === 'Average' ? 'Average' : parseInt(e.target.value))}
-                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-sm"
+                                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-sm"
                                             >
-                                                <option value="Average">{getYearLabel('Average')}</option>
+                                                <option value="Average" className="bg-white dark:bg-navy-950">{getYearLabel('Average')}</option>
                                                 {getAvailableYears().map(year => (
-                                                    <option key={year} value={year}>{getYearLabel(year)}</option>
+                                                    <option key={year} value={year} className="bg-white dark:bg-navy-950">{getYearLabel(year)}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -614,11 +616,11 @@ export default function AggregationPage() {
                                             <select
                                                 value={loadHub}
                                                 onChange={(e) => setLoadHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h}>{h}</option>
+                                                    <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -627,11 +629,11 @@ export default function AggregationPage() {
                                             <select
                                                 value={solarHub}
                                                 onChange={(e) => setSolarHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h}>{h}</option>
+                                                    <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -640,11 +642,11 @@ export default function AggregationPage() {
                                             <select
                                                 value={windHub}
                                                 onChange={(e) => setWindHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h}>{h}</option>
+                                                    <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -657,11 +659,11 @@ export default function AggregationPage() {
                                             <select
                                                 value={nuclearHub}
                                                 onChange={(e) => setNuclearHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h}>{h}</option>
+                                                    <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -670,11 +672,11 @@ export default function AggregationPage() {
                                             <select
                                                 value={geothermalHub}
                                                 onChange={(e) => setGeothermalHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h}>{h}</option>
+                                                    <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -683,11 +685,11 @@ export default function AggregationPage() {
                                             <select
                                                 value={ccsHub}
                                                 onChange={(e) => setCcsHub(e.target.value)}
-                                                className="w-full p-2 rounded border border-white/10 bg-navy-950 text-xs"
+                                                className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-xs"
                                                 disabled={typeof selectedYear !== 'number'}
                                             >
                                                 {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h}>{h}</option>
+                                                    <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -702,7 +704,7 @@ export default function AggregationPage() {
                                         </div>
                                         <input
                                             type="number"
-                                            className="w-full p-2 rounded border border-white/10 bg-navy-950 text-sm"
+                                            className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-sm"
                                             value={financials.rec_price}
                                             onChange={(e) => setFinancials({ ...financials, rec_price: parseFloat(e.target.value) })}
                                         />
@@ -714,7 +716,7 @@ export default function AggregationPage() {
                                         </div>
                                         <input
                                             type="number"
-                                            className="w-full p-2 rounded border border-white/10 bg-navy-950 text-sm"
+                                            className="w-full p-2 rounded border border-gray-200 dark:border-white/10 !bg-white dark:!bg-navy-950 !text-gray-900 dark:!text-white text-sm"
                                             value={financials.market_price_avg}
                                             onChange={(e) => setFinancials({ ...financials, market_price_avg: parseFloat(e.target.value) })}
                                         />
@@ -921,6 +923,19 @@ export default function AggregationPage() {
                             <p className="text-gray-700 dark:text-gray-300">24/7 CFE Portfolio Optimization</p>
                         </div>
                         <div className="flex gap-2">
+                            {scenarios.length > 0 && (
+                                <button
+                                    onClick={() => {
+                                        if (confirm('Are you sure you want to clear all scenarios?')) {
+                                            clearScenarios();
+                                            setScenarios([]);
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-500 rounded-md transition font-medium text-sm"
+                                >
+                                    Clear Scenarios
+                                </button>
+                            )}
                             <button
                                 onClick={() => setShowSaveModal(true)}
                                 className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-navy-950 dark:text-white rounded-md transition font-medium text-sm flex items-center gap-2"
@@ -946,9 +961,17 @@ export default function AggregationPage() {
                         </button>
                         <button
                             onClick={() => setActiveTab('monthly')}
-                            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${activeTab === 'monthly' ? 'border-energy-green text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                            className={`pb-4 px-4 font-medium transition-colors relative ${activeTab === 'monthly' ? 'text-brand dark:text-brand-light' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
                         >
                             Monthly Analysis
+                            {activeTab === 'monthly' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand dark:bg-brand-light" />}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('analysis')}
+                            className={`pb-4 px-4 font-medium transition-colors relative ${activeTab === 'analysis' ? 'text-brand dark:text-brand-light' : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'}`}
+                        >
+                            Advanced Analysis
+                            {activeTab === 'analysis' && <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand dark:bg-brand-light" />}
                         </button>
                         <button
                             onClick={() => setActiveTab('scenarios')}
@@ -1286,10 +1309,27 @@ export default function AggregationPage() {
                         <div className="text-center py-20 text-gray-500">Run a simulation to see monthly breakdown.</div>
                     )}
 
+                    {activeTab === 'analysis' && (
+                        <AnalysisTab result={result} />
+                    )}
+
                     {activeTab === 'scenarios' && (
                         <div className="animate-in fade-in duration-300">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-bold text-white">Saved Scenarios</h3>
+                                {scenarios.length > 0 && (
+                                    <button
+                                        onClick={() => {
+                                            if (confirm('Are you sure you want to clear all scenarios? This cannot be undone.')) {
+                                                clearScenarios();
+                                                setScenarios([]);
+                                            }
+                                        }}
+                                        className="text-sm text-red-400 hover:text-red-300 border border-red-400/30 px-3 py-1 rounded hover:bg-red-400/10 transition"
+                                    >
+                                        Clear All
+                                    </button>
+                                )}
                             </div>
 
                             {scenarios.length === 0 ? (

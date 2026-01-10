@@ -44,8 +44,8 @@ export default function Navigation() {
     const navLinks = [
         { name: 'Home', path: '/', section: null },
         // Tools Section
-        { name: 'Aggregation', path: '/aggregation', section: 'tools' },
-        { name: 'Analysis', path: '/analysis', section: 'tools' },
+        // Tools Section
+        { name: '24/7 CFE Calculator', path: '/aggregation', section: 'tools' },
 
         // Learn Section
         { name: 'Resources', path: '/blog', section: 'learn' },
