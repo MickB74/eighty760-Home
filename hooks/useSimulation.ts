@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { BASE_LOAD_PROFILE, SOLAR_PROFILE, WIND_PROFILE } from '@/lib/data/simulation-profiles';
+import { BASE_LOAD_PROFILE, LOAD_PROFILES, SOLAR_PROFILE, WIND_PROFILE } from '@/lib/data/simulation-profiles';
 
 export interface SimulationMetrics {
     cfeScore: number;
@@ -13,8 +13,17 @@ export function useSimulation() {
     const [nuclearCap, setNuclearCap] = useState(0);
     const [geothermalCap, setGeothermalCap] = useState(0);
 
+    // New Load Inputs
+    const [loadLevel, setLoadLevel] = useState(100); // Nominal Peak MW
+    const [buildingType, setBuildingType] = useState('Office');
+
     // Memoize the calculation to run when inputs change
-    const { metrics, solarGen, windGen, nuclearGen, geothermalGen } = useMemo(() => {
+    const { metrics, solarGen, windGen, nuclearGen, geothermalGen, currentBaseLoad } = useMemo(() => {
+        // Determine Load Profile
+        // Default to Office if not found
+        const profileShape = LOAD_PROFILES[buildingType] || BASE_LOAD_PROFILE;
+        const currentBaseLoad = profileShape.map(v => v * loadLevel);
+
         // Calculate generation
         const sGen = SOLAR_PROFILE.map(v => v * solarCap);
         const wGen = WIND_PROFILE.map(v => v * windCap);
@@ -30,7 +39,7 @@ export function useSimulation() {
         let hoursMatched = 0; // Count hours where gen >= load
 
         for (let i = 0; i < 24; i++) {
-            const load = BASE_LOAD_PROFILE[i];
+            const load = currentBaseLoad[i];
             const gen = sGen[i] + wGen[i] + nGen[i] + gGen[i];
 
             totalLoad += load;
@@ -57,23 +66,23 @@ export function useSimulation() {
             windGen: wGen,
             nuclearGen: nGen,
             geothermalGen: gGen,
+            currentBaseLoad,
         };
-    }, [solarCap, windCap, nuclearCap, geothermalCap]);
+    }, [solarCap, windCap, nuclearCap, geothermalCap, loadLevel, buildingType]);
 
     return {
-        solarCap,
-        setSolarCap,
-        windCap,
-        setWindCap,
-        nuclearCap,
-        setNuclearCap,
-        geothermalCap,
-        setGeothermalCap,
+        solarCap, setSolarCap,
+        windCap, setWindCap,
+        nuclearCap, setNuclearCap,
+        geothermalCap, setGeothermalCap,
+        loadLevel, setLoadLevel,
+        buildingType, setBuildingType,
         metrics,
         solarGen,
         windGen,
         nuclearGen,
         geothermalGen,
-        baseLoad: BASE_LOAD_PROFILE
+        baseLoad: currentBaseLoad
     };
 }
+

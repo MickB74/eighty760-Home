@@ -34,6 +34,8 @@ export default function HeroSimulator() {
         windCap, setWindCap,
         nuclearCap, setNuclearCap,
         geothermalCap, setGeothermalCap,
+        loadLevel, setLoadLevel,
+        buildingType, setBuildingType,
         metrics,
         solarGen,
         windGen,
@@ -152,7 +154,34 @@ export default function HeroSimulator() {
             {/* Inputs & Chart Container */}
             <div className="flex flex-col gap-6">
 
-                {/* Inputs Row */}
+                {/* Scenario Settings */}
+                <div className="flex items-center justify-between gap-4 bg-white/5 p-3 rounded-lg border border-white/5">
+                    <div className="flex flex-col gap-1 w-1/2">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Building Type</label>
+                        <select
+                            value={buildingType}
+                            onChange={(e) => setBuildingType(e.target.value)}
+                            className="bg-[#0f1218] text-white text-xs border border-white/20 rounded px-2 py-1 outline-none focus:border-energy-green"
+                        >
+                            <option value="Office">Office Building</option>
+                            <option value="Data Center">Data Center</option>
+                            <option value="EV Fleet">EV Fleet Depot</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-col gap-1 w-1/2">
+                        <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Avg Load</label>
+                        <div className="flex items-center gap-2">
+                            <input
+                                type="range" min="10" max="200" value={loadLevel}
+                                onChange={(e) => setLoadLevel(parseInt(e.target.value))}
+                                className="w-full h-1 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+                            />
+                            <span className="text-xs font-mono text-white">{loadLevel}MW</span>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Generation Inputs Row */}
                 <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                     <CompactInput label="Solar" value={solarCap} setValue={setSolarCap} max={150} unit="MW" color="accent-amber-500" />
                     <CompactInput label="Wind" value={windCap} setValue={setWindCap} max={150} unit="MW" color="accent-blue-500" />
