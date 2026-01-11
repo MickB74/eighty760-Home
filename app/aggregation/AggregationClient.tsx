@@ -684,7 +684,11 @@ export default function AggregationPage() {
                             </button>
                         )}
                         <button
-                            onClick={() => setShowSaveModal(true)}
+                            onClick={() => {
+                                const date = new Date();
+                                setScenarioName(`Scenario - ${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
+                                setShowSaveModal(true);
+                            }}
                             className="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/20 text-navy-950 dark:text-white rounded-md transition font-medium text-sm flex items-center gap-2"
                         >
                             💾 Save Scenario
