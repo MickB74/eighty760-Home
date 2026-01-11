@@ -32,10 +32,13 @@ export default function HeroSimulator() {
     const {
         solarCap, setSolarCap,
         windCap, setWindCap,
-        batteryCap, setBatteryCap,
+        nuclearCap, setNuclearCap,
+        geothermalCap, setGeothermalCap,
         metrics,
         solarGen,
         windGen,
+        nuclearGen,
+        geothermalGen,
         baseLoad
     } = useSimulation();
 
@@ -51,16 +54,29 @@ export default function HeroSimulator() {
                 pointRadius: 0,
                 fill: false,
                 tension: 0.4,
+                order: 0,
             },
             {
-                label: 'Solar',
-                data: solarGen,
-                backgroundColor: 'rgba(245, 158, 11, 0.8)',
-                borderColor: '#F59E0B',
+                label: 'Geothermal',
+                data: geothermalGen,
+                backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                borderColor: '#EF4444',
                 borderWidth: 0,
                 fill: true,
                 pointRadius: 0,
-                tension: 0.4,
+                tension: 0.2, // Baseload
+                order: 4,
+            },
+            {
+                label: 'Nuclear',
+                data: nuclearGen,
+                backgroundColor: 'rgba(168, 85, 247, 0.8)',
+                borderColor: '#A855F7',
+                borderWidth: 0,
+                fill: true,
+                pointRadius: 0,
+                tension: 0.2, // Baseload
+                order: 3,
             },
             {
                 label: 'Wind',
@@ -71,6 +87,18 @@ export default function HeroSimulator() {
                 fill: true,
                 pointRadius: 0,
                 tension: 0.4,
+                order: 2,
+            },
+            {
+                label: 'Solar',
+                data: solarGen,
+                backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                borderColor: '#F59E0B',
+                borderWidth: 0,
+                fill: true,
+                pointRadius: 0,
+                tension: 0.4,
+                order: 1,
             },
         ],
     };
@@ -112,10 +140,12 @@ export default function HeroSimulator() {
                     <h3 className="text-xl font-bold text-white">Live Simulator</h3>
                     <p className="text-xs text-gray-400">Adjust capacity to match 24h load</p>
                 </div>
-                <div className="flex gap-3 text-[10px] font-mono uppercase tracking-wider text-gray-500">
-                    <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-white/20"></div>Load</div>
-                    <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-amber-500"></div>Solar</div>
-                    <div className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-blue-500"></div>Wind</div>
+                <div className="flex gap-2 text-[10px] font-mono uppercase tracking-wider text-gray-500">
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-white/20"></div>Load</div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-amber-500"></div>Sun</div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>Wind</div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div>Nuc</div>
+                    <div className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-red-500"></div>Geo</div>
                 </div>
             </div>
 
@@ -123,10 +153,11 @@ export default function HeroSimulator() {
             <div className="flex flex-col gap-6">
 
                 {/* Inputs Row */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-6">
                     <CompactInput label="Solar" value={solarCap} setValue={setSolarCap} max={150} unit="MW" color="accent-amber-500" />
                     <CompactInput label="Wind" value={windCap} setValue={setWindCap} max={150} unit="MW" color="accent-blue-500" />
-                    <CompactInput label="Battery" value={batteryCap} setValue={setBatteryCap} max={300} unit="MWh" color="accent-emerald-500" />
+                    <CompactInput label="Nuclear" value={nuclearCap} setValue={setNuclearCap} max={50} unit="MW" color="accent-purple-500" />
+                    <CompactInput label="Geothermal" value={geothermalCap} setValue={setGeothermalCap} max={50} unit="MW" color="accent-red-500" />
                 </div>
 
                 {/* Chart */}
