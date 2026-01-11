@@ -58,6 +58,38 @@ export default function AboutPage() {
 
 
 
+
+                    {/* Technology */}
+                    <section>
+                        <h2 className="text-2xl font-bold text-navy-950 dark:text-white mb-4">Technology & Methodology</h2>
+                        <div className="grid md:grid-cols-2 gap-8 mb-16">
+                            <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-6 border border-gray-200 dark:border-white/10">
+                                <h3 className="text-lg font-semibold text-energy-green-dark dark:text-energy-green mb-2">Simulating Reality</h3>
+                                <p className="text-gray-700 dark:text-slate-300">
+                                    Our engine simulates energy generation and consumption for every 15-minute interval of the year. We use <strong>ERA5 historical weather data</strong> to model solar and wind production with high fidelity, ensuring that your portfolio is tested against real-world variability.
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-6 border border-gray-200 dark:border-white/10">
+                                <h3 className="text-lg font-semibold text-energy-green-dark dark:text-energy-green mb-2">Smart Optimization</h3>
+                                <p className="text-gray-700 dark:text-slate-300">
+                                    Eighty760's "Smart Fill" algorithm automatically rightsizes your generation mix and battery storage to achieve your desired CFE score at the lowest possible cost, accounting for capacity factors and curtailment risk.
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-6 border border-gray-200 dark:border-white/10">
+                                <h3 className="text-lg font-semibold text-energy-green-dark dark:text-energy-green mb-2">Financial Rigor</h3>
+                                <p className="text-gray-700 dark:text-slate-300">
+                                    We integrate real <strong>ERCOT RTM pricing</strong> from 2020-2025 to model financial outcomes, including battery arbitrage revenue, basis risk, and market purchases during scarcity events.
+                                </p>
+                            </div>
+                            <div className="bg-gray-50 dark:bg-white/5 rounded-xl p-6 border border-gray-200 dark:border-white/10">
+                                <h3 className="text-lg font-semibold text-energy-green-dark dark:text-energy-green mb-2">Weather Performance</h3>
+                                <p className="text-gray-700 dark:text-slate-300">
+                                    The past is the best predictor of risk. Our Weather Performance tool backcasts your portfolio against years like 2021 (Winter Storm Uri) and 2023 (Heat Dome) to stress-test resilience.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
                     {/* Get Involved */}
                     <section>
                         <h2 className="text-2xl font-bold text-navy-950 dark:text-white mb-6">Get Involved</h2>

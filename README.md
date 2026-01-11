@@ -18,13 +18,18 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 
 **Data sources:** ERCOT RTM pricing (GridStatus.io, 2020-2025), Open-Meteo historical weather (ERA5), NREL generation models.
 
-**Tools available:** ERCOT Aggregation Tool (`/aggregation`), Portfolio Analysis Tool (`/analysis`), Interactive Home Simulator (`/`).
+**Tools available:** 
+- **Aggregation Tool** (`/aggregation`): Build and optimize portfolios with real-time feedback.
+- **Weather Performance** (`/weather-performance`): Analyze how your portfolio would have performed in past years (2020-2025).
+- **Interactive Home Simulator** (`/`): Quick educational tool for understanding 24/7 concepts.
 
 ## Features
 
 - **Interactive Portfolio Simulator**: Adjust solar, wind, and battery capacities in real-time.
+- **Smart Fill Optimization**: Automatically size your generation and storage to meet a target CFE score.
+- **Weather Performance Analysis**: Backcast your portfolio against 5 years of historical weather and price data.
 - **24-Hour Generation Profiles**: Visualize hourly generation vs. load with dynamic charts.
-- **CFE Score Calculation**: Instant feedback on Hourly Match %, Grid Deficit, and Overgeneration.
+- **Financial modeling**: Estimate costs, PPA settlements, and battery arbitrage revenue.
 - **Dark Mode Support**: Fully responsive design with light/dark themes.
 - **Methodology Documentation**: In-depth explanation of generation modeling and scarcity pricing.
 
