@@ -48,18 +48,6 @@ export default function HeroSimulator() {
         labels: HOURS.map(h => `${h}:00`),
         datasets: [
             {
-                label: 'Load',
-                data: baseLoad,
-                borderColor: '#ffffff',
-                borderWidth: 2,
-                borderDash: [5, 5],
-                pointRadius: 0,
-                fill: false,
-                tension: 0.4,
-                order: 0,
-                stack: 'load'
-            },
-            {
                 label: 'Geothermal',
                 data: geothermalGen,
                 backgroundColor: 'rgba(239, 68, 68, 0.8)',
@@ -67,8 +55,7 @@ export default function HeroSimulator() {
                 borderWidth: 0,
                 fill: true,
                 pointRadius: 0,
-                tension: 0.2, // Baseload
-                order: 4,
+                tension: 0, // Baseload - strictly flat
                 stack: 'generation'
             },
             {
@@ -79,8 +66,7 @@ export default function HeroSimulator() {
                 borderWidth: 0,
                 fill: true,
                 pointRadius: 0,
-                tension: 0.2, // Baseload
-                order: 3,
+                tension: 0, // Baseload - strictly flat
                 stack: 'generation'
             },
             {
@@ -92,7 +78,6 @@ export default function HeroSimulator() {
                 fill: true,
                 pointRadius: 0,
                 tension: 0.4,
-                order: 2,
                 stack: 'generation'
             },
             {
@@ -104,8 +89,18 @@ export default function HeroSimulator() {
                 fill: true,
                 pointRadius: 0,
                 tension: 0.4,
-                order: 1,
                 stack: 'generation'
+            },
+            {
+                label: 'Load',
+                data: baseLoad,
+                borderColor: '#ffffff',
+                borderWidth: 2,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                fill: false,
+                tension: 0.4,
+                stack: 'load'
             },
         ],
     };
