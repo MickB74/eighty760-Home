@@ -411,17 +411,18 @@ export function runAggregationSimulation(
     // 5. Financials
     // Use historical prices if provided, otherwise generate synthetic
     let prices: number[];
-    if (historicalPrices && historicalPrices.length === HOURS) {
+    if (historicalPrices && historicalPrices.length >= HOURS) {
+        const rawPrices = historicalPrices.slice(0, HOURS);
         // Scale to match the target average price
-        const currentSum = historicalPrices.reduce((a, b) => a + b, 0);
+        const currentSum = rawPrices.reduce((a, b) => a + b, 0);
         const currentAvg = currentSum / HOURS;
 
         // Avoid division by zero if for some reason the profile is all zeros
-        if (currentAvg > 0.0001) {
+        if (currentAvg > 0.0001 && !financials.use_actual_prices) {
             const scaler = financials.market_price_avg / currentAvg;
-            prices = historicalPrices.map(p => p * scaler);
+            prices = rawPrices.map(p => p * scaler);
         } else {
-            prices = historicalPrices;
+            prices = rawPrices;
         }
     } else {
         prices = generatePriceProfile(financials.market_price_avg);

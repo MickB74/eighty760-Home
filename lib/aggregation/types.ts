@@ -35,6 +35,7 @@ export interface FinancialParams {
     market_year: number | 'Average';
     use_scarcity?: boolean;
     scarcity_intensity?: number;
+    use_actual_prices?: boolean;
 }
 
 export interface BatteryFinancialParams {

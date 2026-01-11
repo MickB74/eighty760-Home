@@ -115,7 +115,7 @@ export default function MultiYearAnalysisTab({
                 const simRes = runAggregationSimulation(
                     participants,
                     assets,
-                    { ...financials, market_year: year }, // update financial year context if relevant
+                    { ...financials, market_year: year, use_actual_prices: true }, // update financial year context and use actual prices
                     prices,
                     battery,
                     {},
