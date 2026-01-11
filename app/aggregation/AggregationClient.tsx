@@ -224,6 +224,7 @@ export default function AggregationPage() {
     const [scenarios, setScenarios] = useState<Scenario[]>([]);
     const [showSaveModal, setShowSaveModal] = useState(false);
     const [scenarioName, setScenarioName] = useState('');
+    const [scenarioDescription, setScenarioDescription] = useState('');
 
     // Load scenarios on mount
     useEffect(() => {
@@ -747,16 +748,34 @@ export default function AggregationPage() {
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
                         <div className="bg-white dark:bg-navy-950 p-6 rounded-xl border border-white/10 shadow-2xl w-full max-w-md">
                             <h3 className="text-xl font-bold mb-4 text-navy-950 dark:text-white">Save Scenario</h3>
-                            <input
-                                type="text"
-                                placeholder="Scenario Name (e.g. High Solar Case)"
-                                value={scenarioName}
-                                onChange={(e) => setScenarioName(e.target.value)}
-                                className="w-full p-2 rounded border border-gray-300 dark:border-white/20 bg-transparent mb-4"
-                            />
+                            <div className="space-y-4 mb-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Scenario Name (e.g. High Solar Case)"
+                                        value={scenarioName}
+                                        onChange={(e) => setScenarioName(e.target.value)}
+                                        className="w-full p-2 rounded border border-gray-300 dark:border-white/20 bg-transparent text-navy-950 dark:text-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                                    <textarea
+                                        placeholder="Add a brief description..."
+                                        value={scenarioDescription}
+                                        onChange={(e) => setScenarioDescription(e.target.value)}
+                                        rows={3}
+                                        className="w-full p-2 rounded border border-gray-300 dark:border-white/20 bg-transparent text-navy-950 dark:text-white resize-none"
+                                    />
+                                </div>
+                            </div>
                             <div className="flex justify-end gap-2">
                                 <button
-                                    onClick={() => setShowSaveModal(false)}
+                                    onClick={() => {
+                                        setShowSaveModal(false);
+                                        setScenarioDescription('');
+                                    }}
                                     className="px-4 py-2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
                                 >
                                     Cancel
@@ -777,10 +796,11 @@ export default function AggregationPage() {
                                                 geothermalHub,
                                                 ccsHub,
                                                 timestamp: Date.now()
-                                            }, scenarioName);
+                                            }, scenarioName, scenarioDescription);
                                             setScenarios(getScenarios());
                                             setShowSaveModal(false);
                                             setScenarioName('');
+                                            setScenarioDescription('');
                                         }
                                     }}
                                     className="px-4 py-2 bg-energy-green text-navy-950 rounded font-medium"
@@ -1040,6 +1060,63 @@ export default function AggregationPage() {
                                             value={capacities.Wind}
                                             onChange={(e) => setCapacities(p => ({ ...p, Wind: parseInt(e.target.value) }))}
                                             className="w-full accent-blue-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <div className="flex justify-between mb-2">
+                                            <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
+                                                ⚛️ Nuclear Capacity
+                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_NORTH</span>
+                                            </label>
+                                            <span className="font-mono text-emerald-500 font-bold">{capacities.Nuclear} MW</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="5000"
+                                            step="10"
+                                            value={capacities.Nuclear}
+                                            onChange={(e) => setCapacities(p => ({ ...p, Nuclear: parseInt(e.target.value) }))}
+                                            className="w-full accent-emerald-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <div className="flex justify-between mb-2">
+                                            <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
+                                                🌋 Geothermal Capacity
+                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_WEST</span>
+                                            </label>
+                                            <span className="font-mono text-orange-500 font-bold">{capacities.Geothermal} MW</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="5000"
+                                            step="10"
+                                            value={capacities.Geothermal}
+                                            onChange={(e) => setCapacities(p => ({ ...p, Geothermal: parseInt(e.target.value) }))}
+                                            className="w-full accent-orange-500"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <div className="flex justify-between mb-2">
+                                            <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
+                                                🏭 CCS Gas Capacity
+                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_HOUSTON</span>
+                                            </label>
+                                            <span className="font-mono text-indigo-500 font-bold">{capacities['CCS Gas']} MW</span>
+                                        </div>
+                                        <input
+                                            type="range"
+                                            min="0"
+                                            max="5000"
+                                            step="10"
+                                            value={capacities['CCS Gas']}
+                                            onChange={(e) => setCapacities(p => ({ ...p, 'CCS Gas': parseInt(e.target.value) }))}
+                                            className="w-full accent-indigo-500"
                                         />
                                     </div>
 
