@@ -6,7 +6,6 @@ import {
     LinearScale,
     PointElement,
     LineElement,
-    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -21,7 +20,6 @@ ChartJS.register(
     LinearScale,
     PointElement,
     LineElement,
-    BarElement,
     Title,
     Tooltip,
     Legend,
@@ -32,13 +30,21 @@ export default function Simulator() {
     const {
         solarCap, setSolarCap,
         windCap, setWindCap,
-        batteryCap, setBatteryCap,
+        nuclearCap, setNuclearCap,
+        geothermalCap, setGeothermalCap,
         metrics,
         solarGen,
         windGen,
+        nuclearGen,
+        geothermalGen,
         baseLoad
     } = useSimulation();
 
+    // Chart Configuration using "stacked: true" logic.
+    // Order matters: 
+    // - To stack properly from bottom up, datasets should be ordered or use "order" prop?
+    // - Actually, for 'fill: true', the order in the array usually determines z-index.
+    // - Load should NOT be stacked.
     const chartData = {
         labels: HOURS.map(h => `${h}:00`),
         datasets: [
@@ -51,26 +57,61 @@ export default function Simulator() {
                 pointRadius: 0,
                 fill: false,
                 tension: 0.4,
+                order: 0, // Draw on top
+                stack: 'load' // Separate stack group so it doesn't pile on generation
             },
+            // Generation Stack (Bottom to Top)
+            // 1. Geothermal (Baseload)
+            {
+                label: 'Geothermal',
+                data: geothermalGen,
+                backgroundColor: 'rgba(239, 68, 68, 0.85)', // Red-500
+                borderColor: '#EF4444',
+                borderWidth: 0,
+                fill: true,
+                pointRadius: 0,
+                tension: 0.2, // Flatter for baseload
+                order: 4,
+                stack: 'generation'
+            },
+            // 2. Nuclear (Baseload)
+            {
+                label: 'Nuclear',
+                data: nuclearGen,
+                backgroundColor: 'rgba(168, 85, 247, 0.85)', // Purple-500
+                borderColor: '#A855F7',
+                borderWidth: 0,
+                fill: true,
+                pointRadius: 0,
+                tension: 0.2,
+                order: 3,
+                stack: 'generation'
+            },
+            // 3. Wind (Variable)
+            {
+                label: 'Wind Gen',
+                data: windGen,
+                backgroundColor: 'rgba(59, 130, 246, 0.85)', // Blue-500
+                borderColor: '#3B82F6',
+                borderWidth: 0,
+                fill: true,
+                pointRadius: 0,
+                tension: 0.4,
+                order: 2,
+                stack: 'generation'
+            },
+            // 4. Solar (Peaking)
             {
                 label: 'Solar Gen',
                 data: solarGen,
-                backgroundColor: 'rgba(245, 158, 11, 0.85)',
+                backgroundColor: 'rgba(245, 158, 11, 0.85)', // Amber-500
                 borderColor: '#F59E0B',
                 borderWidth: 0,
                 fill: true,
                 pointRadius: 0,
                 tension: 0.4,
-            },
-            {
-                label: 'Wind Gen',
-                data: windGen,
-                backgroundColor: 'rgba(102, 153, 204, 0.85)',
-                borderColor: '#6699CC',
-                borderWidth: 0,
-                fill: true,
-                pointRadius: 0,
-                tension: 0.4,
+                order: 1,
+                stack: 'generation'
             },
         ],
     };
@@ -92,7 +133,7 @@ export default function Simulator() {
         scales: {
             y: {
                 beginAtZero: true,
-                stacked: true,
+                stacked: true, // Enable stacking
                 title: { display: true, text: 'Megawatts (MW)' },
                 grid: { color: 'rgba(0,0,0,0.05)' }
             },
@@ -134,12 +175,18 @@ export default function Simulator() {
                                 unit="MW"
                             />
                             <ControlInput
-                                label="Battery Storage"
-                                value={batteryCap}
-                                setValue={setBatteryCap}
-                                max={500}
-                                step={10}
-                                unit="MWh"
+                                label="Nuclear Capacity"
+                                value={nuclearCap}
+                                setValue={setNuclearCap}
+                                max={50}
+                                unit="MW"
+                            />
+                            <ControlInput
+                                label="Geothermal Capacity"
+                                value={geothermalCap}
+                                setValue={setGeothermalCap}
+                                max={50}
+                                unit="MW"
                             />
                         </div>
                     </div>
@@ -150,10 +197,12 @@ export default function Simulator() {
                             <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">
                                 24-Hour Generation Profile
                             </h3>
-                            <div className="flex gap-4 text-xs text-gray-600 dark:text-gray-400">
+                            <div className="flex flex-wrap gap-4 text-xs text-gray-600 dark:text-gray-400">
                                 <LegendItem color="bg-gray-800" label="Load" />
                                 <LegendItem color="bg-amber-500" label="Solar" />
-                                <LegendItem color="bg-[#6699CC]" label="Wind" />
+                                <LegendItem color="bg-blue-500" label="Wind" />
+                                <LegendItem color="bg-purple-500" label="Nuclear" />
+                                <LegendItem color="bg-red-500" label="Geothermal" />
                             </div>
                         </div>
 
@@ -176,7 +225,7 @@ export default function Simulator() {
     );
 }
 
-// Sub-components for cleaner code
+// Sub-components
 function ControlInput({ label, value, setValue, max, step = 1, unit }: { label: string, value: number, setValue: (v: number) => void, max: number, step?: number, unit: string }) {
     return (
         <div>
@@ -195,7 +244,7 @@ function ControlInput({ label, value, setValue, max, step = 1, unit }: { label: 
                 step={step}
                 value={value}
                 onChange={(e) => setValue(parseInt(e.target.value))}
-                className="w-full"
+                className="w-full accent-energy-green"
             />
         </div>
     );
@@ -211,7 +260,7 @@ function LegendItem({ color, label }: { color: string, label: string }) {
 
 function KpiCard({ label, value, sub }: { label: string, value: string, sub: string }) {
     return (
-        <div className="text-center p-4 rounded-lg bg-gray-50 dark:bg-slate-700 transition-colors duration-300">
+        <div className="text-center p-4 rounded-lg bg-gray-50 dark:bg-slate-700 transition-colors duration-300 border border-gray-100 dark:border-slate-600">
             <div className="text-sm font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400 mb-1">{label}</div>
             <div className="font-mono text-2xl font-bold text-energy-green">{value}</div>
             <div className="text-xs mt-1 text-gray-500 dark:text-gray-400">

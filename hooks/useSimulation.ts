@@ -10,39 +10,18 @@ export interface SimulationMetrics {
 export function useSimulation() {
     const [solarCap, setSolarCap] = useState(50);
     const [windCap, setWindCap] = useState(30);
-    const [batteryCap, setBatteryCap] = useState(0);
+    const [nuclearCap, setNuclearCap] = useState(0);
+    const [geothermalCap, setGeothermalCap] = useState(0);
 
     // Memoize the calculation to run when inputs change
-    const { metrics, batteryDischarge, solarGen, windGen } = useMemo(() => {
+    const { metrics, solarGen, windGen, nuclearGen, geothermalGen } = useMemo(() => {
         // Calculate generation
         const sGen = SOLAR_PROFILE.map(v => v * solarCap);
         const wGen = WIND_PROFILE.map(v => v * windCap);
 
-        // Battery simulation
-        let currentCharge = batteryCap * 0.5;
-        const BATTERY_EFFICIENCY = 0.85;
-        const bDischarge = [];
-
-        for (let i = 0; i < 24; i++) {
-            const totalRenewable = sGen[i] + wGen[i];
-            const load = BASE_LOAD_PROFILE[i];
-            const net = totalRenewable - load;
-
-            let discharged = 0;
-
-            if (net > 0) {
-                const space = batteryCap - currentCharge;
-                const charged = Math.min(net, space);
-                currentCharge += charged * BATTERY_EFFICIENCY;
-            } else if (net < 0) {
-                const deficit = Math.abs(net);
-                const maxOutput = currentCharge;
-                discharged = Math.min(deficit, maxOutput);
-                currentCharge -= discharged;
-            }
-
-            bDischarge.push(discharged);
-        }
+        // Baseload generation (flat profile)
+        const nGen = Array(24).fill(nuclearCap);
+        const gGen = Array(24).fill(geothermalCap);
 
         // Calculate KPIs
         let totalLoad = 0;
@@ -52,7 +31,7 @@ export function useSimulation() {
 
         for (let i = 0; i < 24; i++) {
             const load = BASE_LOAD_PROFILE[i];
-            const gen = sGen[i] + wGen[i] + bDischarge[i];
+            const gen = sGen[i] + wGen[i] + nGen[i] + gGen[i];
 
             totalLoad += load;
 
@@ -74,23 +53,27 @@ export function useSimulation() {
                 gridNeeded: Math.round(totalGrid),
                 overGen: Math.round(totalOver),
             },
-            batteryDischarge: bDischarge,
             solarGen: sGen,
             windGen: wGen,
+            nuclearGen: nGen,
+            geothermalGen: gGen,
         };
-    }, [solarCap, windCap, batteryCap]);
+    }, [solarCap, windCap, nuclearCap, geothermalCap]);
 
     return {
         solarCap,
         setSolarCap,
         windCap,
         setWindCap,
-        batteryCap,
-        setBatteryCap,
+        nuclearCap,
+        setNuclearCap,
+        geothermalCap,
+        setGeothermalCap,
         metrics,
         solarGen,
         windGen,
-        batteryDischarge, // Exported in case we want to visualize it
+        nuclearGen,
+        geothermalGen,
         baseLoad: BASE_LOAD_PROFILE
     };
 }
