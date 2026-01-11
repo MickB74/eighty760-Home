@@ -576,29 +576,60 @@ export default function AggregationPage() {
     const handleDownloadCSV = () => {
         if (!result) return;
 
-        // Flatten data for CSV
-        const rows = result.load_profile.map((load, i) => ({
-            Hour: i,
-            Load: load,
-            Matched_Gen: result.matched_profile[i],
-            Grid_Deficit: Math.max(0, load - (result.matched_profile[i] || 0)),
-            Overgeneration: result.surplus_profile[i],
-            Solar: result.solar_profile[i],
-            Wind: result.wind_profile[i],
-            Nuclear: result.nuc_profile[i],
-            Geothermal: result.geo_profile[i],
-            CCS: result.ccs_profile[i],
-            Battery_Discharge: result.battery_discharge[i],
-            Battery_Charge: result.battery_charge[i],
-            Price: result.market_price_profile[i]
-        }));
+        // Enhanced CSV with detailed financial columns
+        const rows = result.load_profile.map((load, i) => {
+            const solarGen = result.solar_profile[i];
+            const windGen = result.wind_profile[i];
+            const nucGen = result.nuc_profile[i];
+            const geoGen = result.geo_profile[i];
+            const ccsGen = result.ccs_profile[i];
+            const batteryDischarge = result.battery_discharge[i];
+            const price = result.market_price_profile[i];
+            const recPrice = result.rec_price_profile[i];
+
+            return {
+                Hour: i,
+                Load_MW: load.toFixed(2),
+                Matched_Gen_MW: result.matched_profile[i].toFixed(2),
+                Grid_Deficit_MW: Math.max(0, load - (result.matched_profile[i] || 0)).toFixed(2),
+                Overgeneration_MW: result.surplus_profile[i].toFixed(2),
+                // Technology Generation
+                Solar_Gen_MW: solarGen.toFixed(2),
+                Wind_Gen_MW: windGen.toFixed(2),
+                Nuclear_Gen_MW: nucGen.toFixed(2),
+                Geothermal_Gen_MW: geoGen.toFixed(2),
+                CCS_Gen_MW: ccsGen.toFixed(2),
+                Battery_Discharge_MW: batteryDischarge.toFixed(2),
+                Battery_Charge_MW: result.battery_charge[i].toFixed(2),
+                // Financial Details
+                Market_Price_per_MWh: price.toFixed(2),
+                REC_Price_per_MWh: recPrice.toFixed(2),
+                Solar_PPA_Cost: (solarGen * financials.solar_price).toFixed(2),
+                Wind_PPA_Cost: (windGen * financials.wind_price).toFixed(2),
+                Nuclear_PPA_Cost: (nucGen * financials.nuc_price).toFixed(2),
+                Geothermal_PPA_Cost: (geoGen * financials.geo_price).toFixed(2),
+                CCS_PPA_Cost: (ccsGen * financials.ccs_price).toFixed(2),
+                Solar_Market_Revenue: (solarGen * price).toFixed(2),
+                Wind_Market_Revenue: (windGen * price).toFixed(2),
+                Nuclear_Market_Revenue: (nucGen * price).toFixed(2),
+                Geothermal_Market_Revenue: (geoGen * price).toFixed(2),
+                CCS_Market_Revenue: (ccsGen * price).toFixed(2),
+                REC_Cost: ((load - result.matched_profile[i]) * recPrice).toFixed(2),
+                Hourly_Net_Cost: ((solarGen * (financials.solar_price - price)) +
+                    (windGen * (financials.wind_price - price)) +
+                    (nucGen * (financials.nuc_price - price)) +
+                    (geoGen * (financials.geo_price - price)) +
+                    (ccsGen * (financials.ccs_price - price)) +
+                    ((load - result.matched_profile[i]) * recPrice)).toFixed(2)
+            };
+        });
 
         const csv = Papa.unparse(rows);
         const blob = new Blob([csv], { type: 'text/csv' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `eighty760_simulation_results_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `eighty760_detailed_results_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         window.URL.revokeObjectURL(url);
     };
@@ -606,7 +637,16 @@ export default function AggregationPage() {
     const handleDownloadPDF = async () => {
         if (!result) return;
 
-        await generatePDFReport('Current Scenario', result, selectedYear, {});
+        const { generateComprehensivePDFReport } = await import('@/lib/reporting/pdf-generator');
+
+        generateComprehensivePDFReport({
+            scenarioName: 'Portfolio Analysis',
+            results: result,
+            year: selectedYear,
+            participants: participants,
+            assets: activeAssets,
+            charts: {} // TODO: Capture charts in future enhancement
+        });
     };
 
 
