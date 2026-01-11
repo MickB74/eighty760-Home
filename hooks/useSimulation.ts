@@ -46,23 +46,27 @@ export function useSimulation() {
 
         // Calculate KPIs
         let totalLoad = 0;
-        let totalMatched = 0;
         let totalOver = 0;
         let totalGrid = 0;
+        let hoursMatched = 0; // Count hours where gen >= load
 
         for (let i = 0; i < 24; i++) {
             const load = BASE_LOAD_PROFILE[i];
             const gen = sGen[i] + wGen[i] + bDischarge[i];
 
             totalLoad += load;
-            const match = Math.min(gen, load);
-            totalMatched += match;
+
+            // Check if this hour is fully matched
+            if (gen >= load) {
+                hoursMatched++;
+            }
 
             if (gen > load) totalOver += (gen - load);
             if (gen < load) totalGrid += (load - gen);
         }
 
-        const cfeScore = totalLoad > 0 ? (totalMatched / totalLoad) * 100 : 0;
+        // CFE Score = percentage of hours where generation met or exceeded load
+        const cfeScore = (hoursMatched / 24) * 100;
 
         return {
             metrics: {
