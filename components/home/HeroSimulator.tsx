@@ -183,7 +183,7 @@ function CompactInput({ label, value, setValue, max, unit, color }: any) {
         <div>
             <div className="flex justify-between text-xs mb-2">
                 <span className="font-semibold text-gray-300">{label}</span>
-                <span className="font-mono text-white opacity-80">{value}</span>
+                <span className="font-mono text-white opacity-80">{value} <span className="text-[10px] text-gray-500">{unit}</span></span>
             </div>
             <input
                 type="range"
