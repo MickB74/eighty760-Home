@@ -165,12 +165,12 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                     </text>
 
                     {/* Wind */}
-                    <circle cx="80" cy="200" r="30" fill="#3b82f6" opacity="0.2" />
-                    <text x="80" y="205" textAnchor="middle" fontSize="24" className="fill-navy-950 dark:fill-white">💨</text>
-                    <text x="80" y="170" textAnchor="middle" fill="#3b82f6" fontSize="12" fontWeight="600">
+                    <circle cx="80" cy="180" r="30" fill="#3b82f6" opacity="0.2" />
+                    <text x="80" y="185" textAnchor="middle" fontSize="24" className="fill-navy-950 dark:fill-white">💨</text>
+                    <text x="80" y="150" textAnchor="middle" fill="#3b82f6" fontSize="12" fontWeight="600">
                         Wind
                     </text>
-                    <text x="80" y="245" textAnchor="middle" fontSize="16" fontWeight="bold" className="fill-navy-950 dark:fill-white">
+                    <text x="80" y="225" textAnchor="middle" fontSize="16" fontWeight="bold" className="fill-navy-950 dark:fill-white">
                         {wind.toFixed(0)} MWh
                     </text>
 
@@ -183,6 +183,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                     <text x="80" y="325" textAnchor="middle" fill="#8b5cf6" fontSize="14" fontWeight="bold">
                         {nuclear.toFixed(0)} MWh
                     </text>
+
 
                     {/* Geothermal */}
                     <circle cx="200" cy="80" r="30" fill="#f97316" opacity="0.2" />
@@ -278,7 +279,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                     <path d="M 110 80 Q 220 130 330 190" stroke="#fbbf24" strokeWidth={Math.max(2, solar / 30)} fill="none" />
 
                     {/* Wind to Battery */}
-                    <path d="M 110 200 Q 220 200 330 200" stroke="#3b82f6" strokeWidth={Math.max(2, wind / 30)} fill="none" />
+                    <path d="M 110 180 Q 220 190 330 200" stroke="#3b82f6" strokeWidth={Math.max(2, wind / 30)} fill="none" />
 
                     {/* Nuclear to Battery */}
                     <path d="M 110 280 Q 220 240 330 210" stroke="#8b5cf6" strokeWidth={Math.max(2, nuclear / 30)} fill="none" />
@@ -300,7 +301,7 @@ export default function EnergyFlowDiagram({ hour, solar, wind, nuclear, geotherm
                     if (particle.source === 'solar') {
                         path = [[110, 80], [220, 130], [330, 190], [410, 200], [630, 200]];
                     } else if (particle.source === 'wind') {
-                        path = [[110, 200], [220, 200], [330, 200], [410, 200], [630, 200]];
+                        path = [[110, 180], [220, 190], [330, 200], [410, 200], [630, 200]];
                     } else if (particle.source === 'nuclear') {
                         path = [[110, 280], [220, 240], [330, 210], [410, 200], [630, 200]];
                     } else if (particle.source === 'geothermal') {
