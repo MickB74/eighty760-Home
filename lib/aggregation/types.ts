@@ -19,7 +19,7 @@ export interface GenerationAsset {
     id: string;
     name: string;
     type: 'Solar' | 'Wind' | 'Geothermal' | 'Nuclear' | 'CCS Gas';
-    location: 'North' | 'South' | 'West' | 'Houston';
+    location: 'North' | 'South' | 'West' | 'Houston' | 'Panhandle';
     capacity_mw: number;
     capacity_factor?: number; // Optional override to scale profile
 }
