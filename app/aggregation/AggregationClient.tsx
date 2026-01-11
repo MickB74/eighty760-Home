@@ -102,7 +102,7 @@ const HISTORICAL_REC_PRICES: Record<number, number> = {
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'reports' | 'config'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'reports' | 'config'>('config');
     const [loading, setLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
