@@ -88,7 +88,7 @@ export default function ParticipantEditor({ participants, onChange }: Participan
                 </div>
                 <button
                     onClick={handleAdd}
-                    className="w-full py-3 bg-energy-green text-navy-950 rounded-lg hover:bg-energy-green/90 transition font-medium"
+                    className="px-6 py-2 bg-energy-green text-navy-950 rounded-lg hover:bg-energy-green/90 transition font-medium whitespace-nowrap"
                 >
                     + Add Participant
                 </button>
