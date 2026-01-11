@@ -113,5 +113,13 @@ export function recommendPortfolio(
         if (rec.Battery_MW > peak_load * 1.1) rec.Battery_MW = peak_load * 1.1;
     }
 
+    // Round results to 2 decimals
+    rec.Solar = Math.round(rec.Solar * 100) / 100;
+    rec.Wind = Math.round(rec.Wind * 100) / 100;
+    rec.Geothermal = Math.round(rec.Geothermal * 100) / 100;
+    rec.Nuclear = Math.round(rec.Nuclear * 100) / 100;
+    rec['CCS Gas'] = Math.round(rec['CCS Gas'] * 100) / 100;
+    rec.Battery_MW = Math.round(rec.Battery_MW * 100) / 100;
+
     return rec;
 }

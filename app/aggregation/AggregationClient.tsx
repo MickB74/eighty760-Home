@@ -1153,7 +1153,8 @@ export default function AggregationPage() {
                                                     <input
                                                         type="number"
                                                         value={capacities.Battery_MW}
-                                                        onChange={(e) => setCapacities(p => ({ ...p, Battery_MW: parseInt(e.target.value) }))}
+                                                        onChange={(e) => setCapacities(p => ({ ...p, Battery_MW: parseFloat(e.target.value) }))}
+                                                        step="0.01"
                                                         className="w-full bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-3 py-2"
                                                     />
                                                     <span className="text-sm font-medium">MW</span>
