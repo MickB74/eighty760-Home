@@ -753,7 +753,7 @@ export default function AggregationPage() {
                     <div className="animate-in fade-in duration-300 space-y-8">
 
                         {/* 1. LOAD CONFIGURATION */}
-                        <div className="bg-white dark:bg-navy-900/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
+                        <div className="bg-white dark:bg-navy-900 rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-bold text-navy-950 dark:text-white flex items-center gap-2">
                                     <span className="p-2 bg-blue-500/10 text-blue-500 rounded-lg">1</span>
@@ -771,7 +771,7 @@ export default function AggregationPage() {
                         </div>
 
                         {/* 2. REGION & MARKET SETTINGS */}
-                        <div className="bg-white dark:bg-navy-900/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
+                        <div className="bg-white dark:bg-navy-900 rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-bold text-navy-950 dark:text-white flex items-center gap-2">
                                     <span className="p-2 bg-purple-500/10 text-purple-500 rounded-lg">2</span>
@@ -933,7 +933,7 @@ export default function AggregationPage() {
                         </div>
 
                         {/* 3. ASSET CONFIGURATION */}
-                        <div className="bg-white dark:bg-navy-900/50 backdrop-blur-md rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
+                        <div className="bg-white dark:bg-navy-900 rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm">
                             <div className="flex justify-between items-center mb-6">
                                 <h3 className="text-xl font-bold text-navy-950 dark:text-white flex items-center gap-2">
                                     <span className="p-2 bg-energy-green/10 text-energy-green-dark dark:text-energy-green rounded-lg">3</span>
