@@ -43,6 +43,7 @@ import {
 import Link from 'next/link';
 import Papa from 'papaparse';
 import { generatePDFReport } from '@/lib/reporting/pdf-generator';
+import MultiYearAnalysisTab from '@/components/aggregation/MultiYearAnalysisTab';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
 function aggregateTo12x24(data: number[]): number[][] {
@@ -102,7 +103,7 @@ const HISTORICAL_REC_PRICES: Record<number, number> = {
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'reports' | 'config'>('config');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'multi-year' | 'reports' | 'config'>('config');
     const [loading, setLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -725,9 +726,21 @@ export default function AggregationPage() {
                     </button>
                     <button
                         onClick={() => setActiveTab('analysis')}
-                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'analysis'
+                            ? 'bg-energy-green text-navy-950'
+                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
+                            }`}
                     >
-                        Advanced Analysis
+                        <span className="mr-2">📈</span>Detailed Analysis
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('multi-year')}
+                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'multi-year'
+                            ? 'bg-energy-green text-navy-950'
+                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
+                            }`}
+                    >
+                        <span className="mr-2">📊</span>Multi-Year
                     </button>
                     <button
                         onClick={() => setActiveTab('scenarios')}
@@ -1410,6 +1423,21 @@ export default function AggregationPage() {
 
                 {activeTab === 'analysis' && (
                     <AnalysisTab result={result} />
+                )}
+
+                {activeTab === 'multi-year' && (
+                    <MultiYearAnalysisTab
+                        participants={participants}
+                        assets={activeAssets}
+                        financials={financials}
+                        battery={{ mw: capacities.Battery_MW, hours: capacities.Battery_Hours }}
+                        loadHub={loadHub}
+                        solarHub={solarHub}
+                        windHub={windHub}
+                        nuclearHub={nuclearHub}
+                        geothermalHub={geothermalHub}
+                        ccsHub={ccsHub}
+                    />
                 )}
 
                 {activeTab === 'scenarios' && (
