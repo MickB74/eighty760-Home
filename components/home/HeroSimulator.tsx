@@ -57,6 +57,7 @@ export default function HeroSimulator() {
                 fill: false,
                 tension: 0.4,
                 order: 0,
+                stack: 'load'
             },
             {
                 label: 'Geothermal',
@@ -68,6 +69,7 @@ export default function HeroSimulator() {
                 pointRadius: 0,
                 tension: 0.2, // Baseload
                 order: 4,
+                stack: 'generation'
             },
             {
                 label: 'Nuclear',
@@ -79,6 +81,7 @@ export default function HeroSimulator() {
                 pointRadius: 0,
                 tension: 0.2, // Baseload
                 order: 3,
+                stack: 'generation'
             },
             {
                 label: 'Wind',
@@ -90,6 +93,7 @@ export default function HeroSimulator() {
                 pointRadius: 0,
                 tension: 0.4,
                 order: 2,
+                stack: 'generation'
             },
             {
                 label: 'Solar',
@@ -101,6 +105,7 @@ export default function HeroSimulator() {
                 pointRadius: 0,
                 tension: 0.4,
                 order: 1,
+                stack: 'generation'
             },
         ],
     };
