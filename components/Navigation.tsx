@@ -71,7 +71,7 @@ export default function Navigation() {
                     <div className="flex flex-row items-center gap-4">
                         <Link href="/" className="flex items-center">
                             <Image
-                                src="/uploaded_image.png"
+                                src="/logo.png"
                                 alt="Eighty760 Logo"
                                 width={240}
                                 height={120}
