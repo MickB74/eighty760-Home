@@ -16,6 +16,7 @@ const config: Config = {
                     dark: '#1E3A8A', // Blue-900 (Optional, for darker needed)
                 },
                 navy: {
+                    900: '#1a1d2e', // Slightly lighter than 950 for layered dark UI
                     950: '#0a0a0b', // Deep dark for command center aesthetic
                 },
                 'energy-green': '#00ff88', // Bright green for dark mode / highlights
