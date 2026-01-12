@@ -88,7 +88,16 @@ export default function MultiYearAnalysisTab({
                     continue;
                 }
 
-                // 2. Load Profiles
+                // 2. Load ALL Hub Prices for Asset-Specific Calculations
+                // This matches the main dashboard methodology to ensure accurate revenue calculations
+                const hubs = ['North', 'South', 'West', 'Houston', 'Panhandle'];
+                const allHubPrices: Record<string, number[]> = {};
+                for (const h of hubs) {
+                    const hubP = await loadHubPrices(year, h);
+                    if (hubP) allHubPrices[h] = hubP;
+                }
+
+                // 3. Load Profiles
                 const genProfiles: Record<string, number[]> = {};
                 for (const asset of assets) {
                     if (asset.type === 'Solar' || asset.type === 'Wind') {
@@ -112,14 +121,14 @@ export default function MultiYearAnalysisTab({
                     }
                 }
 
-                // 3. Run Sim
+                // 4. Run Sim
                 const simRes = runAggregationSimulation(
                     participants,
                     assets,
                     { ...financials, market_year: year, use_actual_prices: true }, // update financial year context and use actual prices
                     prices,
                     battery,
-                    {},
+                    allHubPrices, // Pass all hub prices for asset-specific revenue calculations
                     genProfiles
                 );
 
