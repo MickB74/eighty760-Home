@@ -200,7 +200,7 @@ export default function MultiYearAnalysisTab({
                                     <th className="p-4">Year</th>
                                     <th className="p-4">Net Cost ($)</th>
                                     <th className="p-4">Avg Cost ($/MWh)</th>
-                                    <th className="p-4">Market Benchmark ($/MWh)</th>
+                                    <th className="p-4">Gen Capture Price ($/MWh)</th>
                                     <th className="p-4">CFE %</th>
                                     <th className="p-4">Unmatched (MWh)</th>
                                 </tr>
@@ -220,7 +220,7 @@ export default function MultiYearAnalysisTab({
                                                     ${item.result.avg_cost_per_mwh.toFixed(2)}
                                                 </td>
                                                 <td className="p-4 font-mono text-gray-500 dark:text-gray-400">
-                                                    ${(item.result.market_purchase_cost / (item.result.total_load_mwh || 1)).toFixed(2)}
+                                                    ${(item.result.total_gen_revenue / (item.result.total_gen_mwh || 1)).toFixed(2)}
                                                 </td>
                                                 <td className="p-4 font-bold text-energy-green-dark dark:text-energy-green">
                                                     {(item.result.cfe_score * 100).toFixed(1)}%

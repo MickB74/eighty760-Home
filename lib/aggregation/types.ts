@@ -84,6 +84,7 @@ export interface SimulationResult {
     avg_cost_per_mwh: number;
     weighted_ppa_price: number;
     market_purchase_cost: number;
+    total_gen_revenue: number; // Market Value of Generation
 
     // Breakdown
     tech_details: Record<string, {
