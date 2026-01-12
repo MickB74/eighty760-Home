@@ -489,7 +489,7 @@ export default function AggregationPage() {
 
                     setFinancials(prev => ({
                         ...prev,
-                        market_price_avg: parseFloat(avg.toFixed(2)),
+                        market_price_avg: avg,
                         rec_price: parseFloat(avgRec.toFixed(2))
                     }));
                 }
@@ -524,7 +524,7 @@ export default function AggregationPage() {
                 const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
                 setFinancials(prev => ({
                     ...prev,
-                    market_price_avg: parseFloat(avg.toFixed(2)),
+                    market_price_avg: avg,
                     rec_price: recPrice
                 }));
             } else {
