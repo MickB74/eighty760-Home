@@ -1332,15 +1332,7 @@ export default function AggregationPage() {
                                     <div className="overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <tbody>
-                                                <tr className="border-b border-white/10">
-                                                    <td className="py-3 font-medium flex items-center gap-2">
-                                                        Market Purchases (Load Bill)
-                                                        <InfoTooltip text="Total Load × Hourly Load Hub Price" />
-                                                    </td>
-                                                    <td className="py-3 text-right font-medium text-red-500">
-                                                        -${result.market_purchase_cost ? result.market_purchase_cost.toLocaleString(undefined, { maximumFractionDigits: 0 }) : '0'}
-                                                    </td>
-                                                </tr>
+
                                                 <tr className="border-b border-white/10">
                                                     <td className="py-3 font-medium flex items-center gap-2">
                                                         Net Settlement Value (PPA vs Market)
