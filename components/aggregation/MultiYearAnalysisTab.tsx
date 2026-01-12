@@ -147,9 +147,9 @@ export default function MultiYearAnalysisTab({
         labels,
         datasets: [
             {
-                label: 'Net Portfolio Cost (k$)',
-                data: validResults.map(r => (r.result.total_cost_net / 1000)),
-                backgroundColor: validResults.map(r => r.result.total_cost_net < 0 ? '#ef4444' : '#10b981'),
+                label: 'Net Portfolio Cashflow (k$)',
+                data: validResults.map(r => (-r.result.total_cost_net / 1000)),
+                backgroundColor: validResults.map(r => -r.result.total_cost_net > 0 ? '#10b981' : '#ef4444'),
                 borderRadius: 4
             }
         ]
@@ -159,8 +159,8 @@ export default function MultiYearAnalysisTab({
         labels,
         datasets: [
             {
-                label: 'Avg Cost ($/MWh)',
-                data: validResults.map(r => r.result.avg_cost_per_mwh),
+                label: 'Net Cashflow ($/MWh)',
+                data: validResults.map(r => -r.result.avg_cost_per_mwh),
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                 tension: 0.3
@@ -198,8 +198,8 @@ export default function MultiYearAnalysisTab({
                             <thead className="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-white/10">
                                 <tr>
                                     <th className="p-4">Year</th>
-                                    <th className="p-4">Net Cost ($)</th>
-                                    <th className="p-4">Avg Cost ($/MWh)</th>
+                                    <th className="p-4">Net Cashflow ($)</th>
+                                    <th className="p-4">Net Cashflow ($/MWh)</th>
                                     <th className="p-4">Gen Capture Price ($/MWh)</th>
                                     <th className="p-4">CFE %</th>
                                     <th className="p-4">Unmatched (MWh)</th>
@@ -213,11 +213,11 @@ export default function MultiYearAnalysisTab({
                                             <td colSpan={5} className="p-4 text-gray-500">Error loading data</td>
                                         ) : (
                                             <>
-                                                <td className={`p-4 font-mono font-bold ${item.result.total_cost_net > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                                                    ${item.result.total_cost_net.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                <td className={`p-4 font-mono font-bold ${-item.result.total_cost_net < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                    ${(-item.result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                 </td>
-                                                <td className="p-4 font-mono text-navy-950 dark:text-white">
-                                                    ${item.result.avg_cost_per_mwh.toFixed(2)}
+                                                <td className={`p-4 font-mono ${-item.result.avg_cost_per_mwh < 0 ? 'text-red-600/70 dark:text-red-400/70' : 'text-green-600/70 dark:text-green-400/70'}`}>
+                                                    ${(-item.result.avg_cost_per_mwh).toFixed(2)}
                                                 </td>
                                                 <td className="p-4 font-mono text-gray-500 dark:text-gray-400">
                                                     ${(item.result.total_gen_revenue / (item.result.total_gen_mwh || 1)).toFixed(2)}
@@ -239,7 +239,7 @@ export default function MultiYearAnalysisTab({
                     {/* Charts Grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-gray-200 dark:border-white/10 h-[350px]">
-                            <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">Net Portfolio Cost</h3>
+                            <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">Net Portfolio Cashflow</h3>
                             <Bar
                                 data={costData}
                                 options={{
@@ -251,7 +251,7 @@ export default function MultiYearAnalysisTab({
                             />
                         </div>
                         <div className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-gray-200 dark:border-white/10 h-[350px]">
-                            <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">Average Cost ($/MWh)</h3>
+                            <h3 className="text-lg font-bold mb-4 text-navy-950 dark:text-white">Net Cashflow ($/MWh)</h3>
                             <Line
                                 data={avgCostData}
                                 options={{
