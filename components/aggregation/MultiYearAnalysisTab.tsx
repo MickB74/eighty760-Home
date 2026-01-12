@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Participant, GenerationAsset, FinancialParams, SimulationResult } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { loadHubPrices, loadAveragePriceProfile, getAvailableYears } from '@/lib/aggregation/price-loader';
+import { generateHourlyCSV, downloadCSV, generateCSVFilename } from '@/lib/utils/csv-export';
 import { Bar, Line } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -139,6 +140,22 @@ export default function MultiYearAnalysisTab({
         setLoading(false);
     };
 
+    const exportToCSV = () => {
+        const validResults = results.filter(r => !r.hasError);
+
+        if (validResults.length === 0) {
+            alert('No data to export. Please run the analysis first.');
+            return;
+        }
+
+        // Generate CSV for each year
+        validResults.forEach(({ year, result }) => {
+            const csvContent = generateHourlyCSV(result, year);
+            const filename = generateCSVFilename('multi_year_analysis', year);
+            downloadCSV(csvContent, filename);
+        });
+    };
+
     // Prepare Charts
     const validResults = results.filter(r => !r.hasError);
     const labels = validResults.map(r => r.year);
@@ -175,13 +192,22 @@ export default function MultiYearAnalysisTab({
                     <h2 className="text-xl font-bold text-navy-950 dark:text-white">Multi-Year Financial Analysis</h2>
                     <p className="text-gray-500 text-sm">Run your portfolio against historical market conditions (2020-2025).</p>
                 </div>
-                <button
-                    onClick={runAnalysis}
-                    disabled={loading}
-                    className="px-6 py-3 bg-energy-green text-navy-950 font-bold rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-energy-green/20"
-                >
-                    {loading ? `Analyzing... ${progress}%` : 'Run Analysis'}
-                </button>
+                <div className="flex gap-3">
+                    <button
+                        onClick={exportToCSV}
+                        disabled={results.length === 0}
+                        className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-600/20"
+                    >
+                        Download CSV
+                    </button>
+                    <button
+                        onClick={runAnalysis}
+                        disabled={loading}
+                        className="px-6 py-3 bg-energy-green text-navy-950 font-bold rounded-lg hover:opacity-90 disabled:opacity-50 transition-all shadow-lg shadow-energy-green/20"
+                    >
+                        {loading ? `Analyzing... ${progress}%` : 'Run Analysis'}
+                    </button>
+                </div>
             </div>
 
             {loading && (

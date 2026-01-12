@@ -3,6 +3,7 @@ import { Scenario } from '@/lib/shared/portfolioStore';
 import { SimulationResult, AggregationState } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { loadHubPrices, loadAveragePriceProfile } from '@/lib/aggregation/price-loader';
+import { generateHourlyCSV, downloadCSV, generateCSVFilename } from '@/lib/utils/csv-export';
 import { Bar } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -176,13 +177,38 @@ export default function ScenarioComparisonTab({ scenarios, onLoadScenario }: Sce
         }]
     };
 
+    const exportScenariosToCSV = () => {
+        const selectedResults = selectedScenarios.filter(s => results[s.id]);
+
+        if (selectedResults.length === 0) {
+            alert('No scenarios with results to export. Please wait for simulations to complete.');
+            return;
+        }
+
+        // Export each scenario's 8760 hourly data
+        selectedResults.forEach(scenario => {
+            const csvContent = generateHourlyCSV(results[scenario.id], scenario.year, scenario.name);
+            const filename = generateCSVFilename('scenario_comparison', scenario.year, scenario.name);
+            downloadCSV(csvContent, filename);
+        });
+    };
+
     return (
         <div className="space-y-8 animate-in fade-in">
             {/* 1. Selection Area */}
             <div className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-gray-200 dark:border-white/10">
                 <div className="flex justify-between items-center mb-4">
                     <h3 className="text-lg font-bold text-navy-950 dark:text-white">Select Scenarios (Max 5)</h3>
-                    <span className="text-sm text-gray-500">{selectedIds.size} selected</span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-sm text-gray-500">{selectedIds.size} selected</span>
+                        <button
+                            onClick={exportScenariosToCSV}
+                            disabled={selectedIds.size === 0 || loading}
+                            className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-600/20 text-sm"
+                        >
+                            Download CSV
+                        </button>
+                    </div>
                 </div>
 
                 {scenarios.length === 0 ? (
