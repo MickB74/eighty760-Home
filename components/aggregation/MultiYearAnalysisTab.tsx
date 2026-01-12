@@ -61,6 +61,7 @@ export default function MultiYearAnalysisTab({
     const [results, setResults] = useState<YearResult[]>([]);
     const [loading, setLoading] = useState(false);
     const [progress, setProgress] = useState(0);
+    const [expandedYears, setExpandedYears] = useState<Set<number>>(new Set());
 
     const runAnalysis = async () => {
         setLoading(true);
@@ -165,6 +166,18 @@ export default function MultiYearAnalysisTab({
         });
     };
 
+    const toggleYearExpanded = (year: number) => {
+        setExpandedYears(prev => {
+            const next = new Set(prev);
+            if (next.has(year)) {
+                next.delete(year);
+            } else {
+                next.add(year);
+            }
+            return next;
+        });
+    };
+
     // Prepare Charts
     const validResults = results.filter(r => !r.hasError);
     const labels = validResults.map(r => r.year);
@@ -232,6 +245,7 @@ export default function MultiYearAnalysisTab({
                         <table className="w-full text-sm text-left">
                             <thead className="bg-gray-50 dark:bg-white/5 text-gray-700 dark:text-gray-300 font-semibold border-b border-gray-200 dark:border-white/10">
                                 <tr>
+                                    <th className="p-4 w-12"></th>
                                     <th className="p-4">Year</th>
                                     <th className="p-4">Net Cashflow ($)</th>
                                     <th className="p-4">Net Cashflow ($/MWh)</th>
@@ -242,30 +256,99 @@ export default function MultiYearAnalysisTab({
                             </thead>
                             <tbody className="divide-y divide-gray-100 dark:divide-white/5">
                                 {results.map((item) => (
-                                    <tr key={item.year} className="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
-                                        <td className="p-4 font-bold text-navy-950 dark:text-white">{item.year} {item.hasError && '⚠️'}</td>
-                                        {item.hasError ? (
-                                            <td colSpan={5} className="p-4 text-gray-500">Error loading data</td>
-                                        ) : (
-                                            <>
-                                                <td className={`p-4 font-mono font-bold ${-item.result.total_cost_net < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                                                    ${(-item.result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    <React.Fragment key={item.year}>
+                                        <tr className="hover:bg-gray-50/50 dark:hover:bg-white/5 transition-colors">
+                                            <td className="p-4">
+                                                {!item.hasError && (
+                                                    <button
+                                                        onClick={() => toggleYearExpanded(item.year)}
+                                                        className="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+                                                    >
+                                                        {expandedYears.has(item.year) ? '▼' : '▶'}
+                                                    </button>
+                                                )}
+                                            </td>
+                                            <td className="p-4 font-bold text-navy-950 dark:text-white">{item.year} {item.hasError && '⚠️'}</td>
+                                            {item.hasError ? (
+                                                <td colSpan={5} className="p-4 text-gray-500">Error loading data</td>
+                                            ) : (
+                                                <>
+                                                    <td className={`p-4 font-mono font-bold ${-item.result.total_cost_net < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                        ${(-item.result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    </td>
+                                                    <td className={`p-4 font-mono ${-item.result.avg_cost_per_mwh < 0 ? 'text-red-600/70 dark:text-red-400/70' : 'text-green-600/70 dark:text-green-400/70'}`}>
+                                                        ${(-item.result.avg_cost_per_mwh).toFixed(2)}
+                                                    </td>
+                                                    <td className="p-4 font-mono text-gray-500 dark:text-gray-400">
+                                                        ${(item.result.total_gen_revenue / (item.result.total_gen_mwh || 1)).toFixed(2)}
+                                                    </td>
+                                                    <td className="p-4 font-bold text-energy-green-dark dark:text-energy-green">
+                                                        {(item.result.cfe_score * 100).toFixed(1)}%
+                                                    </td>
+                                                    <td className="p-4 text-gray-700 dark:text-gray-300">
+                                                        {(item.result.total_load_mwh - item.result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    </td>
+                                                </>
+                                            )}
+                                        </tr>
+                                        {/* Financial Summary Expansion */}
+                                        {expandedYears.has(item.year) && !item.hasError && (
+                                            <tr>
+                                                <td colSpan={7} className="p-0">
+                                                    <div className="bg-gray-50/50 dark:bg-white/5 p-6 border-t border-gray-200 dark:border-white/10">
+                                                        <h4 className="text-sm font-bold text-navy-950 dark:text-white mb-4">Financial Summary</h4>
+                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                            <div className="flex justify-between items-center p-3 bg-white dark:bg-navy-950/50 rounded-lg border border-gray-200 dark:border-white/10">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm text-gray-700 dark:text-gray-300">Net Settlement Value (PPA vs Market)</span>
+                                                                    <span className="text-xs text-gray-500">ⓘ</span>
+                                                                </div>
+                                                                <span className={`font-mono font-bold ${item.result.settlement_value < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                                    ${item.result.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center p-3 bg-white dark:bg-navy-950/50 rounded-lg border border-gray-200 dark:border-white/10">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm text-gray-700 dark:text-gray-300">REC Income (Surplus)</span>
+                                                                    <span className="text-xs text-gray-500">ⓘ</span>
+                                                                </div>
+                                                                <span className="font-mono font-bold text-green-600 dark:text-green-400">
+                                                                    ${item.result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center p-3 bg-white dark:bg-navy-950/50 rounded-lg border border-gray-200 dark:border-white/10">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm text-gray-700 dark:text-gray-300">REC Cost (Deficit)</span>
+                                                                    <span className="text-xs text-gray-500">ⓘ</span>
+                                                                </div>
+                                                                <span className="font-mono font-bold text-red-600 dark:text-red-400">
+                                                                    ${item.result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center p-3 bg-white dark:bg-navy-950/50 rounded-lg border border-gray-200 dark:border-white/10">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm text-gray-700 dark:text-gray-300">Net Portfolio Cashflow</span>
+                                                                    <span className="text-xs text-gray-500">ⓘ</span>
+                                                                </div>
+                                                                <span className={`font-mono font-bold ${-item.result.total_cost_net < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                                    ${(-item.result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                </span>
+                                                            </div>
+                                                            <div className="flex justify-between items-center p-3 bg-white dark:bg-navy-950/50 rounded-lg border border-gray-200 dark:border-white/10">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-sm text-gray-700 dark:text-gray-300">Net Cashflow ($/MWh)</span>
+                                                                    <span className="text-xs text-gray-500">ⓘ</span>
+                                                                </div>
+                                                                <span className={`font-mono font-bold ${-item.result.avg_cost_per_mwh < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                                    ${(-item.result.avg_cost_per_mwh).toFixed(2)}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </td>
-                                                <td className={`p-4 font-mono ${-item.result.avg_cost_per_mwh < 0 ? 'text-red-600/70 dark:text-red-400/70' : 'text-green-600/70 dark:text-green-400/70'}`}>
-                                                    ${(-item.result.avg_cost_per_mwh).toFixed(2)}
-                                                </td>
-                                                <td className="p-4 font-mono text-gray-500 dark:text-gray-400">
-                                                    ${(item.result.total_gen_revenue / (item.result.total_gen_mwh || 1)).toFixed(2)}
-                                                </td>
-                                                <td className="p-4 font-bold text-energy-green-dark dark:text-energy-green">
-                                                    {(item.result.cfe_score * 100).toFixed(1)}%
-                                                </td>
-                                                <td className="p-4 text-gray-700 dark:text-gray-300">
-                                                    {(item.result.total_load_mwh - item.result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                </td>
-                                            </>
+                                            </tr>
                                         )}
-                                    </tr>
+                                    </React.Fragment>
                                 ))}
                             </tbody>
                         </table>
