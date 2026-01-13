@@ -433,7 +433,11 @@ export default function AggregationPage() {
             const res = runAggregationSimulation(
                 participants,
                 activeAssets,
-                financials,
+                {
+                    ...financials,
+                    // Use actual historical prices without scaling when we have historical data
+                    use_actual_prices: historicalPrices !== null
+                },
                 historicalPrices,
                 { mw: capacities.Battery_MW, hours: capacities.Battery_Hours }, // Use base capacities for battery
                 allHubPrices,
