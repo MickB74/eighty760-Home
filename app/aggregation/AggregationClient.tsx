@@ -756,19 +756,13 @@ export default function AggregationPage() {
                     </button>
                     <button
                         onClick={() => setActiveTab('analysis')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'analysis'
-                            ? 'bg-energy-green text-navy-950'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
-                            }`}
+                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                         <span className="mr-2">📈</span>Detailed Analysis
                     </button>
                     <button
                         onClick={() => setActiveTab('multi-year')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'multi-year'
-                            ? 'bg-energy-green text-navy-950'
-                            : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5'
-                            }`}
+                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'multi-year' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                         <span className="mr-2">📊</span>Multi-Year
                     </button>
