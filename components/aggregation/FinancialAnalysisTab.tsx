@@ -334,6 +334,69 @@ export default function FinancialAnalysisTab({ result }: FinancialAnalysisTabPro
                     </div>
                 </div>
             </div>
+
+            {/* Asset Financial Breakdown */}
+            {result.asset_details && result.asset_details.length > 0 && (
+                <div className="bg-white dark:bg-navy-950/50 rounded-xl border border-gray-200 dark:border-white/10 p-6 shadow-sm overflow-x-auto">
+                    <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-lg font-semibold text-navy-950 dark:text-white">Asset Financial Breakdown</h3>
+                    </div>
+                    <table className="w-full text-sm text-left">
+                        <thead>
+                            <tr className="border-b border-gray-200 dark:border-white/10 text-gray-700 dark:text-gray-300">
+                                <th className="py-2 pr-4">Asset Name</th>
+                                <th className="py-2 pr-4">Type</th>
+                                <th className="py-2 pr-4">Hub</th>
+                                <th className="py-2 pr-4 text-right">Capacity</th>
+                                <th className="py-2 pr-4 text-right">Generation</th>
+                                <th className="py-2 pr-4 text-right">Revenue (Basis)</th>
+                                <th className="py-2 pr-4 text-right">PPA Cost</th>
+                                <th className="py-2 text-right">Settlement</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {result.asset_details.map((asset, idx) => (
+                                <tr key={idx} className="border-b border-gray-200 dark:border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-white/5">
+                                    <td className="py-3 pr-4 font-medium text-navy-950 dark:text-white">{asset.name}</td>
+                                    <td className="py-3 pr-4 text-navy-950 dark:text-white">{asset.type}</td>
+                                    <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">{asset.location}</td>
+                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.capacity_mw} MW</td>
+                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
+                                    <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
+                                        ${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </td>
+                                    <td className="py-3 pr-4 text-right text-red-500">
+                                        -${asset.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </td>
+                                    <td className={`py-3 text-right font-medium ${asset.settlement_value >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                        {asset.settlement_value >= 0 ? '+' : ''}${asset.settlement_value.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                        <tfoot>
+                            <tr className="border-t-2 border-gray-200 dark:border-white/20 font-bold bg-gray-50 dark:bg-white/5 text-navy-950 dark:text-white">
+                                <td className="py-3 pr-4" colSpan={3}>Total</td>
+                                <td className="py-3 pr-4 text-right">
+                                    {result.asset_details.reduce((sum, a) => sum + a.capacity_mw, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MW
+                                </td>
+                                <td className="py-3 pr-4 text-right">
+                                    {result.asset_details.reduce((sum, a) => sum + a.total_gen_mwh, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
+                                </td>
+                                <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
+                                    ${result.asset_details.reduce((sum, a) => sum + a.total_revenue, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                </td>
+                                <td className="py-3 pr-4 text-right text-red-500">
+                                    -${result.asset_details.reduce((sum, a) => sum + a.total_cost, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                </td>
+                                <td className={`py-3 text-right ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                    {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            )}
         </div>
     );
 }

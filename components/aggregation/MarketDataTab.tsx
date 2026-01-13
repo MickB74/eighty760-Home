@@ -1,9 +1,18 @@
-
 import React, { useState, useEffect } from 'react';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
 import InfoTooltip from '@/components/shared/InfoTooltip';
-import { fetchErcotRealtimeDemand, fetchHenryHubPrice, fetchErcotGridMix } from '@/lib/external/eia';
+import {
+    fetchErcotRealtimeDemand,
+    fetchHenryHubPrice,
+    fetchErcotGridMix,
+    fetchErcotDemandAndForecast,
+    fetchHenryHubPriceHistory,
+    fetchErcotGridMixHistory,
+    type DemandsData,
+    type HenryHubHistory,
+    type FuelMixHistory
+} from '@/lib/external/eia';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
@@ -17,7 +26,12 @@ export default function MarketDataTab() {
     const [apiKey, setApiKey] = useState('');
     const [isApiConfigOpen, setIsApiConfigOpen] = useState(false);
     const [usingRealData, setUsingRealData] = useState(false);
+
+    // Data State
     const [fuelMix, setFuelMix] = useState<number[]>([42, 25, 18, 8, 5, 2]); // Default simulated
+    const [demandData, setDemandData] = useState<DemandsData[]>([]);
+    const [gasHistory, setGasHistory] = useState<HenryHubHistory[]>([]);
+    const [mixHistory, setMixHistory] = useState<FuelMixHistory[]>([]);
 
     useEffect(() => {
         const savedKey = localStorage.getItem('eia_api_key');
@@ -39,23 +53,12 @@ export default function MarketDataTab() {
 
         const interval = setInterval(() => {
             setCurrentTime(new Date());
-            // Only update simulation frequently, real data usually updates hourly/daily
-            if (!apiKey) {
-                updateData('');
-            }
-        }, 5000);
-
-        // Poll API every 5 minutes if active
-        // But also check apiKey state inside or pass it
-        const apiInterval = setInterval(() => {
-            // We need ref or access to latest apiKey if we used a closure, but here dependencies will re-run effect
-        }, 300000);
+        }, 1000 * 60);
 
         return () => {
             clearInterval(interval);
-            clearInterval(apiInterval);
         };
-    }, [apiKey]); // Re-run when key changes
+    }, []);
 
     // Separate effect for polling real data every 5 mins
     useEffect(() => {
@@ -72,42 +75,62 @@ export default function MarketDataTab() {
         if (key) {
             // Try fetching real data
             try {
-                const [realLoad, realGas, realMix] = await Promise.all([
-                    fetchErcotRealtimeDemand(key),
-                    fetchHenryHubPrice(key),
-                    fetchErcotGridMix(key)
+                const [demands, gasHist, mixHist] = await Promise.all([
+                    fetchErcotDemandAndForecast(key),
+                    fetchHenryHubPriceHistory(key),
+                    fetchErcotGridMixHistory(key)
                 ]);
 
-                if (realLoad !== null) {
-                    setLoad(realLoad);
+                if (demands.length > 0) {
+                    setDemandData(demands);
                     setUsingRealData(true);
 
-                    // Estimate capacity/reserves if we only have load (EIA might not give capacity easily daily)
-                    // We'll keep the reserve simulation logic relative to the real load
-                    setCapacity(Math.round(realLoad * 1.15)); // Assume ~15% reserve margin for display
+                    // Update current load from latest demand
+                    const latest = [...demands].reverse().find(d => d.demand !== null);
+                    if (latest && latest.demand) {
+                        setLoad(latest.demand);
+                        // Estimate capacity/reserves
+                        setCapacity(Math.round(latest.demand * 1.15));
+                    }
+                } else {
+                    // Fallback to single fetch if history fails? Or just simulate
                 }
 
-                if (realGas !== null) {
-                    setGasPrice(realGas);
+                if (gasHist.length > 0) {
+                    setGasHistory(gasHist);
+                    setGasPrice(gasHist[gasHist.length - 1].value);
                 }
 
-                if (realMix) {
-                    // Map EIA fuel types to our chart categories
-                    // EIA types: 'Natural Gas', 'Wind', 'Solar', 'Nuclear', 'Coal', 'Petroleum', 'Hydro', etc.
+                if (mixHist.length > 0) {
+                    setMixHistory(mixHist);
+
+                    // Update current fuel mix slice
+                    const latestMix = mixHist[mixHist.length - 1];
                     const categories = ['Natural Gas', 'Wind', 'Solar', 'Nuclear', 'Coal', 'Other'];
                     const values = categories.map(cat => {
                         if (cat === 'Other') {
-                            // Sum up remaining
-                            return Object.entries(realMix)
-                                .filter(([k]) => !categories.slice(0, 5).includes(k))
-                                .reduce((sum, [, v]) => sum + v, 0);
+                            return Object.entries(latestMix)
+                                .filter(([k]) => k !== 'period' && !categories.slice(0, 5).includes(k))
+                                .reduce((sum, [, v]) => sum + (typeof v === 'number' ? v : 0), 0);
                         }
-                        return realMix[cat] || 0;
+                        return (latestMix[cat] as number) || 0;
                     });
                     setFuelMix(values);
                 } else {
-                    // Fallback check: if we got load but not mix, simulation mix might be wrong scale? 
-                    // Just keep previous mix or simple default
+                    // Try single fetch if history empty?
+                    const currentMix = await fetchErcotGridMix(key);
+                    if (currentMix) {
+                        // We manually map it here just like above if needed, or rely on simulated default if fetch fails
+                        // For now, let's just skip complex fallback logic to keep it clean
+                    }
+                }
+
+                if (demands.length === 0 && gasHist.length === 0) {
+                    // If we got nothing, maybe key is bad or API down
+                    // Don't throw if we got PARTIAL data (e.g. only gas)
+                    if (!demands.length && !gasHist.length && !mixHist.length) {
+                        throw new Error("No data returned");
+                    }
                 }
 
             } catch (e) {
@@ -140,13 +163,17 @@ export default function MarketDataTab() {
 
         // Use default fuel mix
         setFuelMix([42, 25, 18, 8, 5, 2]);
+
+        // Clear real data stats
+        setDemandData([]);
+        setGasHistory([]);
     };
 
     const reserves = capacity - load;
     const reserveMargin = load > 0 ? (reserves / load) * 100 : 0;
 
     // Chart Data - Fuel Mix (Simulated or Real)
-    const fuelMixData = {
+    const fuelMixChartData = {
         labels: ['Natural Gas', 'Wind', 'Solar', 'Nuclear', 'Coal', 'Other'],
         datasets: [
             {
@@ -165,37 +192,77 @@ export default function MarketDataTab() {
     };
 
     // Chart Data - Load Forecast (24h)
-    const hours = Array.from({ length: 24 }, (_, i) => {
-        const h = new Date().getHours() + i;
-        return h >= 24 ? h - 24 : h;
-    }).map(h => `${h}:00`);
+    // If usingRealData, use demandData (which has timestamps)
+    // Else use simulated 
+    let forecastLabels: string[] = [];
+    let loadDataset: (number | null)[] = [];
+    let forecastDataset: (number | null)[] = [];
 
-    const forecastData = {
-        labels: hours,
+    if (usingRealData && demandData.length > 0) {
+        // Format labels from period strings (e.g. "2023-10-27T12")
+        // We might want to show just the hour
+        forecastLabels = demandData.map(d => {
+            const date = new Date(d.period);
+            return date.getHours() + ':00';
+        });
+        loadDataset = demandData.map(d => d.demand);
+        forecastDataset = demandData.map(d => d.forecast);
+    } else {
+        // Simulated
+        forecastLabels = Array.from({ length: 24 }, (_, i) => {
+            const h = new Date().getHours() + i;
+            return (h >= 24 ? h - 24 : h) + ':00';
+        });
+        loadDataset = forecastLabels.map((_, i) => {
+            const h = (new Date().getHours() + i) % 24;
+            const shape = -Math.cos((h - 4) * Math.PI / 12) * 0.5 + 0.5;
+            return 40000 + shape * 35000;
+        });
+        // Simulated forecast slightly off
+        forecastDataset = loadDataset.map(v => (v || 0) * (1 + (Math.random() - 0.5) * 0.1));
+    }
+
+    const forecastChartData = {
+        labels: forecastLabels,
         datasets: [
             {
-                label: 'Forecasted Load',
-                data: hours.map((_, i) => {
-                    const h = (new Date().getHours() + i) % 24;
-                    const shape = -Math.cos((h - 4) * Math.PI / 12) * 0.5 + 0.5;
-                    return 40000 + shape * 35000;
-                }),
+                label: 'Actual Demand',
+                data: loadDataset,
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.1)',
                 fill: true,
                 tension: 0.4
             },
             {
-                label: 'Available Capacity',
-                data: hours.map((_, i) => {
-                    const h = (new Date().getHours() + i) % 24;
-                    const solarShape = Math.max(0, -Math.cos((h - 12) * Math.PI / 8));
-                    return 55000 + solarShape * 15000;
-                }),
-                borderColor: '#10b981',
+                label: 'Day-Ahead Forecast',
+                data: forecastDataset,
+                borderColor: '#10b981', // Green for forecast matching available capacity color in previous? No, let's use teal/emerald
                 backgroundColor: 'rgba(16, 185, 129, 0.0)',
                 borderDash: [5, 5],
                 tension: 0.4
+            }
+        ]
+    };
+
+    // Gas Price History Chart
+    const gasLabels = gasHistory.map(h => {
+        // Parse date string (e.g. YYYY-MM-DD)
+        const parts = h.period.split('-');
+        if (parts.length === 3) {
+            return `${parts[1]}/${parts[2]}`;
+        }
+        return h.period;
+    });
+    const gasChartData = {
+        labels: gasLabels,
+        datasets: [
+            {
+                label: 'Henry Hub Spot Price ($/MMBtu)',
+                data: gasHistory.map(h => h.value),
+                borderColor: '#f97316',
+                backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                fill: true,
+                tension: 0.2
             }
         ]
     };
@@ -216,8 +283,8 @@ export default function MarketDataTab() {
             tooltip: { mode: 'index' as const, intersect: false }
         },
         scales: {
-            x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } },
-            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9ca3af' } }
+            x: { grid: { color: 'rgba(156, 163, 175, 0.1)' }, ticks: { color: '#9ca3af' } },
+            y: { grid: { color: 'rgba(156, 163, 175, 0.1)' }, ticks: { color: '#9ca3af' } }
         }
     };
 
@@ -338,24 +405,38 @@ export default function MarketDataTab() {
                 </div>
             </div>
 
-            {/* Charts Row */}
+            {/* Charts Row 1: Mix + Demand */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Fuel Mix */}
                 <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm lg:col-span-1">
                     <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4">Current Fuel Mix</h3>
                     <div className="h-[300px]">
-                        <Doughnut data={fuelMixData} options={doughnutOptions} />
+                        <Doughnut data={fuelMixChartData} options={doughnutOptions} />
                     </div>
                 </div>
 
                 {/* Supply vs Demand */}
                 <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm lg:col-span-2">
-                    <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4">Supply & Demand Forecast (24hr)</h3>
+                    <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4">
+                        Demand vs Forecast (48h)
+                    </h3>
                     <div className="h-[300px]">
-                        <Line data={forecastData} options={lineOptions} />
+                        <Line data={forecastChartData} options={lineOptions} />
                     </div>
                 </div>
             </div>
+
+            {/* Charts Row 2: Gas Prices + ... */}
+            {usingRealData && gasHistory.length > 0 && (
+                <div className="grid grid-cols-1 gap-6">
+                    <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                        <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4">Henry Hub Price Trends (30 Days)</h3>
+                        <div className="h-[250px]">
+                            <Line data={gasChartData} options={lineOptions} />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-200">
                 <strong>Note:</strong> {usingRealData ? 'Real-time data provided by EIA Open Data API.' : 'Simulated data is being used for demonstration. Connect your EIA API Key to see live data.'}
