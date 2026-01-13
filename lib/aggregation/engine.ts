@@ -627,6 +627,7 @@ export function runAggregationSimulation(
         weighted_ppa_price: total_matched > 0 ? total_ppa_cost / total_matched : 0,
         market_purchase_cost: gross_load_cost, // Return Gross Load Cost for display
         total_gen_revenue: total_market_revenue,
+        total_ppa_cost,  // Add total PPA cost for validation and display
 
         tech_details: {
             'Solar': { matched_mwh: 0, total_mwh: 0, total_cost: 0, market_value: 0, settlement: 0 },

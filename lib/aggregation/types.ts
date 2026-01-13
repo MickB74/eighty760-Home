@@ -85,6 +85,7 @@ export interface SimulationResult {
     weighted_ppa_price: number;
     market_purchase_cost: number;
     total_gen_revenue: number; // Market Value of Generation
+    total_ppa_cost: number;    // Total PPA Cost
 
     // Breakdown
     tech_details: Record<string, {
