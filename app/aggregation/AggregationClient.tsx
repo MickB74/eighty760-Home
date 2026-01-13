@@ -575,6 +575,7 @@ export default function AggregationPage() {
         financials.use_scarcity,
         financials.scarcity_intensity,
         // Price data
+        selectedYear,  // Trigger re-sim when year changes
         historicalPrices,
         allHubPrices,
         genProfiles,
