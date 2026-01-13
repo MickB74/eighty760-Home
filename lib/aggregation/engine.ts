@@ -471,7 +471,7 @@ export function runAggregationSimulation(
 
             // If historicalPrices is present, 'prices' is (historicalPrices * scaler).
             // We should apply the same scaler to the hub prices.
-            if (historicalPrices && historicalPrices.length >= HOURS) {
+            if (historicalPrices && historicalPrices.length >= HOURS && !financials.use_actual_prices) {
                 const currentSum = historicalPrices.slice(0, HOURS).reduce((a, b) => a + b, 0);
                 const currentAvg = currentSum / HOURS;
                 // Avoid div by zero
@@ -492,7 +492,7 @@ export function runAggregationSimulation(
                     }
                 }
             } else {
-                // Synthetic mode: we likely don't have hub prices, fallback to 'prices' array
+                // use_actual_prices is true OR synthetic mode: use raw hub prices without scaling
                 // Or if we do have hub prices (loaded for 'Average'?), use them directly.
                 // For now, if we have them, use them.
                 assetPrices = hubPricesMap[asset.location];
