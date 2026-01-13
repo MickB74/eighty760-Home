@@ -121,7 +121,7 @@ export default function Navigation() {
                             href="mailto:contact@eighty760.com"
                             className="px-6 py-2 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-all hover:scale-105"
                         >
-                            Request Demo
+                            Contact Us
                         </a>
                     </div>
 
@@ -198,7 +198,7 @@ export default function Navigation() {
                             href="mailto:contact@eighty760.com"
                             className="block px-4 py-3 mt-4 bg-energy-green text-navy-950 font-bold rounded-lg text-center hover:bg-energy-green/90 transition"
                         >
-                            Request Demo
+                            Contact Us
                         </a>
                     </div>
                 </motion.div>
