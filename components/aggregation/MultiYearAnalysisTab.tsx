@@ -279,6 +279,7 @@ export default function MultiYearAnalysisTab({
                                     <th className="p-4">Net Cashflow ($/MWh)</th>
                                     <th className="p-4">Gen Capture Price ($/MWh)</th>
                                     <th className="p-4">CFE %</th>
+                                    <th className="p-4">Matched (MWh)</th>
                                     <th className="p-4">Unmatched (MWh)</th>
                                 </tr>
                             </thead>
@@ -298,7 +299,7 @@ export default function MultiYearAnalysisTab({
                                             </td>
                                             <td className="p-4 font-bold text-navy-950 dark:text-white">{item.year} {item.hasError && '⚠️'}</td>
                                             {item.hasError ? (
-                                                <td colSpan={5} className="p-4 text-gray-500">Error loading data</td>
+                                                <td colSpan={6} className="p-4 text-gray-500">Error loading data</td>
                                             ) : (
                                                 <>
                                                     <td className={`p-4 font-mono font-bold ${(item.result.settlement_value + item.result.rec_income - item.result.rec_cost) < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
@@ -312,6 +313,9 @@ export default function MultiYearAnalysisTab({
                                                     </td>
                                                     <td className="p-4 font-bold text-energy-green-dark dark:text-energy-green">
                                                         {(item.result.cfe_score * 100).toFixed(1)}%
+                                                    </td>
+                                                    <td className="p-4 text-gray-700 dark:text-gray-300">
+                                                        {item.result.total_matched_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                     </td>
                                                     <td className="p-4 text-gray-700 dark:text-gray-300">
                                                         {(item.result.total_load_mwh - item.result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })}
