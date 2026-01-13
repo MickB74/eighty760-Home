@@ -9,12 +9,14 @@
         "lint": "next lint"
     },
     "dependencies": {
+        "@types/jszip": "^3.4.1",
         "@types/papaparse": "^5.5.2",
         "chart.js": "^4.4.0",
         "framer-motion": "^12.24.7",
         "html2canvas": "^1.4.1",
         "jspdf": "^4.0.0",
         "jspdf-autotable": "^5.0.7",
+        "jszip": "^3.10.1",
         "next": "14.2.22",
         "papaparse": "^5.5.3",
         "parquet-wasm": "^0.7.1",

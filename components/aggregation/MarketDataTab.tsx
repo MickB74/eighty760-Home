@@ -3,12 +3,6 @@ import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, PointElement,
 import { Line, Doughnut, Bar } from 'react-chartjs-2';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import {
-    fetchErcotRealtimeDemand,
-    fetchHenryHubPrice,
-    fetchErcotGridMix,
-    fetchErcotDemandAndForecast,
-    fetchHenryHubPriceHistory,
-    fetchErcotGridMixHistory,
     type DemandsData,
     type HenryHubHistory,
     type FuelMixHistory
@@ -23,8 +17,6 @@ export default function MarketDataTab() {
     const [gasPrice, setGasPrice] = useState(2.84);
 
     // API State
-    const [apiKey, setApiKey] = useState('');
-    const [isApiConfigOpen, setIsApiConfigOpen] = useState(false);
     const [usingRealData, setUsingRealData] = useState(false);
 
     // Data State
@@ -40,172 +32,151 @@ export default function MarketDataTab() {
     const [hubPrices, setHubPrices] = useState<{ name: string, price: number, trend: 'up' | 'down' | 'flat' }[]>([]);
 
     useEffect(() => {
-        const savedKey = localStorage.getItem('eia_api_key');
-        if (savedKey) setApiKey(savedKey);
-    }, []);
-
-    const handleSaveKey = (key: string) => {
-        setApiKey(key);
-        localStorage.setItem('eia_api_key', key);
-        setIsApiConfigOpen(false);
-        // Trigger fetch immediately
-        updateData(key);
-    };
-
-    // Simulate live data updates or fetch real
-    useEffect(() => {
-        // Initial setup
-        updateData(apiKey);
+        // Initial Fetch
+        updateData();
 
         const interval = setInterval(() => {
             setCurrentTime(new Date());
-        }, 1000 * 60);
+            updateData();
+        }, 60000);
 
         return () => {
             clearInterval(interval);
         };
     }, []);
 
-    // Separate effect for polling real data every 5 mins
-    useEffect(() => {
-        if (!apiKey) return;
+    const updateData = async () => {
+        try {
+            const [statusRes, mixRes] = await Promise.all([
+                fetch('/api/ercot/status'),
+                fetch('/api/ercot/fuel-mix')
+            ]);
 
-        const apiInterval = setInterval(() => {
-            updateData(apiKey);
-        }, 300000); // 5 mins
+            if (statusRes.ok && mixRes.ok) {
+                const statusData = await statusRes.json();
+                const mixData = await mixRes.json();
+                setUsingRealData(true);
 
-        return () => clearInterval(apiInterval);
-    }, [apiKey]);
+                // 1. Reserves from Status
+                const reservesVal = parseFloat(statusData.current_condition.prc_value.replace(/,/g, ''));
 
-    const updateData = async (key: string) => {
-        if (key) {
-            // Try fetching real data
-            try {
-                const [demands, gasHist, mixHist] = await Promise.all([
-                    fetchErcotDemandAndForecast(key),
-                    fetchHenryHubPriceHistory(key),
-                    fetchErcotGridMixHistory(key)
-                ]);
+                // 2. Fuel Mix Parsing
+                const history: FuelMixHistory[] = [];
+                const dates = Object.keys(mixData.data).sort();
+                let latestTotalGen = 0;
 
-                if (demands.length > 0) {
-                    setDemandData(demands);
-                    setUsingRealData(true);
-
-                    // Update current load from latest demand
-                    const latest = [...demands].reverse().find(d => d.demand !== null);
-                    if (latest && latest.demand) {
-                        setLoad(latest.demand);
-                        // Estimate capacity/reserves
-                        setCapacity(Math.round(latest.demand * 1.15));
-                    }
-                }
-
-                if (gasHist.length > 0) {
-                    setGasHistory(gasHist);
-                    setGasPrice(gasHist[gasHist.length - 1].value);
-                }
-
-                if (mixHist.length > 0) {
-                    setMixHistory(mixHist);
-
-                    // Update current fuel mix slice
-                    const latestMix = mixHist[mixHist.length - 1];
-                    const categories = ['Natural Gas', 'Wind', 'Solar', 'Nuclear', 'Coal', 'Other'];
-                    const values = categories.map(cat => {
-                        if (cat === 'Other') {
-                            return Object.entries(latestMix)
-                                .filter(([k]) => k !== 'period' && !categories.slice(0, 5).includes(k))
-                                .reduce((sum, [, v]) => sum + (typeof v === 'number' ? v : 0), 0);
-                        }
-                        return (latestMix[cat] as number) || 0;
-                    });
-                    setFuelMix(values);
-
-                    // Calculations for Carbon + Renewables
-                    // If real data, we calculate carbon intensity for the 24h period
-                    // Intensity Factors (approx gCO2/kWh)
-                    const factors: Record<string, number> = {
-                        'Natural Gas': 490,
-                        'Coal': 820,
-                        'Nuclear': 12,
-                        'Wind': 11,
-                        'Solar': 41,
-                        'Other': 200
-                    };
-
-                    const cHist = mixHist.map(m => {
-                        let totalGen = 0;
-                        let totalEmissions = 0;
-                        let wind = 0;
-                        let solar = 0;
-
-                        Object.entries(m).forEach(([k, v]) => {
-                            if (k === 'period' || typeof v !== 'number') return;
-                            totalGen += v;
-
-                            // Map 'clean' names if necessary, but eia uses specific codes. 
-                            // Our fetcher maps them to human readable keys in 'type-name' usually...
-                            // Wait, our new fetcher returns `Record<string, number>`.
-                            // Let's assume keys match our categories or similar.
-                            // In `eia.ts`, we map `type-name` to key.
-
-                            let factor = 0;
-                            if (k.includes('Gas')) factor = factors['Natural Gas'];
-                            else if (k.includes('Coal') || k.includes('Lignite')) factor = factors['Coal'];
-                            else if (k.includes('Nuclear')) factor = factors['Nuclear'];
-                            else if (k.includes('Wind')) { factor = factors['Wind']; wind = v; }
-                            else if (k.includes('Solar')) { factor = factors['Solar']; solar = v; }
-                            else factor = factors['Other'];
-
-                            totalEmissions += v * factor;
+                dates.forEach(date => {
+                    const times = mixData.data[date];
+                    Object.entries(times).forEach(([ts, val]: [string, any]) => {
+                        let periodGen = 0;
+                        const entry: any = { period: ts };
+                        // API Keys: "Solar", "Wind", "Natural Gas", "Coal and Lignite", "Nuclear", "Hydro", "Power Storage", "Other"
+                        Object.entries(val).forEach(([fuel, data]: [string, any]) => {
+                            const mw = Math.max(0, data.gen || 0);
+                            const key = fuel === 'Coal and Lignite' ? 'Coal' : fuel;
+                            entry[key] = mw;
+                            periodGen += mw;
                         });
-
-                        return {
-                            time: m.period,
-                            intensity: totalGen > 0 ? Math.round(totalEmissions / totalGen) : 0,
-                            wind,
-                            solar
-                        };
+                        history.push(entry);
+                        latestTotalGen = periodGen;
                     });
+                });
 
-                    setCarbonHistory(cHist.map(x => ({ time: x.time, intensity: x.intensity })));
-                    setRenewablesProfile(cHist.map(x => ({ time: x.time, wind: x.wind, solar: x.solar })));
+                // Sort and keep recent
+                history.sort((a, b) => new Date(a.period).getTime() - new Date(b.period).getTime());
+                const recentHistory = history.slice(-288); // Last 24h
+                setMixHistory(recentHistory);
+
+                // Populate derived Demand Data (so charts work)
+                // Since we can't get official Load/Forecast, we usage Total Gen as Proxy for Load
+                const derivedDemand: DemandsData[] = recentHistory.map(h => {
+                    let total = 0;
+                    Object.entries(h).forEach(([k, v]) => {
+                        if (k !== 'period') total += (v as number);
+                    });
+                    return {
+                        period: h.period,
+                        demand: Math.round(total),
+                        forecast: null // We don't have forecast from fuel-mix
+                    };
+                });
+                setDemandData(derivedDemand);
+
+                // Populate Renewables Profile for Net Load
+                const derivedRenewables = recentHistory.map(h => ({
+                    time: h.period,
+                    wind: (h['Wind'] as number) || 0,
+                    solar: (h['Solar'] as number) || 0
+                }));
+                setRenewablesProfile(derivedRenewables);
+
+                // Update Load & Capacity
+                setLoad(Math.round(latestTotalGen));
+                setCapacity(Math.round(latestTotalGen + reservesVal));
+
+                // Update mix chart
+                if (recentHistory.length > 0) {
+                    const latest = recentHistory[recentHistory.length - 1];
+                    const mixValues = [
+                        latest['Natural Gas'] || 0,
+                        latest['Wind'] || 0,
+                        latest['Solar'] || 0,
+                        latest['Nuclear'] || 0,
+                        latest['Coal'] || 0,
+                        (latest['Hydro'] || 0) + (latest['Other'] || 0) + (latest['Power Storage'] || 0)
+                    ];
+                    setFuelMix(mixValues);
                 }
 
-                // Futures Simulation (Mock for now, even with Real Data unless we add new API)
-                generateFutures(gasPrice);
+                // 3. Derived Carbon & Renewables
+                const factors: Record<string, number> = {
+                    'Natural Gas': 490,
+                    'Coal': 820,
+                    'Nuclear': 12,
+                    'Wind': 11,
+                    'Solar': 41,
+                    'Other': 200,
+                    'Hydro': 0,
+                    'Power Storage': 100
+                };
 
-                // Generate Hub Prices (Simulated based on Real Load/Gas if available)
-                // Real LMP is hard to get from free EIA. We estimate:
-                // Price ~ Gas * HeatRate + Scarcity(Load)
-                const currentLoad = load || 40000;
-                const currentGas = gasPrice || 2.5;
-                const estimatedPrice = (currentGas * 8) + Math.max(0, (currentLoad - 50000) * 0.01); // Simple model
+                const derivedCarbon = recentHistory.map(h => {
+                    let emissions = 0;
+                    let gen = 0;
+                    Object.entries(h).forEach(([k, v]) => {
+                        if (k === 'period') return;
+                        const val = v as number;
+                        gen += val;
+                        emissions += val * (factors[k] || 200);
+                    });
+                    return {
+                        time: h.period,
+                        intensity: gen > 0 ? Math.round(emissions / gen) : 0
+                    };
+                });
+                setCarbonHistory(derivedCarbon);
 
+                // Mock Futures and Hub Prices (until we have real sources)
+                generateFutures(2.84);
+                const estimatedPrice = (2.5 * 8) + Math.max(0, (latestTotalGen - 50000) * 0.005);
                 const hubs = [
                     { name: 'HB_NORTH', factor: 1.0 },
                     { name: 'HB_SOUTH', factor: 1.05 },
                     { name: 'HB_WEST', factor: 0.85 },
                     { name: 'HB_HOUSTON', factor: 1.02 }
                 ];
-                setHubPrices(hubs.map(h => {
-                    const price = estimatedPrice * h.factor + (Math.random() - 0.5) * 5;
-                    return {
-                        name: h.name,
-                        price: Math.max(0, price),
-                        trend: Math.random() > 0.5 ? 'up' : 'down' as 'up' | 'down' | 'flat'
-                    };
-                }));
+                setHubPrices(hubs.map(h => ({
+                    name: h.name,
+                    price: Math.max(10, estimatedPrice * h.factor + (Math.random() - 0.5) * 5),
+                    trend: Math.random() > 0.5 ? 'up' : 'down' as 'up' | 'down' | 'flat'
+                })));
 
-                if (demands.length === 0 && gasHist.length === 0) throw new Error("No data");
 
-            } catch (e) {
-                console.warn('API Fetch failed, using simulation', e);
-                setUsingRealData(false);
-                runSimulation();
+            } else {
+                throw new Error("API Error");
             }
-        } else {
-            setUsingRealData(false);
+        } catch (e) {
+            console.warn("Falling back to simulation", e);
             runSimulation();
         }
     };
@@ -505,18 +476,12 @@ export default function MarketDataTab() {
                 <div>
                     <h2 className="text-xl font-bold text-navy-950 dark:text-white flex items-center gap-2">
                         Current Grid Conditions
-                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wider ${usingRealData ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' : 'bg-green-500/10 text-green-500 border-green-500/20'}`}>
-                            {usingRealData ? 'EIA Live Data' : 'Normal (Simulated)'}
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wider ${usingRealData ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
+                            {usingRealData ? 'ERCOT Real-Time' : 'Simulating'}
                         </span>
                     </h2>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <p>{usingRealData ? 'Data Source: EIA Open Data API' : 'Live data (Simulated Demo Stream)'}</p>
-                        <button
-                            onClick={() => setIsApiConfigOpen(!isApiConfigOpen)}
-                            className="text-blue-500 hover:text-blue-600 underline text-xs ml-2"
-                        >
-                            {apiKey ? 'Configure API' : 'Connect EIA API'}
-                        </button>
+                        <p>{usingRealData ? 'Source: ERCOT.com Public Dashboards' : 'Connection failed, using simulation.'}</p>
                     </div>
                 </div>
                 <div className="text-right">
@@ -524,33 +489,6 @@ export default function MarketDataTab() {
                     <p className="text-xs text-gray-500">{currentTime.toLocaleDateString()}</p>
                 </div>
             </div>
-
-            {/* API Config Panel */}
-            {isApiConfigOpen && (
-                <div className="bg-gray-50 dark:bg-white/5 p-4 rounded-lg border border-gray-200 dark:border-white/10 mb-4 animate-in slide-in-from-top-2">
-                    <p className="text-sm font-bold text-navy-950 dark:text-white mb-2">Connect to EIA Open Data</p>
-                    <div className="flex flex-col gap-2">
-                        <p className="text-xs text-gray-500 mb-2">
-                            Enter your free API key from <a href="https://www.eia.gov/opendata/register.php" target="_blank" rel="noreferrer" className="text-blue-500 hover:underline">eia.gov</a> to fetch real-time grid and market data.
-                        </p>
-                        <div className="flex gap-2">
-                            <input
-                                type="password"
-                                value={apiKey}
-                                onChange={(e) => setApiKey(e.target.value)}
-                                placeholder="Enter EIA API Key"
-                                className="flex-1 p-2 rounded border border-gray-300 dark:border-white/10 bg-white dark:bg-navy-950 text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                            />
-                            <button
-                                onClick={() => handleSaveKey(apiKey)}
-                                className="px-4 py-2 bg-blue-600 text-white rounded font-medium text-sm hover:bg-blue-700"
-                            >
-                                Save & Connect
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -793,7 +731,7 @@ export default function MarketDataTab() {
             )}
 
             <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-100 dark:border-blue-900/30 rounded-lg p-4 text-sm text-blue-800 dark:text-blue-200">
-                <strong>Note:</strong> {usingRealData ? 'Real-time data provided by EIA Open Data API.' : 'Simulated data is being used for demonstration. Connect your EIA API Key to see live data.'}
+                <strong>Note:</strong> {usingRealData ? 'Real-time data provided by ERCOT Public Dashboards.' : 'Simulated data is being used for demonstration.'}
             </div>
         </div>
     );

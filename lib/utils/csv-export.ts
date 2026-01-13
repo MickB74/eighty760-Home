@@ -67,6 +67,130 @@ export function generateHourlyCSV(result: SimulationResult, year?: number | stri
 }
 
 /**
+ * Converts simulation result to CSV format with DETAILED financial breakdown
+ * Matches the granularity of the Financial Analysis download
+ */
+export function generateDetailedHourlyCSV(result: SimulationResult, financials: import('../aggregation/types').FinancialParams, year?: number | string): string {
+    const rows: string[] = [];
+
+    // Header row
+    const headers = [
+        'Hour',
+        ...(year ? ['Year'] : []),
+        'Load (MW)',
+        'Matched Gen (MW)',
+        'Grid Deficit (MW)',
+        'Overgeneration (MW)',
+        // Technology Generation
+        'Solar Gen (MW)',
+        'Wind Gen (MW)',
+        'Nuclear Gen (MW)',
+        'Geothermal Gen (MW)',
+        'CCS Gen (MW)',
+        'Battery Discharge (MW)',
+        'Battery Charge (MW)',
+        // Financial Details
+        'Market Price ($/MWh)',
+        'REC Price ($/MWh)',
+        // PPA Prices
+        'Solar PPA Price ($/MWh)',
+        'Wind PPA Price ($/MWh)',
+        'Nuclear PPA Price ($/MWh)',
+        'Geothermal PPA Price ($/MWh)',
+        'CCS PPA Price ($/MWh)',
+        // Costs & Revenues
+        'Solar PPA Cost ($)',
+        'Wind PPA Cost ($)',
+        'Nuclear PPA Cost ($)',
+        'Geothermal PPA Cost ($)',
+        'CCS PPA Cost ($)',
+        'Solar Market Revenue ($)',
+        'Wind Market Revenue ($)',
+        'Nuclear Market Revenue ($)',
+        'Geothermal Market Revenue ($)',
+        'CCS Market Revenue ($)',
+        'REC Cost ($)',
+        'Hourly Net Cost ($)'
+    ];
+    rows.push(headers.join(','));
+
+    // Data rows (8760 hours)
+    const HOURS = 8760;
+    for (let i = 0; i < HOURS; i++) {
+        const load = result.load_profile[i] || 0;
+        const solarGen = result.solar_profile[i] || 0;
+        const windGen = result.wind_profile[i] || 0;
+        const nucGen = result.nuc_profile[i] || 0;
+        const geoGen = result.geo_profile[i] || 0;
+        const ccsGen = result.ccs_profile[i] || 0;
+        const batteryDischarge = result.battery_discharge[i] || 0;
+        const price = result.market_price_profile[i] || 0;
+        const recPrice = result.rec_price_profile[i] || 0;
+        const match = result.matched_profile[i] || 0;
+
+        // Calculations
+        const solarPPACost = solarGen * financials.solar_price;
+        const windPPACost = windGen * financials.wind_price;
+        const nucPPACost = nucGen * financials.nuc_price;
+        const geoPPACost = geoGen * financials.geo_price;
+        const ccsPPACost = ccsGen * financials.ccs_price;
+
+        const solarRev = solarGen * price;
+        const windRev = windGen * price;
+        const nucRev = nucGen * price;
+        const geoRev = geoGen * price;
+        const ccsRev = ccsGen * price;
+
+        const recCost = (load - match) * recPrice;
+
+        const netCost = (solarPPACost - solarRev) +
+            (windPPACost - windRev) +
+            (nucPPACost - nucRev) +
+            (geoPPACost - geoRev) +
+            (ccsPPACost - ccsRev) +
+            recCost;
+
+        const row = [
+            i.toString(),
+            ...(year ? [year.toString()] : []),
+            load.toFixed(2),
+            match.toFixed(2),
+            Math.max(0, load - match).toFixed(2), // Deficit
+            result.surplus_profile[i]?.toFixed(2) || '0', // Overgen
+            solarGen.toFixed(2),
+            windGen.toFixed(2),
+            nucGen.toFixed(2),
+            geoGen.toFixed(2),
+            ccsGen.toFixed(2),
+            batteryDischarge.toFixed(2),
+            result.battery_charge[i]?.toFixed(2) || '0',
+            price.toFixed(2),
+            recPrice.toFixed(2),
+            financials.solar_price.toFixed(2),
+            financials.wind_price.toFixed(2),
+            financials.nuc_price.toFixed(2),
+            financials.geo_price.toFixed(2),
+            financials.ccs_price.toFixed(2),
+            solarPPACost.toFixed(2),
+            windPPACost.toFixed(2),
+            nucPPACost.toFixed(2),
+            geoPPACost.toFixed(2),
+            ccsPPACost.toFixed(2),
+            solarRev.toFixed(2),
+            windRev.toFixed(2),
+            nucRev.toFixed(2),
+            geoRev.toFixed(2),
+            ccsRev.toFixed(2),
+            recCost.toFixed(2),
+            netCost.toFixed(2)
+        ];
+        rows.push(row.join(','));
+    }
+
+    return rows.join('\n');
+}
+
+/**
  * Triggers browser download of CSV file
  */
 export function downloadCSV(csvContent: string, filename: string): void {

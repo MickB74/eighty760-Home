@@ -314,7 +314,22 @@ export default function FinancialAnalysisTab({ result }: FinancialAnalysisTabPro
                 <div className="bg-white dark:bg-navy-950/50 rounded-xl p-6 border border-gray-200 dark:border-white/10">
                     <h3 className="text-lg font-semibold mb-4 text-navy-950 dark:text-white">Net Monthly Cashflow Trend</h3>
                     <div className="h-64">
-                        <Line data={netMonthlyCashflowData} options={chartOptions} />
+                        <Line data={netMonthlyCashflowData} options={{
+                            ...chartOptions,
+                            scales: {
+                                ...chartOptions.scales,
+                                x: chartOptions.scales.x,
+                                y: {
+                                    ...chartOptions.scales.y,
+                                    suggestedMax: 0,
+                                    suggestedMin: 0,
+                                    grid: {
+                                        color: (context) => context.tick.value === 0 ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 255, 255, 0.05)',
+                                        lineWidth: (context) => context.tick.value === 0 ? 2 : 1,
+                                    }
+                                }
+                            }
+                        }} />
                     </div>
                 </div>
 

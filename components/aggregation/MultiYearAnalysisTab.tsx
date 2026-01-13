@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import JSZip from 'jszip';
 import { Participant, GenerationAsset, FinancialParams, SimulationResult } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { loadHubPrices, loadAveragePriceProfile, getAvailableYears } from '@/lib/aggregation/price-loader';
-import { generateHourlyCSV, downloadCSV, generateCSVFilename } from '@/lib/utils/csv-export';
+import { generateHourlyCSV, downloadCSV, generateCSVFilename, generateDetailedHourlyCSV } from '@/lib/utils/csv-export';
 import { Bar, Line } from 'react-chartjs-2';
 import {
     Chart as ChartJS,
@@ -178,7 +179,7 @@ export default function MultiYearAnalysisTab({
         battery.hours
     ]);
 
-    const exportToCSV = () => {
+    const exportToCSV = async () => {
         const validResults = results.filter(r => !r.hasError);
 
         if (validResults.length === 0) {
@@ -186,12 +187,31 @@ export default function MultiYearAnalysisTab({
             return;
         }
 
+        const zip = new JSZip();
+
         // Generate CSV for each year
         validResults.forEach(({ year, result }) => {
-            const csvContent = generateHourlyCSV(result, year);
-            const filename = generateCSVFilename('multi_year_analysis', year);
-            downloadCSV(csvContent, filename);
+            const yearFinancials = { ...financials, market_year: year };
+            const csvContent = generateDetailedHourlyCSV(result, yearFinancials, year);
+            const filename = generateCSVFilename('financial_analysis', year);
+            zip.file(filename, csvContent);
         });
+
+        // Generate and download ZIP
+        try {
+            const content = await zip.generateAsync({ type: 'blob' });
+            const url = window.URL.createObjectURL(content);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `multi_year_detailed_analysis_${new Date().toISOString().split('T')[0]}.zip`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Failed to generate zip:', error);
+            alert('Failed to generate ZIP file.');
+        }
     };
 
     const toggleYearExpanded = (year: number) => {
@@ -248,7 +268,7 @@ export default function MultiYearAnalysisTab({
                         disabled={results.length === 0}
                         className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:opacity-90 disabled:opacity-30 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-600/20"
                     >
-                        Download CSV
+                        Download ZIP
                     </button>
                     <button
                         onClick={runAnalysis}
