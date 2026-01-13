@@ -350,7 +350,7 @@ export default function MultiYearAnalysisTab({
                                                                     <span className="text-xs text-gray-500">ⓘ</span>
                                                                 </div>
                                                                 <span className="font-mono font-bold text-red-600 dark:text-red-400">
-                                                                    ${item.result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                    -${item.result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                                 </span>
                                                             </div>
                                                             <div className="flex justify-between items-center p-3 bg-white dark:bg-navy-950/50 rounded-lg border border-gray-200 dark:border-white/10">
