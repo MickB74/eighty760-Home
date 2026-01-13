@@ -118,12 +118,12 @@ export default function MarketDataTab() {
                 if (recentHistory.length > 0) {
                     const latest = recentHistory[recentHistory.length - 1];
                     const mixValues = [
-                        latest['Natural Gas'] || 0,
-                        latest['Wind'] || 0,
-                        latest['Solar'] || 0,
-                        latest['Nuclear'] || 0,
-                        latest['Coal'] || 0,
-                        (latest['Hydro'] || 0) + (latest['Other'] || 0) + (latest['Power Storage'] || 0)
+                        (latest['Natural Gas'] as number) || 0,
+                        (latest['Wind'] as number) || 0,
+                        (latest['Solar'] as number) || 0,
+                        (latest['Nuclear'] as number) || 0,
+                        (latest['Coal'] as number) || 0,
+                        ((latest['Hydro'] as number) || 0) + ((latest['Other'] as number) || 0) + ((latest['Power Storage'] as number) || 0)
                     ];
                     setFuelMix(mixValues);
                 }
