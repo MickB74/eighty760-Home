@@ -233,7 +233,7 @@ export default function AnalysisTab({ result }: AnalysisTabProps) {
                         <span className="text-6xl filter drop-shadow-md">{gradeIcon}</span>
                         <div>
                             <div className="flex items-baseline gap-2">
-                                <span className="text-7xl font-extrabold text-navy-950 dark:text-white tracking-tight">{cfe.toFixed(1)}</span>
+                                <span className="text-7xl font-extrabold text-navy-950 dark:text-white tracking-tight">{cfe.toFixed(2)}</span>
                                 <span className="text-3xl font-bold text-navy-950 dark:text-white">%</span>
                             </div>
                             <div className="flex items-center gap-3">
@@ -244,10 +244,10 @@ export default function AnalysisTab({ result }: AnalysisTabProps) {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-right flex-1 w-full lg:w-auto border-t lg:border-t-0 lg:border-l border-navy-900/10 dark:border-white/10 pt-6 lg:pt-0 lg:pl-8">
                         {[
-                            { l: "Annual Load", v: (result.total_load_mwh || 0).toLocaleString(), u: "MWh" },
-                            { l: "Clean Gen", v: (result.total_gen_mwh || 0).toLocaleString(), u: "MWh" },
-                            { l: "Match Gen", v: (result.total_matched_mwh || 0).toLocaleString(), u: "MWh" }, // handle type mismatch if any
-                            { l: "Net Cost", v: `$${Math.abs(result.total_cost_net || 0).toLocaleString()}`, u: (result.total_cost_net || 0) < 0 ? "(Profit)" : "(Cost)" },
+                            { l: "Annual Load", v: (result.total_load_mwh || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), u: "MWh" },
+                            { l: "Clean Gen", v: (result.total_gen_mwh || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), u: "MWh" },
+                            { l: "Match Gen", v: (result.total_matched_mwh || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), u: "MWh" }, // handle type mismatch if any
+                            { l: "Net Cost", v: `$${Math.abs(result.total_cost_net || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, u: (result.total_cost_net || 0) < 0 ? "(Profit)" : "(Cost)" },
                         ].map((s, i) => (
                             <div key={i}>
                                 <div className="text-xs uppercase tracking-wider text-navy-900/60 dark:text-white/60 font-semibold">{s.l}</div>
