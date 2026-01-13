@@ -1285,8 +1285,9 @@ export default function AggregationPage() {
                         {result ? (
                             <div className="space-y-8 animate-in fade-in duration-500">
                                 {/* KPI Grid */}
-                                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+                                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4">
                                     <KPICard label="24/7 Score" value={(result.cfe_score * 100).toFixed(1) + '%'} sub="Hourly Match" />
+                                    <KPICard label="Total Load" value={result.total_load_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
                                     <KPICard label="Annual Match" value={(result.total_load_mwh > 0 ? (result.total_gen_mwh / result.total_load_mwh * 100).toFixed(0) : '0') + '%'} sub="Gen / Load" />
                                     <KPICard label="Grid Deficit" value={(result.total_load_mwh - result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Unmatched" />
                                     <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
