@@ -104,7 +104,7 @@ const HISTORICAL_REC_PRICES: Record<number, number> = {
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'financials' | 'multi-year' | 'reports' | 'config'>('config');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'scenarios' | 'analysis' | 'financials' | 'multi-year' | 'reports' | 'config'>('config');
     const [loading, setLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -749,12 +749,7 @@ export default function AggregationPage() {
                     >
                         Dashboard
                     </button>
-                    <button
-                        onClick={() => setActiveTab('monthly')}
-                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'monthly' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                    >
-                        Monthly Analysis
-                    </button>
+
                     <button
                         onClick={() => setActiveTab('analysis')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
@@ -1423,21 +1418,7 @@ export default function AggregationPage() {
                     </>
                 )}
 
-                {activeTab === 'monthly' && result && (
-                    <div className="animate-in fade-in duration-300 space-y-8">
-                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
-                            <h3 className="text-xl font-bold mb-4 text-white">Monthly Production</h3>
-                            <div className="h-[400px]">
-                                <MonthlyProductionChart result={result} />
-                            </div>
-                        </div>
 
-                    </div>
-                )}
-
-                {activeTab === 'monthly' && !result && (
-                    <div className="text-center py-20 text-gray-500">Run a simulation to see monthly breakdown.</div>
-                )}
 
                 {activeTab === 'analysis' && (
                     <AnalysisTab result={result} />
