@@ -1669,11 +1669,26 @@ function MonthlyProductionChart({ result }: { result: SimulationResult }) {
     const monthlyCcs = new Array(12).fill(0);
     const monthlyBattery = new Array(12).fill(0);
 
-    for (let i = 0; i < 8760; i++) {
-        // Simple approximation: 30.4 days per month * 24 = ~730 hours
-        const month = Math.min(11, Math.floor(i / 730));
-        monthlyLoad[month] += result.load_profile[i] || 0;
+    // Map each hour to its correct calendar month
+    // Days in each month for non-leap year (standard 8760 hours)
+    const daysPerMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const hoursPerMonth = daysPerMonth.map(d => d * 24);
+    const monthBoundaries = [0];
+    for (let m = 0; m < 12; m++) {
+        monthBoundaries.push(monthBoundaries[m] + hoursPerMonth[m]);
+    }
 
+    for (let i = 0; i < 8760; i++) {
+        // Find which month this hour belongs to
+        let month = 0;
+        for (let m = 0; m < 12; m++) {
+            if (i >= monthBoundaries[m] && i < monthBoundaries[m + 1]) {
+                month = m;
+                break;
+            }
+        }
+
+        monthlyLoad[month] += result.load_profile[i] || 0;
         monthlySolar[month] += result.solar_profile[i] || 0;
         monthlyWind[month] += result.wind_profile[i] || 0;
         monthlyNuc[month] += result.nuc_profile[i] || 0;
