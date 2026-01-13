@@ -25,6 +25,7 @@ const financials: FinancialParams = {
     ccs_price: 35,
     rec_price: 5,
     market_price_avg: 25,
+    market_year: 2025,
     use_actual_prices: false,
 };
 
