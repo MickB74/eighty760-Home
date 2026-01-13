@@ -118,7 +118,19 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                     <div className="flex gap-2">
                                         <select
                                             value={asset.type}
-                                            onChange={(e) => handleEdit(asset.id, 'type', e.target.value)}
+                                            onChange={(e) => {
+                                                const type = e.target.value as GenerationAsset['type'];
+                                                onUpdate(assets.map(a => {
+                                                    if (a.id === asset.id) {
+                                                        return {
+                                                            ...a,
+                                                            type,
+                                                            location: type === 'Wind' ? 'West' : a.location
+                                                        };
+                                                    }
+                                                    return a;
+                                                }));
+                                            }}
                                             className="bg-transparent text-xs p-0 border-none focus:ring-0 text-gray-500 dark:text-gray-400"
                                         >
                                             {TECH_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
@@ -172,7 +184,12 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                 <select
                                     className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-sm text-gray-900 dark:text-gray-100"
                                     value={newAsset.type}
-                                    onChange={e => setNewAsset({ ...newAsset, type: e.target.value as GenerationAsset['type'] })}
+                                    onChange={e => {
+                                        const type = e.target.value as GenerationAsset['type'];
+                                        // Auto-select West for Wind as per user preference
+                                        const location = type === 'Wind' ? 'West' : newAsset.location;
+                                        setNewAsset({ ...newAsset, type, location });
+                                    }}
                                 >
                                     {TECH_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                 </select>

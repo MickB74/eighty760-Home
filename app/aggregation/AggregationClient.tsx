@@ -133,7 +133,7 @@ export default function AggregationPage() {
     // Track current hour for Energy Flow visualization (default to hour 0 = Jan 1, 1st hour)
     const [currentHour, setCurrentHour] = useState(0);
     const [solarHub, setSolarHub] = useState<string>('West');
-    const [windHub, setWindHub] = useState<string>('Panhandle');
+    const [windHub, setWindHub] = useState<string>('West');
     const [nuclearHub, setNuclearHub] = useState<string>('North');
     const [geothermalHub, setGeothermalHub] = useState<string>('West');
     const [ccsHub, setCcsHub] = useState<string>('Houston');
