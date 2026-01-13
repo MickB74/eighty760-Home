@@ -257,12 +257,15 @@ export default function AggregationPage() {
     const handleClearParticipants = () => setParticipants([]);
 
     const handleInstantDemo = () => {
-        // Clear and load demo scenario with 3 random participants
+        // Clear and load demo scenario with random (3-6) participants
         const locations = ['North Zone', 'South Zone', 'West Zone', 'Houston', 'Coastal', 'Panhandle'];
         const types: Array<Participant['type']> = ['Data Center', 'Manufacturing', 'Office'];
 
-        // Shuffle locations to get 3 unique ones
-        const shuffledLocs = [...locations].sort(() => 0.5 - Math.random()).slice(0, 3);
+        // Determine number of properties: Random int between 3 and 6
+        const numProps = Math.floor(Math.random() * (6 - 3 + 1)) + 3;
+
+        // Shuffle locations to get unique ones for the count
+        const shuffledLocs = [...locations].sort(() => 0.5 - Math.random()).slice(0, numProps);
 
         const newParticipants: Participant[] = shuffledLocs.map((loc, i) => {
             const type = types[Math.floor(Math.random() * types.length)];
@@ -271,9 +274,13 @@ export default function AggregationPage() {
             if (type === 'Manufacturing') baseLoad = 80000 + Math.random() * 50000;
             if (type === 'Office') baseLoad = 20000 + Math.random() * 20000;
 
+            // Randomize name a bit more
+            const suffixes = ['HQ', 'Facility', 'Plant', 'Campus', 'Branch', 'Hub'];
+            const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+
             return {
                 id: Date.now().toString() + i,
-                name: `${loc} ${type}`,
+                name: `${loc} ${type} ${suffix}`,
                 type: type,
                 load_mwh: Math.round(baseLoad)
             };
@@ -638,6 +645,13 @@ export default function AggregationPage() {
                 // Financial Details
                 Market_Price_per_MWh: price.toFixed(2),
                 REC_Price_per_MWh: recPrice.toFixed(2),
+                // PPA Prices (Added by Request)
+                Solar_PPA_Price_MWh: financials.solar_price.toFixed(2),
+                Wind_PPA_Price_MWh: financials.wind_price.toFixed(2),
+                Nuclear_PPA_Price_MWh: financials.nuc_price.toFixed(2),
+                Geothermal_PPA_Price_MWh: financials.geo_price.toFixed(2),
+                CCS_PPA_Price_MWh: financials.ccs_price.toFixed(2),
+                // Costs
                 Solar_PPA_Cost: (solarGen * financials.solar_price).toFixed(2),
                 Wind_PPA_Cost: (windGen * financials.wind_price).toFixed(2),
                 Nuclear_PPA_Cost: (nucGen * financials.nuc_price).toFixed(2),

@@ -16,22 +16,28 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 - **Hourly Matching**: Portfolio optimization to achieve high CFE scores across all hours
 - **Virtual PPAs**: Power Purchase Agreements with basis risk and settlement modeling
 
-**Data sources:** ERCOT RTM pricing (GridStatus.io, 2020-2025), Open-Meteo historical weather (ERA5), NREL generation models.
+**Data sources:** 
+- **EIA Open Data API**: Real-time ERCOT grid conditions, Demand Forecasts, Henry Hub Futures (Simulated in Demo), and Carbon Intensity.
+- **GridStatus.io**: Historical ERCOT RTM pricing (2020-2025).
+- **Open-Meteo**: ERA5 historical weather data.
+- **NREL**: PVWatts and SAM generation models.
 
 **Tools available:** 
-- **Aggregation Tool** (`/aggregation`): Build and optimize portfolios with real-time feedback.
+- **Aggregation Tool** (`/aggregation`): Build and optimize portfolios with real-time feedback. Includes sub-tabs for **Live Market Data**, **Detailed Analysis**, **Financials**, and **Scenario Comparison**.
 - **Weather Performance** (`/weather-performance`): Analyze how your portfolio would have performed in past years (2020-2025).
 - **Interactive Home Simulator** (`/`): Quick educational tool for understanding 24/7 concepts.
 
 ## Features
 
 - **Interactive Portfolio Simulator**: Adjust solar, wind, and battery capacities in real-time.
+- **Instant Demo Mode**: One-click generation of randomized portfolios (3-6 varied properties) for immediate exploration.
+- **Live Market Data Tab**: View real-time ERCOT grid conditions, Fuel Mix trends, 24h Demand Forecasts, and Carbon Intensity via EIA API integration.
+- **Scenario Comparison**: Save and compare multiple portfolio configurations side-by-side to evaluate different strategies.
+- **Financial Modeling**: Deep dive into PPA settlement costs, basis risk (Hub vs Node), Battery Arbitrage revenue, and REC costs.
 - **Smart Fill Optimization**: Automatically size your generation and storage to meet a target CFE score.
 - **Weather Performance Analysis**: Backcast your portfolio against 5 years of historical weather and price data.
-- **24-Hour Generation Profiles**: Visualize hourly generation vs. load with dynamic charts.
-- **Financial modeling**: Estimate costs, PPA settlements, and battery arbitrage revenue.
+- **24-Hour Generation Profiles**: Visualize hourly generation vs. load with dynamic charts (Duck Curve, Net Load).
 - **Dark Mode Support**: Fully responsive design with light/dark themes.
-- **Methodology Documentation**: In-depth explanation of generation modeling and scarcity pricing.
 
 ## Tech Stack
 
@@ -69,6 +75,12 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 4. **Open your browser**:
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application.
 
+### EIA API Configuration (Optional)
+To see real-time market data in the **Aggregation > Live Market** tab:
+1. Register for a free API key at [eia.gov/opendata](https://www.eia.gov/opendata/register.php).
+2. Click "Connect EIA API" in the Market Data tab and paste your key.
+3. The application will fetch live grid demand, fuel mix, and pricing data.
+
 ## Project Structure
 
 ```bash
@@ -76,16 +88,18 @@ eighty760-Home/
 ├── app/
 │   ├── layout.tsx      # Root layout (Metadata, Fonts, Global providers)
 │   ├── page.tsx        # Home page (Hero, Simulator wrapper, Methodology)
-│   ├── aggregation/    # Aggregation tool route
+│   ├── aggregation/    # Aggregation tool (Main Application)
 │   └── whitepaper/     # Methodology documentation route
 ├── components/
+│   ├── aggregation/    # Core business logic components (MarketData, Analysis, Financials)
 │   ├── Simulator.tsx   # Core simulation logic and UI
 │   ├── Navigation.tsx  # Responsive nav bar with dark mode toggle
-│   └── Hero.tsx        # Hero section component
+├── lib/
+│   ├── external/       # API clients (EIA, etc.)
+│   ├── aggregation/    # Simulation Engines & Types
 ├── scripts/            # Python utilities for data fetching/processing
 ├── public/             # Static assets (images, icons)
-├── tailwind.config.ts  # Tailwind configuration
-└── globals.css         # Global CSS variables and base styles
+└── tailwind.config.ts  # Tailwind configuration
 ```
 
 ## Deployment
