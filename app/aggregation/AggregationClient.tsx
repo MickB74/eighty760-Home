@@ -1361,8 +1361,8 @@ export default function AggregationPage() {
                                                         Net Portfolio Cashflow
                                                         <InfoTooltip text="Net Value of PPA Settlement + Net REC Value" />
                                                     </td>
-                                                    <td className={`py-3 text-right font-bold text-lg ${-result.total_cost_net >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                        {-result.total_cost_net >= 0 ? '+' : '-'}${Math.abs(-result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    <td className={`py-3 text-right font-bold text-lg ${(result.settlement_value + result.rec_income - result.rec_cost) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                        {(result.settlement_value + result.rec_income - result.rec_cost) >= 0 ? '+' : '-'}${Math.abs(result.settlement_value + result.rec_income - result.rec_cost).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -1370,8 +1370,8 @@ export default function AggregationPage() {
                                                         Net Cashflow ($/MWh)
                                                         <InfoTooltip text="Net Portfolio Cashflow / Total Annual Load" />
                                                     </td>
-                                                    <td className={`py-3 text-right ${-result.avg_cost_per_mwh >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                        {(-result.avg_cost_per_mwh).toFixed(2)}
+                                                    <td className={`py-3 text-right ${(result.settlement_value + result.rec_income - result.rec_cost) / (result.total_load_mwh || 1) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                        {((result.settlement_value + result.rec_income - result.rec_cost) / (result.total_load_mwh || 1)).toFixed(2)}
                                                     </td>
                                                 </tr>
                                             </tbody>

@@ -187,8 +187,8 @@ export default function MultiYearAnalysisTab({
         datasets: [
             {
                 label: 'Net Portfolio Cashflow (k$)',
-                data: validResults.map(r => (-r.result.total_cost_net / 1000)),
-                backgroundColor: validResults.map(r => -r.result.total_cost_net > 0 ? '#10b981' : '#ef4444'),
+                data: validResults.map(r => ((r.result.settlement_value + r.result.rec_income - r.result.rec_cost) / 1000)),
+                backgroundColor: validResults.map(r => (r.result.settlement_value + r.result.rec_income - r.result.rec_cost) > 0 ? '#10b981' : '#ef4444'),
                 borderRadius: 4
             }
         ]
@@ -199,7 +199,7 @@ export default function MultiYearAnalysisTab({
         datasets: [
             {
                 label: 'Net Cashflow ($/MWh)',
-                data: validResults.map(r => -r.result.avg_cost_per_mwh),
+                data: validResults.map(r => ((r.result.settlement_value + r.result.rec_income - r.result.rec_cost) / (r.result.total_load_mwh || 1))),
                 borderColor: '#3b82f6',
                 backgroundColor: 'rgba(59, 130, 246, 0.5)',
                 tension: 0.3
@@ -273,11 +273,11 @@ export default function MultiYearAnalysisTab({
                                                 <td colSpan={5} className="p-4 text-gray-500">Error loading data</td>
                                             ) : (
                                                 <>
-                                                    <td className={`p-4 font-mono font-bold ${-item.result.total_cost_net < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                                                        ${(-item.result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                    <td className={`p-4 font-mono font-bold ${(item.result.settlement_value + item.result.rec_income - item.result.rec_cost) < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                        ${(item.result.settlement_value + item.result.rec_income - item.result.rec_cost).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                     </td>
-                                                    <td className={`p-4 font-mono ${-item.result.avg_cost_per_mwh < 0 ? 'text-red-600/70 dark:text-red-400/70' : 'text-green-600/70 dark:text-green-400/70'}`}>
-                                                        ${(-item.result.avg_cost_per_mwh).toFixed(2)}
+                                                    <td className={`p-4 font-mono ${((item.result.settlement_value + item.result.rec_income - item.result.rec_cost) / (item.result.total_load_mwh || 1)) < 0 ? 'text-red-600/70 dark:text-red-400/70' : 'text-green-600/70 dark:text-green-400/70'}`}>
+                                                        ${((item.result.settlement_value + item.result.rec_income - item.result.rec_cost) / (item.result.total_load_mwh || 1)).toFixed(2)}
                                                     </td>
                                                     <td className="p-4 font-mono text-gray-500 dark:text-gray-400">
                                                         ${(item.result.total_gen_revenue / (item.result.total_gen_mwh || 1)).toFixed(2)}
@@ -330,8 +330,8 @@ export default function MultiYearAnalysisTab({
                                                                     <span className="text-sm text-gray-700 dark:text-gray-300">Net Portfolio Cashflow</span>
                                                                     <span className="text-xs text-gray-500">ⓘ</span>
                                                                 </div>
-                                                                <span className={`font-mono font-bold ${-item.result.total_cost_net < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                                                                    ${(-item.result.total_cost_net).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                                <span className={`font-mono font-bold ${(item.result.settlement_value + item.result.rec_income - item.result.rec_cost) < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                                    ${(item.result.settlement_value + item.result.rec_income - item.result.rec_cost).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                                                 </span>
                                                             </div>
                                                             <div className="flex justify-between items-center p-3 bg-white dark:bg-navy-950/50 rounded-lg border border-gray-200 dark:border-white/10">
@@ -339,8 +339,8 @@ export default function MultiYearAnalysisTab({
                                                                     <span className="text-sm text-gray-700 dark:text-gray-300">Net Cashflow ($/MWh)</span>
                                                                     <span className="text-xs text-gray-500">ⓘ</span>
                                                                 </div>
-                                                                <span className={`font-mono font-bold ${-item.result.avg_cost_per_mwh < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
-                                                                    ${(-item.result.avg_cost_per_mwh).toFixed(2)}
+                                                                <span className={`font-mono font-bold ${(item.result.settlement_value + item.result.rec_income - item.result.rec_cost) / (item.result.total_load_mwh || 1) < 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}`}>
+                                                                    ${((item.result.settlement_value + item.result.rec_income - item.result.rec_cost) / (item.result.total_load_mwh || 1)).toFixed(2)}
                                                                 </span>
                                                             </div>
                                                         </div>
