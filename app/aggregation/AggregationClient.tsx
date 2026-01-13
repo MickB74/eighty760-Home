@@ -494,7 +494,7 @@ export default function AggregationPage() {
 
                     setFinancials(prev => ({
                         ...prev,
-                        market_price_avg: avg,
+                        market_price_avg: parseFloat(avg.toFixed(2)),
                         rec_price: parseFloat(avgRec.toFixed(2))
                     }));
                 }
@@ -529,7 +529,7 @@ export default function AggregationPage() {
                 const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
                 setFinancials(prev => ({
                     ...prev,
-                    market_price_avg: avg,
+                    market_price_avg: parseFloat(avg.toFixed(2)),
                     rec_price: recPrice
                 }));
             } else {
@@ -891,7 +891,7 @@ export default function AggregationPage() {
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                                 {/* Left Col: Year, Hub, Map (Cols 1-5) */}
                                 <div className="lg:col-span-5 space-y-6">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="mb-4">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Simulated Year</label>
                                             <select
@@ -902,18 +902,6 @@ export default function AggregationPage() {
                                                 <option value="Average" className="bg-white dark:bg-navy-950">{getYearLabel('Average')}</option>
                                                 {getAvailableYears().map(year => (
                                                     <option key={year} value={year} className="bg-white dark:bg-navy-950">{getYearLabel(year)}</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Load Hub</label>
-                                            <select
-                                                value={loadHub}
-                                                onChange={(e) => setLoadHub(e.target.value)}
-                                                className="w-full p-2.5 rounded-lg bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 text-navy-950 dark:text-white focus:outline-none focus:ring-2 focus:ring-energy-green text-sm"
-                                            >
-                                                {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                    <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
                                                 ))}
                                             </select>
                                         </div>
@@ -999,7 +987,7 @@ export default function AggregationPage() {
                                                     <input
                                                         type="number"
                                                         className="w-full pl-6 p-2 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-sm"
-                                                        value={financials.market_price_avg}
+                                                        value={Number(financials.market_price_avg).toFixed(2)}
                                                         onChange={(e) => setFinancials({ ...financials, market_price_avg: parseFloat(e.target.value) })}
                                                     />
                                                 </div>
