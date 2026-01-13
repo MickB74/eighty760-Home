@@ -150,6 +150,34 @@ export default function MultiYearAnalysisTab({
         setLoading(false);
     };
 
+    // Auto-run analysis when inputs change
+    useEffect(() => {
+        if (participants.length === 0) {
+            setResults([]);
+            return;
+        }
+
+        // Debounce to avoid running too frequently when multiple inputs change
+        const timeoutId = setTimeout(() => {
+            runAnalysis();
+        }, 500);
+
+        return () => clearTimeout(timeoutId);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [
+        JSON.stringify(participants),
+        JSON.stringify(assets),
+        JSON.stringify(financials),
+        loadHub,
+        solarHub,
+        windHub,
+        nuclearHub,
+        geothermalHub,
+        ccsHub,
+        battery.mw,
+        battery.hours
+    ]);
+
     const exportToCSV = () => {
         const validResults = results.filter(r => !r.hasError);
 
