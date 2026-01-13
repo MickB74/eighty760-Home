@@ -551,7 +551,32 @@ export default function AggregationPage() {
         }, 300); // 300ms debounce
 
         return () => clearTimeout(timeoutId);
-    }, [participants.length, activeAssetsKey, capacities.Battery_MW, capacities.Battery_Hours, financials.solar_price, financials.wind_price, financials.geo_price, financials.nuc_price, financials.ccs_price, financials.rec_price, financials.market_price_avg, historicalPrices, allHubPrices, genProfiles, runSimulation]);
+    }, [
+        // Participants (watch the array itself for load changes)
+        JSON.stringify(participants),
+        // Assets (watch activeAssetsKey which changes when assets change)
+        activeAssetsKey,
+        // Battery
+        capacities.Battery_MW,
+        capacities.Battery_Hours,
+        // Financials - all properties that affect calculation
+        financials.solar_price,
+        financials.wind_price,
+        financials.geo_price,
+        financials.nuc_price,
+        financials.ccs_price,
+        financials.rec_price,
+        financials.market_price_avg,
+        financials.market_year, // Added - was missing!
+        financials.use_scarcity,
+        financials.scarcity_intensity,
+        // Price data
+        historicalPrices,
+        allHubPrices,
+        genProfiles,
+        // Function
+        runSimulation
+    ]);
 
     // Save portfolio to localStorage when simulation completes
     useEffect(() => {
