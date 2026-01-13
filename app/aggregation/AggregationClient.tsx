@@ -30,6 +30,7 @@ import Navigation from '@/components/Navigation';
 import InfoTooltip from '@/components/shared/InfoTooltip';
 import TexasHubMap from '@/components/aggregation/TexasHubMap';
 import AnalysisTab from '@/components/aggregation/AnalysisTab';
+import FinancialAnalysisTab from '@/components/aggregation/FinancialAnalysisTab';
 import ScenarioComparisonTab from '@/components/aggregation/ScenarioComparisonTab';
 import {
     loadPortfolio,
@@ -103,7 +104,7 @@ const HISTORICAL_REC_PRICES: Record<number, number> = {
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'multi-year' | 'reports' | 'config'>('config');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'monthly' | 'scenarios' | 'analysis' | 'financials' | 'multi-year' | 'reports' | 'config'>('config');
     const [loading, setLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -759,6 +760,12 @@ export default function AggregationPage() {
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                         <span className="mr-2">📈</span>Detailed Analysis
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('financials')}
+                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'financials' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                    >
+                        <span className="mr-2">💰</span>Financial Analysis
                     </button>
                     <button
                         onClick={() => setActiveTab('multi-year')}
@@ -1434,6 +1441,10 @@ export default function AggregationPage() {
 
                 {activeTab === 'analysis' && (
                     <AnalysisTab result={result} />
+                )}
+
+                {activeTab === 'financials' && result && (
+                    <FinancialAnalysisTab result={result} />
                 )}
 
                 {activeTab === 'multi-year' && (
