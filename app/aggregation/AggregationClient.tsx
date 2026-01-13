@@ -1400,12 +1400,6 @@ export default function AggregationPage() {
                             </div>
                         </div>
 
-                        <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
-                            <h3 className="text-xl font-bold mb-4 text-white">Monthly Settlement & Cost</h3>
-                            <div className="h-[400px]">
-                                <MonthlyFinancialChart result={result} />
-                            </div>
-                        </div>
                     </div>
                 )}
 
