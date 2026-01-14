@@ -10,7 +10,7 @@ interface BatteryFinancialsProps {
 export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps) {
     if (!cvtaResult) {
         return (
-            <div className="text-center py-8 text-[var(--text-secondary)]">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 Run simulation to see battery financials
             </div>
         );
@@ -28,26 +28,26 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
     return (
         <div className="space-y-6">
             {/* Performance Metrics */}
-            <div className="bg-[var(--bg-secondary)] rounded-lg p-4 border border-[var(--border-color)]">
+            <div className="bg-gray-50 dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
                 <h4 className="font-medium mb-3">Battery Performance</h4>
                 <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
-                        <div className="text-[var(--text-secondary)] mb-1">Actual RTE</div>
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Actual RTE</div>
                         <div className="font-semibold">{formatPercent(cvtaResult.performance.actual_rte)}</div>
                     </div>
                     <div>
-                        <div className="text-[var(--text-secondary)] mb-1">Throughput</div>
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Throughput</div>
                         <div className="font-semibold">{cvtaResult.performance.total_throughput_mwh.toLocaleString()} MWh</div>
                     </div>
                     <div>
-                        <div className="text-[var(--text-secondary)] mb-1">Utilization</div>
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Utilization</div>
                         <div className="font-semibold">{formatPercent(cvtaResult.performance.utilization_rate)}</div>
                     </div>
                 </div>
             </div>
 
             {/* Buyer's P&L (Trading House) */}
-            <div className="bg-[var(--card-bg)] rounded-lg p-4 border border-[var(--border-color)]">
+            <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
                 <h4 className="font-medium mb-3 text-energy-green">🏢 Buyer&apos;s P&L (Trading House)</h4>
                 <div className="space-y-2 text-sm">
                     {/* Revenue */}
@@ -59,7 +59,7 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
                         <span className="text-green-600 dark:text-green-400">Ancillary Revenue</span>
                         <span className="font-mono text-green-600 dark:text-green-400">{formatCurrency(cvtaResult.buyer.ancillary_revenue)}</span>
                     </div>
-                    <div className="flex justify-between py-1.5 border-t border-[var(--border-color)] font-semibold">
+                    <div className="flex justify-between py-1.5 border-t border-gray-200 dark:border-slate-700 font-semibold">
                         <span>Total Revenue</span>
                         <span className="font-mono">{formatCurrency(cvtaResult.buyer.total_revenue)}</span>
                     </div>
@@ -73,7 +73,7 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
                         <span className="text-red-600 dark:text-red-400">Charging Cost</span>
                         <span className="font-mono text-red-600 dark:text-red-400">-{formatCurrency(cvtaResult.buyer.charging_cost)}</span>
                     </div>
-                    <div className="flex justify-between py-1.5 border-t border-[var(--border-color)] font-semibold">
+                    <div className="flex justify-between py-1.5 border-t border-gray-200 dark:border-slate-700 font-semibold">
                         <span>Total Cost</span>
                         <span className="font-mono">-{formatCurrency(cvtaResult.buyer.total_cost)}</span>
                     </div>
@@ -90,7 +90,7 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
             </div>
 
             {/* Owner's View */}
-            <div className="bg-[var(--card-bg)] rounded-lg p-4 border border-[var(--border-color)]">
+            <div className="bg-white dark:bg-slate-800 rounded-lg p-4 border border-gray-200 dark:border-slate-700">
                 <h4 className="font-medium mb-3 text-purple-600 dark:text-purple-400">🏭 Owner&apos;s View (Asset Owner)</h4>
                 <div className="space-y-2 text-sm">
                     <div className="flex justify-between py-1">
@@ -101,7 +101,7 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
                         <span className="text-green-600 dark:text-green-400">VOM Revenue</span>
                         <span className="font-mono text-green-600 dark:text-green-400">{formatCurrency(cvtaResult.owner.vom_revenue)}</span>
                     </div>
-                    <div className="flex justify-between py-1.5 border-t border-[var(--border-color)] font-semibold">
+                    <div className="flex justify-between py-1.5 border-t border-gray-200 dark:border-slate-700 font-semibold">
                         <span>Total Revenue</span>
                         <span className="font-mono">{formatCurrency(cvtaResult.owner.total_revenue)}</span>
                     </div>

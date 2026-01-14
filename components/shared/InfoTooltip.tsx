@@ -34,7 +34,7 @@ export default function InfoTooltip({ text, size = 'sm', className = '' }: InfoT
         <>
             <div
                 ref={triggerRef}
-                className={`inline-flex items-center justify-center rounded-full border border-[var(--text-tertiary)] text-[var(--text-tertiary)] hover:border-[var(--brand-color)] hover:text-[var(--brand-color)] cursor-help transition-colors ${sizeClasses[size]} ${className}`}
+                className={`inline-flex items-center justify-center rounded-full border border-gray-400 dark:border-slate-500 text-gray-400 dark:text-slate-500 hover:border-brand dark:hover:border-brand-light hover:text-brand dark:hover:text-brand-light cursor-help transition-colors ${sizeClasses[size]} ${className}`}
                 onMouseEnter={handleMouseEnter}
                 onMouseLeave={() => setIsVisible(false)}
             >
