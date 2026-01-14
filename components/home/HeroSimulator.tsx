@@ -165,7 +165,6 @@ export default function HeroSimulator() {
                         >
                             <option value="Office">Office Building</option>
                             <option value="Data Center">Data Center</option>
-                            <option value="EV Fleet">EV Fleet Depot</option>
                         </select>
                     </div>
                     <div className="flex flex-col gap-1 w-1/2">
