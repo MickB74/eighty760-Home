@@ -116,7 +116,7 @@ export default function FileUpload({
             )}
 
             {description && !error && !fileName && (
-                <p className="text-xs text-[var(--text-secondary)]">{description}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{description}</p>
             )}
         </div>
     );

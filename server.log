@@ -1,0 +1,18 @@
+
+> eighty760@1.0.0 dev
+> next dev
+
+  ▲ Next.js 14.2.22
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 1953ms
+ ○ Compiling / ...
+ ✓ Compiled / in 10.6s (1375 modules)
+ ✓ Compiled in 1298ms (687 modules)
+ GET / 200 in 11936ms
+ GET / 200 in 65ms
+ GET / 200 in 45ms
+ ○ Compiling /aggregation ...
+ ✓ Compiled /aggregation in 4.8s (1935 modules)
+ GET /aggregation 200 in 5183ms

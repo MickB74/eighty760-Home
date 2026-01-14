@@ -104,21 +104,21 @@ export default function ScenarioManager({
             {/* Save Dialog */}
             {showDialog && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-[var(--card-bg)] rounded-xl p-6 max-w-md w-full mx-4 border border-[var(--border-color)]">
-                        <h4 className="text-lg font-semibold mb-4">Save Scenario</h4>
+                    <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-md w-full mx-4 border border-gray-200 dark:border-slate-700">
+                        <h4 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">Save Scenario</h4>
                         <input
                             type="text"
                             placeholder="Scenario name..."
                             value={scenarioName}
                             onChange={(e) => setScenarioName(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSave()}
-                            className="w-full px-3 py-2 rounded border border-[var(--border-color)] bg-[var(--bg-secondary)] mb-4"
+                            className="w-full px-3 py-2 rounded border border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-gray-100 mb-4"
                             autoFocus
                         />
                         <div className="flex justify-end gap-2">
                             <button
                                 onClick={() => setShowDialog(false)}
-                                className="px-4 py-2 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                                className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 transition"
                             >
                                 Cancel
                             </button>
@@ -135,7 +135,7 @@ export default function ScenarioManager({
 
             {/* Scenario List */}
             {scenarios.length === 0 ? (
-                <div className="text-center py-8 text-[var(--text-secondary)] border-2 border-dashed border-[var(--border-color)] rounded-lg">
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400 border-2 border-dashed border-gray-200 dark:border-slate-700 rounded-lg">
                     No saved scenarios yet.
                 </div>
             ) : (
@@ -143,11 +143,11 @@ export default function ScenarioManager({
                     {scenarios.map((scenario) => (
                         <div
                             key={scenario.id}
-                            className="flex items-center justify-between p-3 rounded-lg border border-[var(--border-color)] hover:bg-[var(--row-hover)] transition"
+                            className="flex items-center justify-between p-3 rounded-lg border border-gray-200 dark:border-slate-700 hover:bg-gray-50 dark:hover:bg-slate-800 transition"
                         >
                             <div className="flex-1">
-                                <div className="font-medium">{scenario.name}</div>
-                                <div className="text-xs text-[var(--text-secondary)]">
+                                <div className="font-medium text-gray-900 dark:text-gray-100">{scenario.name}</div>
+                                <div className="text-xs text-gray-500 dark:text-gray-400">
                                     {formatDate(scenario.timestamp)}
                                 </div>
                             </div>
