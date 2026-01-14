@@ -148,7 +148,8 @@ export default function AggregationPage() {
         guaranteed_rte: 0.85,           // 85%
         vom_rate: 2.5,                  // $2.5/MWh
         ancillary_type: 'Fixed',
-        ancillary_input: 50000          // $50k/month default
+        ancillary_input: 50000,          // $50k/month default
+        cycles_per_year: 365            // Default 1 cycle per day
     });
 
     // 6. Technology Exclusion
@@ -1037,6 +1038,73 @@ export default function AggregationPage() {
                                                         </div>
                                                     </div>
                                                 ))}
+                                            </div>
+                                        </details>
+
+                                        <details className="text-sm group mt-4">
+                                            <summary className="font-medium cursor-pointer text-purple-600 hover:text-purple-700 transition-colors flex items-center gap-2 select-none">
+                                                <span>Battery CVTA Assumptions</span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 transition-transform group-open:rotate-180" viewBox="0 0 20 20" fill="currentColor">
+                                                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                </svg>
+                                            </summary>
+                                            <div className="mt-3 grid grid-cols-2 gap-3 p-3 bg-gray-50 dark:bg-black/20 rounded-lg border border-gray-200 dark:border-white/5">
+                                                <div>
+                                                    <label className="text-[10px] uppercase text-gray-500 mb-1">Base Rate ($/MW-mo)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="w-full p-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-xs"
+                                                        value={batteryParams.base_rate_monthly}
+                                                        onChange={(e) => setBatteryParams({ ...batteryParams, base_rate_monthly: Number(e.target.value) })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] uppercase text-gray-500 mb-1">Variable O&M ($/MWh)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="w-full p-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-xs"
+                                                        value={batteryParams.vom_rate}
+                                                        onChange={(e) => setBatteryParams({ ...batteryParams, vom_rate: Number(e.target.value) })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] uppercase text-gray-500 mb-1">Guaranteed RTE (%)</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        className="w-full p-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-xs"
+                                                        value={batteryParams.guaranteed_rte}
+                                                        onChange={(e) => setBatteryParams({ ...batteryParams, guaranteed_rte: Number(e.target.value) })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] uppercase text-gray-500 mb-1">Availability (%)</label>
+                                                    <input
+                                                        type="number"
+                                                        step="0.01"
+                                                        className="w-full p-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-xs"
+                                                        value={batteryParams.guaranteed_availability}
+                                                        onChange={(e) => setBatteryParams({ ...batteryParams, guaranteed_availability: Number(e.target.value) })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] uppercase text-gray-500 mb-1">Ancillary Rev ($/mo)</label>
+                                                    <input
+                                                        type="number"
+                                                        className="w-full p-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-xs"
+                                                        value={batteryParams.ancillary_input}
+                                                        onChange={(e) => setBatteryParams({ ...batteryParams, ancillary_input: Number(e.target.value) })}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <label className="text-[10px] uppercase text-gray-500 mb-1">Max Cycles / Year</label>
+                                                    <input
+                                                        type="number"
+                                                        className="w-full p-1 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-xs"
+                                                        value={batteryParams.cycles_per_year || 365}
+                                                        onChange={(e) => setBatteryParams({ ...batteryParams, cycles_per_year: Number(e.target.value) })}
+                                                    />
+                                                </div>
                                             </div>
                                         </details>
                                     </div>

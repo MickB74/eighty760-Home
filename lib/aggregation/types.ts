@@ -46,6 +46,7 @@ export interface BatteryFinancialParams {
     vom_rate: number; // $/MWh
     ancillary_type: 'Fixed' | 'Dynamic';
     ancillary_input: number; // $ or %
+    cycles_per_year?: number; // Max cycles per year limit
 }
 
 export interface SimulationResult {

@@ -35,6 +35,7 @@ export interface BatteryCVTAResult {
         actual_rte: number;              // Actual round-trip efficiency achieved
         total_throughput_mwh: number;    // Total energy cycled through battery
         utilization_rate: number;        // Utilization as % of capacity
+        capacity_mwh: number;
     };
 }
 
@@ -130,7 +131,8 @@ export function calculateBatteryCVTA(
         performance: {
             actual_rte,
             total_throughput_mwh: total_throughput,
-            utilization_rate
+            utilization_rate,
+            capacity_mwh
         }
     };
 }

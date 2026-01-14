@@ -43,6 +43,10 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
                         <div className="text-gray-500 dark:text-gray-400 mb-1">Utilization</div>
                         <div className="font-semibold">{formatPercent(cvtaResult.performance.utilization_rate)}</div>
                     </div>
+                    <div>
+                        <div className="text-gray-500 dark:text-gray-400 mb-1">Cycles / Year</div>
+                        <div className="font-semibold">{Math.round(cvtaResult.performance.total_throughput_mwh / 2 / (cvtaResult.performance.capacity_mwh || 1)).toLocaleString()}</div>
+                    </div>
                 </div>
             </div>
 
@@ -80,8 +84,8 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
 
                     {/* Net */}
                     <div className={`flex justify-between p-3 rounded-md font-bold text-base mt-2 ${cvtaResult.buyer.net_pnl >= 0
-                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+                        ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                        : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
                         }`}>
                         <span>Net P&L (Buyer)</span>
                         <span className="font-mono">{formatCurrency(cvtaResult.buyer.net_pnl)}</span>
@@ -112,8 +116,8 @@ export default function BatteryFinancials({ cvtaResult }: BatteryFinancialsProps
                     </div>
 
                     <div className={`flex justify-between p-3 rounded-md font-bold text-base mt-2 ${cvtaResult.owner.net_pnl >= 0
-                            ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                            : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
+                        ? 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
+                        : 'bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400'
                         }`}>
                         <span>Net P&L (Owner)</span>
                         <span className="font-mono">{formatCurrency(cvtaResult.owner.net_pnl)}</span>
