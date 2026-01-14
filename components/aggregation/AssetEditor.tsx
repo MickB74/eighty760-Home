@@ -7,7 +7,7 @@ interface AssetEditorProps {
     onUpdate: (assets: GenerationAsset[]) => void;
 }
 
-const LOCATIONS = ['North', 'South', 'West', 'Houston', 'Panhandle'] as const;
+const LOCATIONS = ['North', 'South', 'West', 'Houston', 'Panhandle', 'South (Coastal)'] as const;
 const TECH_TYPES = ['Solar', 'Wind', 'Geothermal', 'Nuclear', 'CCS Gas'] as const;
 
 export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
@@ -137,7 +137,7 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                                     return a;
                                                 }));
                                             }}
-                                            className="bg-transparent text-xs p-0 border-none focus:ring-0 text-gray-500 dark:text-gray-400"
+                                            className="bg-transparent text-xs p-0 border-none focus:ring-0 text-gray-500 dark:text-gray-400 w-1/2"
                                         >
                                             {TECH_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                                         </select>
@@ -145,12 +145,13 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                         <select
                                             value={asset.location}
                                             onChange={(e) => handleEdit(asset.id, 'location', e.target.value)}
-                                            className="bg-transparent text-xs p-0 border-none focus:ring-0 text-gray-500 dark:text-gray-400"
+                                            className="bg-transparent text-xs p-0 border-none focus:ring-0 text-gray-500 dark:text-gray-400 w-1/2"
                                         >
                                             {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
                                         </select>
                                     </div>
                                 </div>
+
                                 <div>
                                     <label className="text-[10px] uppercase text-gray-400 dark:text-gray-500 font-bold">Capacity (MW)</label>
                                     <input
@@ -186,36 +187,36 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                 />
                             </div>
                             <div>
-                                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Type</label>
-                                <select
-                                    className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-sm text-gray-900 dark:text-gray-100"
-                                    value={newAsset.type}
-                                    onChange={e => {
-                                        const type = e.target.value as GenerationAsset['type'];
-                                        // Auto-select location based on type defaults
-                                        let location = newAsset.location;
-                                        if (type === 'Solar') location = 'North';
-                                        if (type === 'Wind') location = 'West';
-                                        if (type === 'Nuclear') location = 'North';
-                                        if (type === 'Geothermal') location = 'West';
-                                        if (type === 'CCS Gas') location = 'Houston';
+                                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Type & Location</label>
+                                <div className="space-y-2">
+                                    <select
+                                        className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-sm text-gray-900 dark:text-gray-100"
+                                        value={newAsset.type}
+                                        onChange={e => {
+                                            const type = e.target.value as GenerationAsset['type'];
+                                            // Auto-select location based on type defaults
+                                            let location = newAsset.location;
+                                            if (type === 'Solar') location = 'North';
+                                            if (type === 'Wind') location = 'West';
+                                            if (type === 'Nuclear') location = 'North';
+                                            if (type === 'Geothermal') location = 'West';
+                                            if (type === 'CCS Gas') location = 'Houston';
 
-                                        setNewAsset({ ...newAsset, type, location });
-                                    }}
-                                >
-                                    {TECH_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                                </select>
+                                            setNewAsset({ ...newAsset, type, location });
+                                        }}
+                                    >
+                                        {TECH_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                                    </select>
+                                    <select
+                                        className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-sm text-gray-900 dark:text-gray-100"
+                                        value={newAsset.location}
+                                        onChange={e => setNewAsset({ ...newAsset, location: e.target.value as GenerationAsset['location'] })}
+                                    >
+                                        {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                                    </select>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Location</label>
-                                <select
-                                    className="w-full p-2 rounded border border-gray-200 dark:border-white/10 bg-white dark:bg-navy-950 text-sm text-gray-900 dark:text-gray-100"
-                                    value={newAsset.location}
-                                    onChange={e => setNewAsset({ ...newAsset, location: e.target.value as GenerationAsset['location'] })}
-                                >
-                                    {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-                                </select>
-                            </div>
+
                             <div>
                                 <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">Capacity (MW)</label>
                                 <input

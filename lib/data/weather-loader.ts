@@ -44,13 +44,29 @@ export async function loadSolarProfile(location: string, year: number): Promise<
 // Load wind generation profile for a specific location and year
 export async function loadWindProfile(location: string, year: number): Promise<number[] | null> {
     try {
-        const response = await fetch(`/data/profiles/Wind_${location}_${year}.json`);
+        // Handle "South (Coastal)" - Load "South" and scale
+        let targetLocation = location;
+        let scaleFactor = 1.0;
+
+        if (location === 'South (Coastal)') {
+            targetLocation = 'South';
+            scaleFactor = 1.65; // Boost from ~16% to ~27%
+        }
+
+        const response = await fetch(`/data/profiles/Wind_${targetLocation}_${year}.json`);
         if (!response.ok) {
             console.warn(`No wind data for ${location} ${year}`);
             return null;
         }
         const data = await response.json();
-        return data.generation || data.profile || data;
+        const rawProfile = data.generation || data.profile || data;
+
+        if (scaleFactor !== 1.0 && Array.isArray(rawProfile)) {
+            // Apply scaling and clip at 1.0 (assuming normalized profile)
+            return rawProfile.map((val: number) => Math.min(1.0, val * scaleFactor));
+        }
+
+        return rawProfile;
     } catch (error) {
         console.error(`Error loading wind profile for ${location} ${year}:`, error);
         return null;

@@ -1,5 +1,14 @@
 import { SimulationResult } from '../aggregation/types';
 
+const DEFAULT_LOCATIONS: Record<string, { city: string, county: string, lat: number, lon: number }> = {
+    'North': { city: 'Wichita Falls', county: 'Wichita', lat: 33.91, lon: -98.49 },
+    'South': { city: 'Corpus Christi', county: 'Nueces', lat: 27.80, lon: -97.39 },
+    'West': { city: 'Odessa', county: 'Ector', lat: 31.85, lon: -102.37 },
+    'Houston': { city: 'Houston', county: 'Harris', lat: 29.76, lon: -95.36 },
+    'Panhandle': { city: 'Amarillo', county: 'Potter', lat: 35.22, lon: -101.83 },
+    'South (Coastal)': { city: 'Galveston', county: 'Galveston', lat: 29.30, lon: -94.80 }
+};
+
 /**
  * Converts simulation result to CSV format with 8760 hourly data
  */
@@ -27,11 +36,12 @@ export function generateHourlyCSV(result: SimulationResult, year?: number | stri
 
         // Individual Asset List
         rows.push('Asset Breakdown');
-        rows.push('Name,Type,Location,Capacity (MW)');
+        rows.push('Name,Type,Location,City,County,Latitude,Longitude,Capacity (MW)');
         activeAssets.forEach(a => {
             // Escape name in quotes if it contains comma
             const cleanName = a.name.includes(',') ? `"${a.name}"` : a.name;
-            rows.push(`${cleanName},${a.type},${a.location},${a.capacity_mw.toFixed(2)}`);
+            const defaults = DEFAULT_LOCATIONS[a.location] || { city: '', county: '', lat: 0, lon: 0 };
+            rows.push(`${cleanName},${a.type},${a.location},${defaults.city},${defaults.county},${defaults.lat},${defaults.lon},${a.capacity_mw.toFixed(2)}`);
         });
         rows.push(''); // Empty line for separation
     }
@@ -143,10 +153,11 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
 
         rows.push('');
         rows.push('Asset Breakdown');
-        rows.push('Name,Type,Location,Capacity (MW)');
+        rows.push('Name,Type,Location,City,County,Latitude,Longitude,Capacity (MW)');
         activeAssets.forEach(a => {
             const cleanName = a.name.includes(',') ? `"${a.name}"` : a.name;
-            rows.push(`${cleanName},${a.type},${a.location},${a.capacity_mw.toFixed(2)}`);
+            const defaults = DEFAULT_LOCATIONS[a.location] || { city: '', county: '', lat: 0, lon: 0 };
+            rows.push(`${cleanName},${a.type},${a.location},${defaults.city},${defaults.county},${defaults.lat},${defaults.lon},${a.capacity_mw.toFixed(2)}`);
         });
         rows.push('');
     }

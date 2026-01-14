@@ -185,9 +185,14 @@ export function generateGenProfile(capacity_mw: number, type: string, capacity_f
         const day = Math.floor(h / 24); // 0-364
 
         if (type === 'Solar') {
-            const isDay = hour >= 6 && hour <= 19;
+            // Adjust to UTC-6 (Central Time) assumption for "Noon" alignment
+            // UTC Noon = 18:00.
+            // If h=18, localHour = 12.
+            const localHour = (hour - 6 + 24) % 24;
+
+            const isDay = localHour >= 6 && localHour <= 19;
             if (isDay) {
-                let dayShape = Math.sin(Math.PI * (hour - 6) / 13);
+                let dayShape = Math.sin(Math.PI * (localHour - 6) / 13);
                 if (dayShape < 0) dayShape = 0;
 
                 // Seasonal: Peak Summer (Day 172)
@@ -201,17 +206,50 @@ export function generateGenProfile(capacity_mw: number, type: string, capacity_f
 
         } else if (type === 'Wind') {
             // Diurnal: Peak Night/Early Morning
-            const hourArg = 2 * Math.PI * ((hour - 2) / 24);
+            // Use local hour for diurnal wind patterns too, to be consistent?
+            // Wind is less strictly tied to solar noon, but let's shift it too for consistency.
+            const localHour = (hour - 6 + 24) % 24;
+
+            const hourArg = 2 * Math.PI * ((localHour - 2) / 24);
             const diurnal = 0.6 + 0.25 * Math.cos(hourArg);
 
             // Seasonal: Peak Spring/Fall
-            const seasonal = 0.7 + 0.3 * Math.sin(2 * Math.PI * (day - 50) / 365 * 2);
+            const seasonal = 0.6 + 0.3 * Math.sin(2 * Math.PI * (day - 50) / 365 * 2);
 
-            const noise = rng.normal(0, 0.15);
+            const noise = rng.normal(0, 0.2); // Increased noise slightly
+
             let raw = diurnal * seasonal + noise;
-            raw = Math.max(0, Math.min(1, raw)); // Clip 0-1
 
-            profile[h] = raw * capacity_mw;
+            // Soft Clipping / Saturation to avoid hard "flat top" at 100%
+            // Use a hyperbolic tangent-like behavior near max
+            // Map 0 -> 0, 1 -> ~0.95, High -> 1.0 slowly
+
+            // Normalize raw roughly to 0-1 range first
+            // raw avg is ~ 0.6*0.7 = 0.42. 
+            // We want CF ~ 30-35%. 
+
+            // Apply a "Weibull-ish" shape capability or just power curve
+            // Simple approach: Clamp negative, then apply soft saturation
+            raw = Math.max(0, raw);
+
+            // Soft saturation function: f(x) = x / (1 + x^k)^(1/k) is standard soft clipper
+            // Let's use simple exponential approach for the top end:
+            // If raw > 0.8, compress.
+
+            if (raw > 1.0) {
+                // Soft cap: 1.0 + log(raw) * 0.1? No, that can grow.
+                // Tanh? 0.9 + 0.1 * tanh((raw - 0.9)/0.1)
+                // Let's just normalize 'raw' so it rarely hits 1.0 HARD.
+                // Scaling factor:
+                raw = raw * 0.9; // Scale down so max is lower
+            }
+
+            // Smooth saturation to 1.0
+            // x / (1 + (x/1.5)^4)^0.25
+            const limit = 1.0;
+            const output = raw / Math.pow(1 + Math.pow(raw / limit, 4), 0.25);
+
+            profile[h] = output * capacity_mw;
 
         } else if (type === 'Geothermal') {
             // Baseload
