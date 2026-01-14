@@ -1502,7 +1502,7 @@ export default function AggregationPage() {
                 )}
 
                 {activeTab === 'financials' && result && (
-                    <FinancialAnalysisTab result={result} />
+                    <FinancialAnalysisTab result={result} cvtaResult={cvtaResult} />
                 )}
 
                 {activeTab === 'multi-year' && (

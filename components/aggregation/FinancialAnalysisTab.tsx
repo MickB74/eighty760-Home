@@ -1,5 +1,6 @@
 import React from 'react';
 import { SimulationResult } from '@/lib/aggregation/types';
+import { BatteryCVTAResult } from '@/lib/aggregation/battery-cvta';
 import { Chart as ChartJS, ArcElement, CategoryScale, LinearScale, BarElement, LineElement, PointElement, Title, Tooltip, Legend } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import InfoTooltip from '@/components/shared/InfoTooltip';
@@ -8,9 +9,10 @@ ChartJS.register(ArcElement, CategoryScale, LinearScale, BarElement, LineElement
 
 interface FinancialAnalysisTabProps {
     result: SimulationResult;
+    cvtaResult?: BatteryCVTAResult | null;
 }
 
-export default function FinancialAnalysisTab({ result }: FinancialAnalysisTabProps) {
+export default function FinancialAnalysisTab({ result, cvtaResult }: FinancialAnalysisTabProps) {
     if (!result) {
         return (
             <div className="flex flex-col items-center justify-center min-h-[400px] p-8 text-center bg-white dark:bg-white/5 rounded-2xl border border-dashed border-gray-300 dark:border-white/20 animate-in fade-in zoom-in-95 duration-500">
@@ -396,6 +398,25 @@ export default function FinancialAnalysisTab({ result }: FinancialAnalysisTabPro
                                     </td>
                                 </tr>
                             ))}
+                            {/* Battery Row (if cvtaResult is provided) */}
+                            {cvtaResult && (
+                                <tr className="border-b border-gray-200 dark:border-white/10 last:border-0 hover:bg-gray-50 dark:hover:bg-white/5 bg-purple-50/50 dark:bg-purple-900/10">
+                                    <td className="py-3 pr-4 font-medium text-navy-950 dark:text-white">Battery Storage</td>
+                                    <td className="py-3 pr-4 text-navy-950 dark:text-white">Storage</td>
+                                    <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">-</td>
+                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{cvtaResult.performance.capacity_mwh / 2} MW</td>
+                                    <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{(cvtaResult.performance.total_throughput_mwh / 2).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
+                                    <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
+                                        ${cvtaResult.buyer.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </td>
+                                    <td className="py-3 pr-4 text-right text-red-500">
+                                        -${cvtaResult.buyer.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </td>
+                                    <td className={`py-3 text-right font-medium ${cvtaResult.buyer.net_pnl >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                        {cvtaResult.buyer.net_pnl >= 0 ? '+' : ''}${cvtaResult.buyer.net_pnl.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                         <tfoot>
                             <tr className="border-t-2 border-gray-200 dark:border-white/20 font-bold bg-gray-50 dark:bg-white/5 text-navy-950 dark:text-white">
