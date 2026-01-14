@@ -18,6 +18,7 @@ import {
 import { Participant, TechCapacity, FinancialParams, SimulationResult, BatteryFinancialParams, GenerationAsset } from '@/lib/aggregation/types';
 import { runAggregationSimulation } from '@/lib/aggregation/engine';
 import { recommendPortfolio } from '@/lib/aggregation/optimizer';
+import { generateDetailedHourlyCSV, downloadCSV, generateCSVFilename } from '@/lib/utils/csv-export';
 import { loadERCOTPrices, getAvailableYears, getYearLabel, loadAveragePriceProfile, loadHubPrices } from '@/lib/aggregation/price-loader';
 import ParticipantEditor from '@/components/aggregation/ParticipantEditor';
 import BatteryFinancials from '@/components/aggregation/BatteryFinancials';
@@ -43,7 +44,7 @@ import {
     type Scenario
 } from '@/lib/shared/portfolioStore';
 import Link from 'next/link';
-import Papa from 'papaparse';
+
 import { generatePDFReport } from '@/lib/reporting/pdf-generator';
 import MultiYearAnalysisTab from '@/components/aggregation/MultiYearAnalysisTab';
 
@@ -618,69 +619,10 @@ export default function AggregationPage() {
     const handleDownloadCSV = () => {
         if (!result) return;
 
-        // Enhanced CSV with detailed financial columns
-        const rows = result.load_profile.map((load, i) => {
-            const solarGen = result.solar_profile[i];
-            const windGen = result.wind_profile[i];
-            const nucGen = result.nuc_profile[i];
-            const geoGen = result.geo_profile[i];
-            const ccsGen = result.ccs_profile[i];
-            const batteryDischarge = result.battery_discharge[i];
-            const price = result.market_price_profile[i];
-            const recPrice = result.rec_price_profile[i];
-
-            return {
-                Hour: i,
-                Load_MW: load.toFixed(2),
-                Matched_Gen_MW: result.matched_profile[i].toFixed(2),
-                Grid_Deficit_MW: Math.max(0, load - (result.matched_profile[i] || 0)).toFixed(2),
-                Overgeneration_MW: result.surplus_profile[i].toFixed(2),
-                // Technology Generation
-                Solar_Gen_MW: solarGen.toFixed(2),
-                Wind_Gen_MW: windGen.toFixed(2),
-                Nuclear_Gen_MW: nucGen.toFixed(2),
-                Geothermal_Gen_MW: geoGen.toFixed(2),
-                CCS_Gen_MW: ccsGen.toFixed(2),
-                Battery_Discharge_MW: batteryDischarge.toFixed(2),
-                Battery_Charge_MW: result.battery_charge[i].toFixed(2),
-                // Financial Details
-                Market_Price_per_MWh: price.toFixed(2),
-                REC_Price_per_MWh: recPrice.toFixed(2),
-                // PPA Prices (Added by Request)
-                Solar_PPA_Price_MWh: financials.solar_price.toFixed(2),
-                Wind_PPA_Price_MWh: financials.wind_price.toFixed(2),
-                Nuclear_PPA_Price_MWh: financials.nuc_price.toFixed(2),
-                Geothermal_PPA_Price_MWh: financials.geo_price.toFixed(2),
-                CCS_PPA_Price_MWh: financials.ccs_price.toFixed(2),
-                // Costs
-                Solar_PPA_Cost: (solarGen * financials.solar_price).toFixed(2),
-                Wind_PPA_Cost: (windGen * financials.wind_price).toFixed(2),
-                Nuclear_PPA_Cost: (nucGen * financials.nuc_price).toFixed(2),
-                Geothermal_PPA_Cost: (geoGen * financials.geo_price).toFixed(2),
-                CCS_PPA_Cost: (ccsGen * financials.ccs_price).toFixed(2),
-                Solar_Market_Revenue: (solarGen * price).toFixed(2),
-                Wind_Market_Revenue: (windGen * price).toFixed(2),
-                Nuclear_Market_Revenue: (nucGen * price).toFixed(2),
-                Geothermal_Market_Revenue: (geoGen * price).toFixed(2),
-                CCS_Market_Revenue: (ccsGen * price).toFixed(2),
-                REC_Cost: ((load - result.matched_profile[i]) * recPrice).toFixed(2),
-                Hourly_Net_Cost: ((solarGen * (financials.solar_price - price)) +
-                    (windGen * (financials.wind_price - price)) +
-                    (nucGen * (financials.nuc_price - price)) +
-                    (geoGen * (financials.geo_price - price)) +
-                    (ccsGen * (financials.ccs_price - price)) +
-                    ((load - result.matched_profile[i]) * recPrice)).toFixed(2)
-            };
-        });
-
-        const csv = Papa.unparse(rows);
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `eighty760_detailed_results_${new Date().toISOString().split('T')[0]}.csv`;
-        a.click();
-        window.URL.revokeObjectURL(url);
+        // Use the shared helper which now includes Date/Time and Portfolio Summary
+        const csvContent = generateDetailedHourlyCSV(result, financials, selectedYear, activeAssets);
+        const filename = generateCSVFilename('detailed_results', selectedYear);
+        downloadCSV(csvContent, filename);
     };
 
     const handleDownloadPDF = async () => {

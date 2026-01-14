@@ -157,14 +157,13 @@ export default function FinancialAnalysisTab({ result, cvtaResult }: FinancialAn
 
     // Chart 5: Cost Breakdown Pie
     const costBreakdownData = {
-        labels: ['PPA Cost', 'REC Cost', 'Market Purchase'],
+        labels: ['PPA Cost', 'REC Cost'],
         datasets: [{
             data: [
                 result.total_ppa_cost,
-                result.rec_cost,
-                result.market_purchase_cost
+                result.rec_cost
             ],
-            backgroundColor: ['#ef4444', '#f97316', '#eab308'],
+            backgroundColor: ['#ef4444', '#f97316'],
             borderWidth: 2,
             borderColor: '#1e293b'
         }]
@@ -345,7 +344,7 @@ export default function FinancialAnalysisTab({ result, cvtaResult }: FinancialAn
 
                 {/* Chart 5: Cost Breakdown */}
                 <div className="bg-white dark:bg-navy-950/50 rounded-xl p-6 border border-gray-200 dark:border-white/10">
-                    <h3 className="text-lg font-semibold mb-4 text-navy-950 dark:text-white">Total Cost Breakdown</h3>
+                    <h3 className="text-lg font-semibold mb-4 text-navy-950 dark:text-white">PPA & REC Cost Breakdown</h3>
                     <div className="h-64">
                         <Doughnut data={costBreakdownData} options={pieOptions} />
                     </div>

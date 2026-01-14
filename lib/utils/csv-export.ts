@@ -3,11 +3,32 @@ import { SimulationResult } from '../aggregation/types';
 /**
  * Converts simulation result to CSV format with 8760 hourly data
  */
-export function generateHourlyCSV(result: SimulationResult, year?: number | string, scenarioName?: string): string {
+export function generateHourlyCSV(result: SimulationResult, year?: number | string, scenarioName?: string, activeAssets?: import('../aggregation/types').GenerationAsset[]): string {
     const rows: string[] = [];
 
-    // Header row
+    // --- Portfolio Summary Header ---
+    if (activeAssets) {
+        rows.push('Portfolio Configuration');
+
+        // Summarize capacities
+        const capacityMap: Record<string, number> = {};
+        let totalCap = 0;
+        activeAssets.forEach(a => {
+            capacityMap[a.type] = (capacityMap[a.type] || 0) + a.capacity_mw;
+            totalCap += a.capacity_mw;
+        });
+
+        rows.push(`Total Capacity (MW),${totalCap.toFixed(2)}`);
+        Object.entries(capacityMap).forEach(([type, cap]) => {
+            rows.push(`${type} Capacity (MW),${cap.toFixed(2)}`);
+        });
+        rows.push(`Total Load (MWh),${result.total_load_mwh.toLocaleString()}`);
+        rows.push(''); // Empty line for separation
+    }
+
+    // --- Column Headers ---
     const headers = [
+        'Date/Time', // New
         'Hour',
         ...(year ? ['Year'] : []),
         ...(scenarioName ? ['Scenario'] : []),
@@ -30,10 +51,32 @@ export function generateHourlyCSV(result: SimulationResult, year?: number | stri
     ];
     rows.push(headers.join(','));
 
-    // Data rows (8760 hours)
+    // --- Data Rows ---
     const HOURS = 8760;
+    const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     for (let i = 0; i < HOURS; i++) {
+        // Calculate Date/Time
+        let dayOfYear = Math.floor(i / 24);
+        let hourOfDay = i % 24;
+        let monthIdx = 0;
+        let dayOfMonth = 0;
+
+        // Simple day mapping (ignores leap year for display simplicity unless strictly needed)
+        let tempDays = dayOfYear;
+        for (let m = 0; m < 12; m++) {
+            if (tempDays < monthDays[m]) {
+                monthIdx = m;
+                dayOfMonth = tempDays + 1;
+                break;
+            }
+            tempDays -= monthDays[m];
+        }
+        const dateTimeStr = `${monthNames[monthIdx]}-${dayOfMonth.toString().padStart(2, '0')} ${hourOfDay.toString().padStart(2, '0')}:00`;
+
         const row = [
+            dateTimeStr,
             i.toString(),
             ...(year ? [year.toString()] : []),
             ...(scenarioName ? [`"${scenarioName}"`] : []),
@@ -70,11 +113,29 @@ export function generateHourlyCSV(result: SimulationResult, year?: number | stri
  * Converts simulation result to CSV format with DETAILED financial breakdown
  * Matches the granularity of the Financial Analysis download
  */
-export function generateDetailedHourlyCSV(result: SimulationResult, financials: import('../aggregation/types').FinancialParams, year?: number | string): string {
+export function generateDetailedHourlyCSV(result: SimulationResult, financials: import('../aggregation/types').FinancialParams, year?: number | string, activeAssets?: import('../aggregation/types').GenerationAsset[]): string {
     const rows: string[] = [];
 
-    // Header row
+    // --- Portfolio Summary Header ---
+    if (activeAssets) {
+        rows.push('Portfolio Detailed Analysis');
+
+        let totalCap = 0;
+        const capacityMap: Record<string, number> = {};
+        activeAssets.forEach(a => {
+            capacityMap[a.type] = (capacityMap[a.type] || 0) + a.capacity_mw;
+            totalCap += a.capacity_mw;
+        });
+
+        rows.push(`Total Capacity (MW),${totalCap.toFixed(2)}`);
+        rows.push(`Total Annual Load (MWh),${result.total_load_mwh.toLocaleString()}`);
+        rows.push(`Net Cost ($),${result.total_cost_net.toLocaleString()}`);
+        rows.push('');
+    }
+
+    // --- Header row ---
     const headers = [
+        'Date/Time', // New
         'Hour',
         ...(year ? ['Year'] : []),
         'Load (MW)',
@@ -114,9 +175,29 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
     ];
     rows.push(headers.join(','));
 
-    // Data rows (8760 hours)
+    // --- Data rows ---
     const HOURS = 8760;
+    const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
     for (let i = 0; i < HOURS; i++) {
+        // Calculate Date/Time
+        let dayOfYear = Math.floor(i / 24);
+        let hourOfDay = i % 24;
+        let monthIdx = 0;
+        let dayOfMonth = 0;
+
+        let tempDays = dayOfYear;
+        for (let m = 0; m < 12; m++) {
+            if (tempDays < monthDays[m]) {
+                monthIdx = m;
+                dayOfMonth = tempDays + 1;
+                break;
+            }
+            tempDays -= monthDays[m];
+        }
+        const dateTimeStr = `${monthNames[monthIdx]}-${dayOfMonth.toString().padStart(2, '0')} ${hourOfDay.toString().padStart(2, '0')}:00`;
+
         const load = result.load_profile[i] || 0;
         const solarGen = result.solar_profile[i] || 0;
         const windGen = result.wind_profile[i] || 0;
@@ -151,6 +232,7 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
             recCost;
 
         const row = [
+            dateTimeStr,
             i.toString(),
             ...(year ? [year.toString()] : []),
             load.toFixed(2),

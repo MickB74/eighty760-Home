@@ -625,7 +625,7 @@ export function runAggregationSimulation(
         total_cost_net,
         avg_cost_per_mwh: total_load_mwh > 0 ? total_cost_net / total_load_mwh : 0,
         weighted_ppa_price: total_matched > 0 ? total_ppa_cost / total_matched : 0,
-        market_purchase_cost: gross_load_cost, // Return Gross Load Cost for display
+        market_purchase_cost: market_purchase_cost, // Return Deficit Cost (Net Market Purchase)
         total_gen_revenue: total_market_revenue,
         total_ppa_cost,  // Add total PPA cost for validation and display
 

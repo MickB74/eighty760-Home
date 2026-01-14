@@ -192,7 +192,7 @@ export default function MultiYearAnalysisTab({
         // Generate CSV for each year
         validResults.forEach(({ year, result }) => {
             const yearFinancials = { ...financials, market_year: year };
-            const csvContent = generateDetailedHourlyCSV(result, yearFinancials, year);
+            const csvContent = generateDetailedHourlyCSV(result, yearFinancials, year, assets);
             const filename = generateCSVFilename('financial_analysis', year);
             zip.file(filename, csvContent);
         });
