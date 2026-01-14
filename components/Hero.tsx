@@ -4,12 +4,14 @@ import HeroSimulator from './home/HeroSimulator';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import EnergyTicker from './home/EnergyTicker';
+import NewsTicker from './home/NewsTicker';
 
 export default function Hero() {
 
     return (
-        <header className="min-h-screen relative overflow-hidden gradient-mesh flex items-center pt-10">
+        <header className="min-h-screen relative overflow-hidden gradient-mesh flex items-center pt-20">
             <EnergyTicker />
+            <NewsTicker />
             {/* Background overlay for depth */}
             <div className="absolute inset-0 bg-white/80 dark:bg-navy-950/80 transition-colors duration-300"></div>
 
