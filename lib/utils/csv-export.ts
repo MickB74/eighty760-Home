@@ -24,6 +24,16 @@ export function generateHourlyCSV(result: SimulationResult, year?: number | stri
         });
         rows.push(`Total Load (MWh),${result.total_load_mwh.toLocaleString()}`);
         rows.push(''); // Empty line for separation
+
+        // Individual Asset List
+        rows.push('Asset Breakdown');
+        rows.push('Name,Type,Location,Capacity (MW)');
+        activeAssets.forEach(a => {
+            // Escape name in quotes if it contains comma
+            const cleanName = a.name.includes(',') ? `"${a.name}"` : a.name;
+            rows.push(`${cleanName},${a.type},${a.location},${a.capacity_mw.toFixed(2)}`);
+        });
+        rows.push(''); // Empty line for separation
     }
 
     // --- Column Headers ---
@@ -130,6 +140,14 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
         rows.push(`Total Capacity (MW),${totalCap.toFixed(2)}`);
         rows.push(`Total Annual Load (MWh),${result.total_load_mwh.toLocaleString()}`);
         rows.push(`Net Cost ($),${result.total_cost_net.toLocaleString()}`);
+
+        rows.push('');
+        rows.push('Asset Breakdown');
+        rows.push('Name,Type,Location,Capacity (MW)');
+        activeAssets.forEach(a => {
+            const cleanName = a.name.includes(',') ? `"${a.name}"` : a.name;
+            rows.push(`${cleanName},${a.type},${a.location},${a.capacity_mw.toFixed(2)}`);
+        });
         rows.push('');
     }
 
