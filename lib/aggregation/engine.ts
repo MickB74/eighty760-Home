@@ -150,6 +150,36 @@ export function generateGenProfile(capacity_mw: number, type: string, capacity_f
     const seedMap: Record<string, number> = { 'Solar': 500, 'Wind': 600, 'Geothermal': 700, 'Nuclear': 800, 'CCS Gas': 900 };
     const rng = new SeededRNG(seedMap[type] || 999);
 
+    // Nuclear Refueling Schedule (Pseudo-random but deterministic per seed)
+    // Typically refueling is every 18-24 months. We'll simulate a 50% chance of a refueling outage in this year.
+    // Outage duration ~ 2-3 weeks (15-20 days).
+    let nuclearOutageStart = -1;
+    let nuclearOutageDuration = 0;
+    if (type === 'Nuclear') {
+        const hasRefueling = rng.random() > 0.5; // 50% chance of refueling this year
+        if (hasRefueling) {
+            // Schedule in Spring (March-May) or Fall (Sept-Nov) to avoid peaks
+            const isSpring = rng.random() > 0.5;
+            const startMonth = isSpring ? 2 : 8; // March (2) or Sept (8)
+            const startDay = Math.floor(rng.random() * 30);
+            nuclearOutageStart = (startMonth * 30 + startDay) * 24;
+            nuclearOutageDuration = (14 + Math.floor(rng.random() * 10)) * 24; // 14-24 days
+        }
+    }
+
+    // CCS Gas Maintenance Schedule
+    // 2 outages per year, ~5-10 days each
+    const ccsOutages: { start: number, duration: number }[] = [];
+    if (type === 'CCS Gas') {
+        // Spring outage
+        const springStart = (2 * 30 + Math.floor(rng.random() * 60)) * 24; // March-April
+        ccsOutages.push({ start: springStart, duration: (5 + Math.floor(rng.random() * 6)) * 24 });
+
+        // Fall outage
+        const fallStart = (8 * 30 + Math.floor(rng.random() * 60)) * 24; // Sept-Oct
+        ccsOutages.push({ start: fallStart, duration: (5 + Math.floor(rng.random() * 6)) * 24 });
+    }
+
     for (let h = 0; h < HOURS; h++) {
         const hour = h % 24;
         const day = Math.floor(h / 24); // 0-364
@@ -183,12 +213,61 @@ export function generateGenProfile(capacity_mw: number, type: string, capacity_f
 
             profile[h] = raw * capacity_mw;
 
-        } else if (type === 'Geothermal' || type === 'CCS Gas' || type === 'Nuclear') {
+        } else if (type === 'Geothermal') {
             // Baseload
-            const noiseMag = type === 'Geothermal' ? 0.01 : 0.005;
+            const noiseMag = 0.01;
             const noise = rng.normal(0, noiseMag * capacity_mw);
             profile[h] = Math.max(0, Math.min(capacity_mw, capacity_mw + noise));
-            if (type === 'Nuclear') profile[h] = capacity_mw; // Nuclear is strictly flat here
+
+        } else if (type === 'Nuclear') {
+            // Baseload with outages
+            // Refueling Outage?
+            if (nuclearOutageStart >= 0 && h >= nuclearOutageStart && h < nuclearOutageStart + nuclearOutageDuration) {
+                profile[h] = 0;
+            } else {
+                // Occasional Forced Outage / Trip (rare, 0.5% chance per day to trip for 24h)
+                // We'll roll once per day
+                const dayStartHour = day * 24;
+                // Use a seeded value for the day
+                // Note: This is simplified, strictly we should track state. 
+                // But for stateless profile gen, we can use deterministic hashing of the day.
+                const dayRoll = Math.sin(day * 999 + seedMap[type]) * 10000;
+                const isForcedOutage = (dayRoll - Math.floor(dayRoll)) > 0.995; // 0.5% chance
+
+                if (isForcedOutage) {
+                    profile[h] = 0;
+                } else {
+                    // Normal Operation - Very flat, tiny noise
+                    const noise = rng.normal(0, 0.002 * capacity_mw); // 0.2% noise
+                    profile[h] = Math.max(0, Math.min(capacity_mw, capacity_mw + noise));
+                }
+            }
+
+        } else if (type === 'CCS Gas') {
+            // Baseload with maintenance and forced outages
+            let isOutage = false;
+            for (const out of ccsOutages) {
+                if (h >= out.start && h < out.start + out.duration) {
+                    isOutage = true;
+                    break;
+                }
+            }
+
+            if (isOutage) {
+                profile[h] = 0;
+            } else {
+                // Forced outage chance (higher than nuclear, ~1% per day)
+                const dayRoll = Math.sin(day * 888 + seedMap[type]) * 10000;
+                const isForcedOutage = (dayRoll - Math.floor(dayRoll)) > 0.99; // 1% chance
+
+                if (isForcedOutage) {
+                    profile[h] = 0;
+                } else {
+                    // Normal Op - Some thermal efficiency variance
+                    const noise = rng.normal(0, 0.02 * capacity_mw); // 2% noise
+                    profile[h] = Math.max(0, Math.min(capacity_mw, capacity_mw + noise));
+                }
+            }
         }
     }
     // Scaling Logic: If capacity_factor is provided, scale the profile to match it
