@@ -25,7 +25,7 @@ export function recommendPortfolio(
     const rec: TechCapacity = {
         Solar: existing_capacities.Solar || 0,
         Wind: existing_capacities.Wind || 0,
-        Geothermal: existing_capacities.Geothermal || 0,
+        Geothermal: 0, // Exclude Geothermal from Smart Fill as per request
         Nuclear: existing_capacities.Nuclear || 0,
         'CCS Gas': existing_capacities['CCS Gas'] || 0,
         Battery_MW: existing_capacities.Battery_MW || 0,

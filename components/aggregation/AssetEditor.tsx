@@ -125,7 +125,13 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                                         return {
                                                             ...a,
                                                             type,
-                                                            location: type === 'Wind' ? 'West' : a.location
+                                                            location:
+                                                                type === 'Solar' ? 'North' :
+                                                                    type === 'Wind' ? 'West' :
+                                                                        type === 'Nuclear' ? 'North' :
+                                                                            type === 'Geothermal' ? 'West' :
+                                                                                type === 'CCS Gas' ? 'Houston' :
+                                                                                    a.location
                                                         };
                                                     }
                                                     return a;
@@ -186,8 +192,14 @@ export default function AssetEditor({ assets, onUpdate }: AssetEditorProps) {
                                     value={newAsset.type}
                                     onChange={e => {
                                         const type = e.target.value as GenerationAsset['type'];
-                                        // Auto-select West for Wind as per user preference
-                                        const location = type === 'Wind' ? 'West' : newAsset.location;
+                                        // Auto-select location based on type defaults
+                                        let location = newAsset.location;
+                                        if (type === 'Solar') location = 'North';
+                                        if (type === 'Wind') location = 'West';
+                                        if (type === 'Nuclear') location = 'North';
+                                        if (type === 'Geothermal') location = 'West';
+                                        if (type === 'CCS Gas') location = 'Houston';
+
                                         setNewAsset({ ...newAsset, type, location });
                                     }}
                                 >
