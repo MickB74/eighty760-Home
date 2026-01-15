@@ -544,7 +544,13 @@ export default function AggregationPage() {
 
     // Memoize active assets key to avoid complex dependency warning
     const activeAssetsKey = useMemo(() => {
-        return JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location, type: a.type })));
+        return JSON.stringify(activeAssets.map(a => ({
+            id: a.id,
+            capacity_mw: a.capacity_mw,
+            location: a.location,
+            type: a.type,
+            capacity_factor: a.capacity_factor
+        })));
     }, [activeAssets]);
 
     // Run sim when key inputs change (debounced to avoid excessive re-renders)
@@ -556,7 +562,7 @@ export default function AggregationPage() {
 
         const timeoutId = setTimeout(() => {
             runSimulation();
-        }, 300); // 300ms debounce
+        }, 150); // 150ms debounce
 
         return () => clearTimeout(timeoutId);
     }, [
