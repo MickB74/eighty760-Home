@@ -11,7 +11,7 @@ import {
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
 export default function MarketDataTab() {
-    const [currentTime, setCurrentTime] = useState(new Date());
+    const [lastUpdated, setLastUpdated] = useState<string>('');
     const [load, setLoad] = useState(0);
     const [capacity, setCapacity] = useState(0);
     const [gasPrice, setGasPrice] = useState(2.84);
@@ -36,7 +36,6 @@ export default function MarketDataTab() {
         updateData();
 
         const interval = setInterval(() => {
-            setCurrentTime(new Date());
             updateData();
         }, 60000);
 
@@ -56,6 +55,18 @@ export default function MarketDataTab() {
                 const statusData = await statusRes.json();
                 const mixData = await mixRes.json();
                 setUsingRealData(true);
+
+                // 0. Update Timestamp
+                // Format: 2026-01-15 11:01:33-0600 -> Local Time
+                if (statusData.lastUpdated) {
+                    const date = new Date(statusData.lastUpdated);
+                    if (!isNaN(date.getTime())) {
+                        setLastUpdated(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                    } else {
+                        // Fallback parse if Date string format is non-standard or needs tweaks
+                        setLastUpdated(statusData.lastUpdated.split(' ')[1].slice(0, 5));
+                    }
+                }
 
                 // 1. Reserves from Status
                 const reservesVal = parseFloat(statusData.current_condition.prc_value.replace(/,/g, ''));
@@ -485,8 +496,8 @@ export default function MarketDataTab() {
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl font-mono text-navy-950 dark:text-white font-bold">{currentTime.toLocaleTimeString()}</p>
-                    <p className="text-xs text-gray-500">{currentTime.toLocaleDateString()}</p>
+                    <p className="text-2xl font-mono text-navy-950 dark:text-white font-bold">{lastUpdated || '--:--'}</p>
+                    <p className="text-xs text-gray-500">Last Data Update</p>
                 </div>
             </div>
 

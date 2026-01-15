@@ -4,18 +4,16 @@ import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 interface PriceData {
-    HB_NORTH: string;
-    HB_SOUTH: string;
-    HB_WEST: string;
-    HB_HOUSTON: string;
-    LZ_NORTH: string;
-    LZ_SOUTH: string;
-    LZ_WEST: string;
-    LZ_HOUSTON: string;
+    [key: string]: string; // Dynamic keys
+}
+
+interface TickerResponse {
+    prices: PriceData;
+    timestamp?: string;
 }
 
 export default function PriceTicker() {
-    const [prices, setPrices] = useState<PriceData | null>(null);
+    const [data, setData] = useState<TickerResponse | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -24,7 +22,7 @@ export default function PriceTicker() {
                 if (res.ok) {
                     const json = await res.json();
                     if (json.prices) {
-                        setPrices(json.prices);
+                        setData(json);
                     }
                 }
             } catch (err) {
@@ -37,7 +35,7 @@ export default function PriceTicker() {
         return () => clearInterval(interval);
     }, []);
 
-    const displayPrices = prices || {
+    const displayPrices = data?.prices || {
         HB_NORTH: "28.50", HB_SOUTH: "27.80", HB_WEST: "22.10", HB_HOUSTON: "31.40",
         LZ_NORTH: "28.90", LZ_SOUTH: "28.10", LZ_WEST: "23.50", LZ_HOUSTON: "32.80"
     };
@@ -51,6 +49,7 @@ export default function PriceTicker() {
         { label: 'LZ_SOUTH', value: displayPrices.LZ_SOUTH },
         { label: 'LZ_WEST', value: displayPrices.LZ_WEST },
         { label: 'LZ_HOUSTON', value: displayPrices.LZ_HOUSTON },
+        { label: 'UPDATED', value: data?.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'LIVE' },
     ];
 
     // Marquee duplication
