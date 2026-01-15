@@ -33,7 +33,7 @@ export default function NewsTicker() {
     const marqueeContent = [...headlines, ...headlines, ...headlines];
 
     return (
-        <div className="w-full bg-white/5 border-b border-white/5 backdrop-blur-sm overflow-hidden z-40 h-8 flex items-center absolute top-10 left-0">
+        <div className="w-full bg-white/5 border-b border-white/5 backdrop-blur-sm overflow-hidden z-40 h-8 flex items-center relative">
             {/* Label */}
             <div className="absolute left-0 h-full bg-navy-950/80 px-4 flex items-center z-10 border-r border-white/10">
                 <span className="text-[10px] font-bold tracking-widest text-red-400 uppercase">Breaking News</span>
@@ -50,7 +50,14 @@ export default function NewsTicker() {
             >
                 {marqueeContent.map((item, i) => (
                     <div key={i} className="flex items-center px-8 text-[11px] font-medium tracking-wide text-slate-300">
-                        <span>{item}</span>
+                        <a
+                            href={`https://news.google.com/search?q=${encodeURIComponent(item)}&hl=en-US&gl=US&ceid=US:en`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-energy-green transition-colors cursor-pointer"
+                        >
+                            {item}
+                        </a>
                         <span className="ml-8 text-white/5 mx-2">•</span>
                     </div>
                 ))}
