@@ -527,9 +527,21 @@ export default function AggregationPage() {
                 recPrice = HISTORICAL_REC_PRICES[selectedYear];
             }
 
-            // Calculate and update average price
-            if (prices && prices.length > 0) {
-                const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
+            // Calculate and update average price across ALL hubs (User Request)
+            const allHubsPrices = Object.values(hubMap);
+            if (allHubsPrices.length > 0) {
+                let totalSum = 0;
+                let totalCount = 0;
+
+                allHubsPrices.forEach(hPrices => {
+                    if (hPrices && hPrices.length > 0) {
+                        totalSum += hPrices.reduce((a, b) => a + b, 0);
+                        totalCount += hPrices.length;
+                    }
+                });
+
+                const avg = totalCount > 0 ? totalSum / totalCount : 0;
+
                 setFinancials(prev => ({
                     ...prev,
                     market_price_avg: parseFloat(avg.toFixed(2)),
@@ -900,35 +912,7 @@ export default function AggregationPage() {
 
                                 {/* Right Col: Default Locations & Financials (Cols 6-12) */}
                                 <div className="lg:col-span-7 space-y-6">
-                                    <div className="p-4 bg-gray-50 dark:bg-white/5 rounded-xl border border-gray-200 dark:border-white/5">
-                                        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-                                            <span>Default Asset Locations</span>
-                                            <span className="text-xs font-normal px-2 py-0.5 bg-gray-200 dark:bg-white/10 rounded-full text-gray-600 dark:text-gray-300">Simple Mode</span>
-                                        </h4>
-                                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                                            {[
-                                                { label: 'Solar', value: solarHub, setter: setSolarHub },
-                                                { label: 'Wind', value: windHub, setter: setWindHub },
-                                                { label: 'Nuclear', value: nuclearHub, setter: setNuclearHub },
-                                                { label: 'Geothermal', value: geothermalHub, setter: setGeothermalHub },
-                                                { label: 'CCS Gas', value: ccsHub, setter: setCcsHub },
-                                            ].map((item) => (
-                                                <div key={item.label}>
-                                                    <label className="text-xs text-gray-500 dark:text-gray-400 block mb-1">{item.label} Hub</label>
-                                                    <select
-                                                        value={item.value}
-                                                        onChange={(e) => item.setter(e.target.value)}
-                                                        className="w-full p-2 rounded bg-white dark:bg-black/20 border border-gray-200 dark:border-white/10 text-sm"
-                                                        disabled={typeof selectedYear !== 'number'}
-                                                    >
-                                                        {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                            <option key={h} value={h} className="bg-white dark:bg-navy-950">{h}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
+
 
                                     <div>
                                         <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-4">Financial Assumptions</h4>
