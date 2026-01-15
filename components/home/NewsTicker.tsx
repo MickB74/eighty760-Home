@@ -1,17 +1,33 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
 export default function NewsTicker() {
-    // Simulated live news headlines
-    const headlines = [
-        "ERCOT: Grid operating normally, sufficient generation available.",
-        "MARKET: Solar output hits new daily record of 18 GW.",
-        "WEATHER: Cold front approaching North Texas, demand expected to rise.",
-        "REGULATORY: PUC discusses new battery storage interconnection rules.",
-        "PRICE ALERT: Real-time prices stable at $25/MWh.",
-        "INDUSTRY: Texas leads nation in new utility-scale wind capacity.",
-    ];
+    const [headlines, setHeadlines] = useState<string[]>([
+        "Loading live energy news...",
+    ]);
+
+    useEffect(() => {
+        const fetchNews = async () => {
+            try {
+                const res = await fetch('/api/news');
+                if (res.ok) {
+                    const json = await res.json();
+                    if (json.headlines && json.headlines.length > 0) {
+                        setHeadlines(json.headlines);
+                    }
+                }
+            } catch (err) {
+                console.error("Failed to fetch news:", err);
+            }
+        };
+
+        fetchNews();
+        // Refresh every 5 minutes
+        const interval = setInterval(fetchNews, 300000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Duplicated for seamless loop
     const marqueeContent = [...headlines, ...headlines, ...headlines];
