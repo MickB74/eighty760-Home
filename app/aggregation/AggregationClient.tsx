@@ -382,55 +382,49 @@ export default function AggregationPage() {
 
     useEffect(() => {
         const loadProfiles = async () => {
-            // Only proceed if we have a valid numeric year (2020-2025)
-            // If Synthetic or Average, we skip loading specific profiles (engine falls back to synthetic)
             if (typeof selectedYear !== 'number') return;
 
+            const missingAssets = activeAssets.filter(a =>
+                (a.type === 'Solar' || a.type === 'Wind') && !genProfiles[a.id]
+            );
+
+            if (missingAssets.length === 0) return;
+
+            // Fetch missing profiles
             const newProfiles: Record<string, number[]> = {};
-            const promises: Promise<void>[] = [];
+            const promises = missingAssets.map(async (asset) => {
+                const tech = asset.type;
+                let loc = asset.location;
+                // Determine URL based on TMY toggle
+                let url = `/data/profiles/${tech}_${loc}_${selectedYear}.json`;
+                if (useTMY) {
+                    url = `/data/profiles/${tech}_${loc}_TMY.json`;
+                }
 
-            // Identify unique profiles needed
-            // Key format in file: `{Tech}_{Location}_{Year}.json` e.g. Solar_North_2023.json
-            // We map this to asset.id in the state so engine can look it up easily.
-
-            activeAssets.forEach(asset => {
-                if (asset.type === 'Solar' || asset.type === 'Wind') {
-                    // normalize location
-                    let loc = asset.location;
-                    // ensure simple name "North", "South" etc. (AssetEditor uses these)
-
-                    const tech = asset.type;
-
-                    // Determine URL based on TMY toggle
-                    let url = `/data/profiles/${tech}_${loc}_${selectedYear}.json`;
-                    if (useTMY) {
-                        url = `/data/profiles/${tech}_${loc}_TMY.json`;
+                try {
+                    const res = await fetch(url);
+                    if (res.ok) {
+                        const data = await res.json();
+                        newProfiles[asset.id] = data;
                     }
-
-                    // Check if already loaded in current state (optimization)
-                    // But we are rebuilding 'newProfiles' to be clean.
-                    // Actually, let's just fetch everything needed for current state.
-
-                    const p = fetch(url).then(async (res) => {
-                        if (res.ok) {
-                            const data = await res.json();
-                            newProfiles[asset.id] = data;
-                        } else {
-                            // console.warn(`Profile not found: ${url}`);
-                        }
-                    }).catch(e => console.error(e));
-                    promises.push(p);
+                } catch (e) {
+                    console.error(`Failed to load profile for ${asset.name}`, e);
                 }
             });
 
             if (promises.length > 0) {
                 await Promise.all(promises);
-                setGenProfiles(newProfiles);
+                if (Object.keys(newProfiles).length > 0) {
+                    setGenProfiles(prev => ({
+                        ...prev,
+                        ...newProfiles
+                    }));
+                }
             }
         };
 
         loadProfiles();
-    }, [selectedYear, activeAssets, useTMY]);
+    }, [selectedYear, activeAssets, useTMY, genProfiles]);
 
     const runSimulation = useCallback(() => {
         setLoading(true);
