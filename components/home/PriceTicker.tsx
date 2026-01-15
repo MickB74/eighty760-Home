@@ -60,8 +60,8 @@ export default function PriceTicker() {
     const marqueeItems = [...items, ...items, ...items];
 
     return (
-        <div className="w-full bg-slate-900 border-b border-slate-800 overflow-hidden h-10 flex items-center absolute top-[72px] left-0 z-30">
-            <div className="absolute left-0 h-full bg-slate-900 px-4 flex items-center z-10 border-r border-slate-800 shadow-md">
+        <div className="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-hidden h-10 flex items-center relative z-30">
+            <div className="absolute left-0 h-full bg-white dark:bg-slate-900 px-4 flex items-center z-10 border-r border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-md">
                 <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase">Real-Time LMP</span>
             </div>
 
@@ -76,9 +76,14 @@ export default function PriceTicker() {
             >
                 {marqueeItems.map((item, i) => (
                     <div key={i} className="flex items-center px-6 text-sm font-mono">
-                        <span className="text-slate-500 mr-2 font-semibold">{item.label}</span>
-                        <span className="text-emerald-400 font-bold">${item.value}</span>
-                        <span className="ml-6 text-slate-800">|</span>
+                        <span className="text-gray-500 mr-2 font-bold">{item.label}:</span>
+                        <span className={`${item.label === 'UPDATED' || item.label === 'DATA SOURCE'
+                                ? (item.label === 'DATA SOURCE'
+                                    ? 'text-amber-600 dark:text-amber-500'
+                                    : 'text-gray-900 dark:text-white')
+                                : 'text-emerald-600 dark:text-emerald-400'
+                            } font-medium tracking-tight`}>{item.value}</span>
+                        <span className="ml-6 text-slate-300 dark:text-slate-700">|</span>
                     </div>
                 ))}
             </motion.div>

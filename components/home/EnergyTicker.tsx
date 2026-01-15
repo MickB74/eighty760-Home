@@ -46,15 +46,15 @@ export default function EnergyTicker() {
     };
 
     const items = [
-        { label: 'ERCOT LOAD', value: `${displayData.load.toLocaleString()} MW`, color: 'text-blue-400' },
-        { label: 'HENRY HUB', value: `$${displayData.gasPrice.toFixed(2)}`, color: 'text-green-400' },
-        { label: 'CARBON ITY', value: `${displayData.carbonIntensity} g/kWh`, color: 'text-gray-400' },
-        { label: 'SOLAR', value: `${displayData.solarOutput.toLocaleString()} MW`, color: 'text-yellow-400' },
-        { label: 'WIND', value: `${displayData.windOutput.toLocaleString()} MW`, color: 'text-cyan-400' },
+        { label: 'ERCOT LOAD', value: `${displayData.load.toLocaleString()} MW`, color: 'text-blue-600 dark:text-blue-400' },
+        { label: 'HENRY HUB', value: `$${displayData.gasPrice.toFixed(2)}`, color: 'text-green-600 dark:text-green-400' },
+        { label: 'CARBON ITY', value: `${displayData.carbonIntensity} g/kWh`, color: 'text-gray-600 dark:text-gray-400' },
+        { label: 'SOLAR', value: `${displayData.solarOutput.toLocaleString()} MW`, color: 'text-yellow-600 dark:text-yellow-400' },
+        { label: 'WIND', value: `${displayData.windOutput.toLocaleString()} MW`, color: 'text-cyan-600 dark:text-cyan-400' },
         {
             label: displayData.isRealData ? 'UPDATED' : 'DATA SOURCE',
             value: displayData.isRealData && displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED',
-            color: displayData.isRealData ? 'text-white' : 'text-amber-500'
+            color: displayData.isRealData ? 'text-gray-900 dark:text-white' : 'text-amber-600 dark:text-amber-500'
         },
     ];
 
@@ -62,7 +62,7 @@ export default function EnergyTicker() {
     const marqueeItems = [...items, ...items, ...items, ...items];
 
     return (
-        <div className="w-full bg-navy-950/90 border-b border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center absolute top-0 left-0">
+        <div className="w-full bg-white/95 dark:bg-navy-950/90 border-b border-slate-200 dark:border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center relative">
             <motion.div
                 className="flex whitespace-nowrap"
                 animate={{ x: [0, "-25%"] }}
@@ -76,7 +76,7 @@ export default function EnergyTicker() {
                     <div key={i} className="flex items-center px-8 text-xs font-mono tracking-wider">
                         <span className="text-gray-500 mr-2 font-bold">{item.label}:</span>
                         <span className={`${item.color} font-medium`}>{item.value}</span>
-                        <span className="ml-8 text-white/10">|</span>
+                        <span className="ml-8 text-slate-300 dark:text-white/10">|</span>
                     </div>
                 ))}
             </motion.div>
