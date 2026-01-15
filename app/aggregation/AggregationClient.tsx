@@ -527,7 +527,7 @@ export default function AggregationPage() {
                 recPrice = HISTORICAL_REC_PRICES[selectedYear];
             }
 
-            // Calculate and update average price across ALL hubs (User Request)
+            // Calculate and update average price across ALL hubs (User Request - Restored)
             const allHubsPrices = Object.values(hubMap);
             if (allHubsPrices.length > 0) {
                 let totalSum = 0;
@@ -633,7 +633,7 @@ export default function AggregationPage() {
         if (!result) return;
 
         // Use the shared helper which now includes Date/Time and Portfolio Summary
-        const csvContent = generateDetailedHourlyCSV(result, financials, selectedYear, activeAssets);
+        const csvContent = generateDetailedHourlyCSV(result, financials, selectedYear, activeAssets, allHubPrices);
         const filename = generateCSVFilename('detailed_results', selectedYear);
         downloadCSV(csvContent, filename);
     };

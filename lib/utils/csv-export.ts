@@ -133,7 +133,7 @@ export function generateHourlyCSV(result: SimulationResult, year?: number | stri
  * Converts simulation result to CSV format with DETAILED financial breakdown
  * Matches the granularity of the Financial Analysis download
  */
-export function generateDetailedHourlyCSV(result: SimulationResult, financials: import('../aggregation/types').FinancialParams, year?: number | string, activeAssets?: import('../aggregation/types').GenerationAsset[]): string {
+export function generateDetailedHourlyCSV(result: SimulationResult, financials: import('../aggregation/types').FinancialParams, year?: number | string, activeAssets?: import('../aggregation/types').GenerationAsset[], hubPrices?: Record<string, number[]>): string {
     const rows: string[] = [];
 
     // --- Portfolio Summary Header ---
@@ -162,6 +162,9 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
         rows.push('');
     }
 
+    // Identify available extra hubs
+    const extraHubs = hubPrices ? Object.keys(hubPrices).sort() : [];
+
     // --- Header row ---
     const headers = [
         'Date/Time', // New
@@ -181,6 +184,7 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
         'Battery Charge (MW)',
         // Financial Details
         'Market Price ($/MWh)',
+        ...extraHubs.map(h => `${h} Price ($/MWh)`), // Add extra hub headers
         'REC Price ($/MWh)',
         // PPA Prices
         'Solar PPA Price ($/MWh)',
@@ -248,6 +252,7 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
         const solarRev = solarGen * price;
         const windRev = windGen * price;
         const nucRev = nucGen * price;
+
         const geoRev = geoGen * price;
         const ccsRev = ccsGen * price;
 
@@ -276,6 +281,7 @@ export function generateDetailedHourlyCSV(result: SimulationResult, financials: 
             batteryDischarge.toFixed(2),
             result.battery_charge[i]?.toFixed(2) || '0',
             price.toFixed(2),
+            ...extraHubs.map(h => (hubPrices?.[h]?.[i] || 0).toFixed(2)),
             recPrice.toFixed(2),
             financials.solar_price.toFixed(2),
             financials.wind_price.toFixed(2),
