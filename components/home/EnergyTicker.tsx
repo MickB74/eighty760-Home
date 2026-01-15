@@ -10,6 +10,7 @@ interface TickerData {
     solarOutput: number;
     windOutput: number;
     timestamp?: string;
+    isRealData?: boolean;
 }
 
 export default function EnergyTicker() {
@@ -39,7 +40,9 @@ export default function EnergyTicker() {
         gasPrice: 3.10,
         carbonIntensity: 380,
         solarOutput: 8500,
-        windOutput: 12000
+        windOutput: 12000,
+        timestamp: new Date().toISOString(),
+        isRealData: false
     };
 
     const items = [
@@ -49,9 +52,9 @@ export default function EnergyTicker() {
         { label: 'SOLAR', value: `${displayData.solarOutput.toLocaleString()} MW`, color: 'text-yellow-400' },
         { label: 'WIND', value: `${displayData.windOutput.toLocaleString()} MW`, color: 'text-cyan-400' },
         {
-            label: 'UPDATED',
-            value: displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'LIVE',
-            color: 'text-white'
+            label: displayData.isRealData ? 'UPDATED' : 'DATA SOURCE',
+            value: displayData.isRealData && displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED',
+            color: displayData.isRealData ? 'text-white' : 'text-amber-500'
         },
     ];
 

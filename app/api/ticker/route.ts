@@ -39,7 +39,8 @@ export async function GET() {
             solarOutput,
             windOutput,
             prices: ercotPrices || generateSimulatedPrices(),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            isRealData: !!(load && ercotPrices)
         });
     } catch (error) {
         console.error('Ticker API error:', error);
@@ -51,7 +52,8 @@ export async function GET() {
             solarOutput: 8400,
             windOutput: 12500,
             prices: generateSimulatedPrices(),
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            isRealData: false
         });
     }
 }

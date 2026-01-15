@@ -224,6 +224,7 @@ export default function MarketDataTab() {
 
         setLoad(simLoad);
         setCapacity(Math.round(targetLoad + 5000 + Math.random() * 1000)); // Reserves ~5GW
+        setLastUpdated(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 
         // Random walk gas price slightly
         const simGasPrice = Math.max(1.5, Math.min(5.0, 2.84 + (Math.random() - 0.5) * 0.1));
@@ -496,8 +497,12 @@ export default function MarketDataTab() {
                     </div>
                 </div>
                 <div className="text-right">
-                    <p className="text-2xl font-mono text-navy-950 dark:text-white font-bold">{lastUpdated || '--:--'}</p>
-                    <p className="text-xs text-gray-500">Last Data Update</p>
+                    <p className={`text-2xl font-mono font-bold ${usingRealData ? 'text-navy-950 dark:text-white' : 'text-amber-500'}`}>
+                        {usingRealData ? (lastUpdated || '--:--') : 'SIMULATED'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                        {usingRealData ? 'Last Data Update' : 'Data Mode'}
+                    </p>
                 </div>
             </div>
 

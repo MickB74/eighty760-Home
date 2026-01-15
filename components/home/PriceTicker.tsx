@@ -10,6 +10,7 @@ interface PriceData {
 interface TickerResponse {
     prices: PriceData;
     timestamp?: string;
+    isRealData?: boolean;
 }
 
 export default function PriceTicker() {
@@ -49,7 +50,10 @@ export default function PriceTicker() {
         { label: 'LZ_SOUTH', value: displayPrices.LZ_SOUTH },
         { label: 'LZ_WEST', value: displayPrices.LZ_WEST },
         { label: 'LZ_HOUSTON', value: displayPrices.LZ_HOUSTON },
-        { label: 'UPDATED', value: data?.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'LIVE' },
+        {
+            label: data?.isRealData ? 'UPDATED' : 'DATA SOURCE',
+            value: data?.isRealData && data?.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED'
+        },
     ];
 
     // Marquee duplication
