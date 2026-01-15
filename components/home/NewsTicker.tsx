@@ -33,7 +33,7 @@ export default function NewsTicker() {
     const marqueeContent = [...headlines, ...headlines, ...headlines];
 
     return (
-        <div className="w-full bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5 backdrop-blur-sm overflow-hidden z-40 h-8 flex items-center relative">
+        <div className="w-full bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-white/5 backdrop-blur-sm overflow-hidden z-40 h-8 flex items-center absolute top-10 left-0">
             {/* Label */}
             <div className="absolute left-0 h-full bg-slate-100 dark:bg-navy-950/80 px-4 flex items-center z-10 border-r border-slate-200 dark:border-white/10">
                 <span className="text-[10px] font-bold tracking-widest text-red-400 uppercase">Breaking News</span>
