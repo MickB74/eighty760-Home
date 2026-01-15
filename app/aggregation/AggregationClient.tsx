@@ -1065,13 +1065,54 @@ export default function AggregationPage() {
                                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">Mode:</span>
                                     <div className="flex bg-gray-100 dark:bg-black/20 rounded-lg p-1">
                                         <button
-                                            onClick={() => setUseAdvancedAssets(false)}
+                                            onClick={() => {
+                                                // Sync Advanced -> Simple (Aggregate)
+                                                setCapacities(prev => {
+                                                    const next = { ...prev };
+                                                    // Reset generation caps
+                                                    next.Solar = 0;
+                                                    next.Wind = 0;
+                                                    next.Geothermal = 0;
+                                                    next.Nuclear = 0;
+                                                    next['CCS Gas'] = 0;
+                                                    return next;
+                                                });
+
+                                                // Calculate totals and find hubs
+                                                const totals = { Solar: 0, Wind: 0, Geothermal: 0, Nuclear: 0, 'CCS Gas': 0 };
+                                                const hubs: Record<string, string> = {};
+
+                                                assets.forEach(a => {
+                                                    if (a.type in totals) {
+                                                        totals[a.type as keyof typeof totals] += a.capacity_mw;
+                                                        if (!hubs[a.type]) hubs[a.type] = a.location;
+                                                    }
+                                                });
+
+                                                setCapacities(prev => ({
+                                                    ...prev,
+                                                    ...totals
+                                                }));
+
+                                                if (hubs.Solar) setSolarHub(hubs.Solar);
+                                                if (hubs.Wind) setWindHub(hubs.Wind);
+                                                if (hubs.Geothermal) setGeothermalHub(hubs.Geothermal);
+                                                if (hubs.Nuclear) setNuclearHub(hubs.Nuclear);
+                                                if (hubs['CCS Gas']) setCcsHub(hubs['CCS Gas']);
+
+                                                setUseAdvancedAssets(false);
+                                            }}
                                             className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${!useAdvancedAssets ? 'bg-white dark:bg-white/10 shadow text-navy-950 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
                                         >
                                             Simple
                                         </button>
                                         <button
-                                            onClick={() => setUseAdvancedAssets(true)}
+                                            onClick={() => {
+                                                // Sync Simple -> Advanced (Hydrate)
+                                                // activeAssets currently holds the Simple representation
+                                                setAssets(activeAssets);
+                                                setUseAdvancedAssets(true);
+                                            }}
                                             className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${useAdvancedAssets ? 'bg-white dark:bg-white/10 shadow text-navy-950 dark:text-white' : 'text-gray-500 dark:text-gray-400'}`}
                                         >
                                             Advanced
@@ -1301,7 +1342,7 @@ export default function AggregationPage() {
                                                         <option value="Wind">Wind</option>
                                                         <option value="Nuclear">Nuclear</option>
                                                         <option value="Geothermal">Geothermal</option>
-                                                        <option value="CCS">Gas + CCS</option>
+                                                        <option value="CCS Gas">Gas + CCS</option>
                                                     </select>
                                                     <select
                                                         value={asset.location}
