@@ -15,24 +15,26 @@ export default function ResultsHeatmap({ data, title, min, max, unit = '' }: Res
     const dataMin = min !== undefined ? min : Math.min(...data);
     const dataMax = max !== undefined ? max : Math.max(...data);
 
-    // Helper to get color based on value (green = good/low, red = bad/high)
+    // Helper to get color based on value (red = bad/low, green = good/high)
     const getColor = (value: number) => {
         if (dataMax === dataMin) return 'rgb(34, 197, 94)'; // green-500
 
         const normalized = (value - dataMin) / (dataMax - dataMin);
 
-        // Green (low) -> Yellow (mid) -> Red (high)
+        // Red (low) -> Yellow (mid) -> Green (high)
         if (normalized < 0.5) {
-            // Green to Yellow
-            const r = Math.round(34 + (234 - 34) * (normalized * 2));
-            const g = Math.round(197 + (179 - 197) * (normalized * 2));
-            const b = Math.round(94 + (0 - 94) * (normalized * 2));
+            // Red to Yellow
+            // Red: (239, 68, 68) -> Yellow: (234, 179, 8)
+            const r = Math.round(239 + (234 - 239) * (normalized * 2));
+            const g = Math.round(68 + (179 - 68) * (normalized * 2));
+            const b = Math.round(68 + (8 - 68) * (normalized * 2));
             return `rgb(${r}, ${g}, ${b})`;
         } else {
-            // Yellow to Red
-            const r = Math.round(234 + (239 - 234) * ((normalized - 0.5) * 2));
-            const g = Math.round(179 + (68 - 179) * ((normalized - 0.5) * 2));
-            const b = Math.round(0);
+            // Yellow to Green
+            // Yellow: (234, 179, 8) -> Green: (34, 197, 94)
+            const r = Math.round(234 + (34 - 234) * ((normalized - 0.5) * 2));
+            const g = Math.round(179 + (197 - 179) * ((normalized - 0.5) * 2));
+            const b = Math.round(8 + (94 - 8) * ((normalized - 0.5) * 2));
             return `rgb(${r}, ${g}, ${b})`;
         }
     };
@@ -69,11 +71,11 @@ export default function ResultsHeatmap({ data, title, min, max, unit = '' }: Res
                 </div>
                 <div className="flex items-center gap-4 text-xs">
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-sm bg-green-500"></div>
+                        <div className="w-3 h-3 rounded-sm bg-red-500"></div>
                         <span className="text-slate-400">Low</span>
                     </div>
                     <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-sm bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-sm bg-green-500"></div>
                         <span className="text-slate-400">High</span>
                     </div>
                 </div>
