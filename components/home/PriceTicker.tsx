@@ -57,9 +57,9 @@ export default function PriceTicker() {
     const marqueeItems = [...items, ...items, ...items];
 
     return (
-        <div className="w-full bg-slate-900 border-y border-slate-800 overflow-hidden h-12 flex items-center relative z-20">
+        <div className="w-full bg-slate-900 border-b border-slate-800 overflow-hidden h-10 flex items-center absolute top-[72px] left-0 z-30">
             <div className="absolute left-0 h-full bg-slate-900 px-4 flex items-center z-10 border-r border-slate-800 shadow-md">
-                <span className="text-xs font-bold tracking-widest text-emerald-400 uppercase">Real-Time LMP</span>
+                <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase">Real-Time LMP</span>
             </div>
 
             <motion.div
