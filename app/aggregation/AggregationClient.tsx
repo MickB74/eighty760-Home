@@ -312,7 +312,38 @@ export default function AggregationPage() {
                 // Pass empty object for existing_capacities to force a fresh recommendation
                 // matching the load, rather than getting stuck in local minima from current slider values.
                 const rec = recommendPortfolio(totalLoad, 'Data Center', 0.95, {});
-                setCapacities(rec);
+
+                // 1. Update Battery
+                setCapacities(prev => ({
+                    ...prev,
+                    Battery_MW: rec.Battery_MW,
+                    Battery_Hours: rec.Battery_Hours
+                }));
+
+                // 2. Convert Generation Caps to Assets
+                const newAssets: GenerationAsset[] = [];
+                const techs = ['Solar', 'Wind', 'Geothermal', 'Nuclear', 'CCS Gas'];
+
+                techs.forEach(type => {
+                    const mw = (rec as any)[type] || 0;
+                    if (mw > 0) {
+                        let loc: any = loadHub === 'HB_NORTH' ? 'North' : loadHub; // Default for others
+                        if (type === 'Solar') loc = solarHub === 'HB_NORTH' ? 'North' : solarHub;
+                        if (type === 'Wind') loc = windHub === 'HB_NORTH' ? 'North' : windHub;
+                        if (type === 'Nuclear') loc = nuclearHub === 'HB_NORTH' ? 'North' : nuclearHub;
+                        if (type === 'Geothermal') loc = geothermalHub === 'HB_NORTH' ? 'North' : geothermalHub;
+                        if (type === 'CCS Gas') loc = ccsHub === 'HB_NORTH' ? 'North' : ccsHub;
+
+                        newAssets.push({
+                            id: crypto.randomUUID(),
+                            name: `Smart Fill ${type}`,
+                            type: type as GenerationAsset['type'],
+                            location: loc, // Use specific hub
+                            capacity_mw: mw
+                        });
+                    }
+                });
+                setAssets(newAssets);
             }
             setLoading(false);
         }, 100);
