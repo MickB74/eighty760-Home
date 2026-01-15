@@ -1093,7 +1093,7 @@ export default function AggregationPage() {
                                                     className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-energy-green cursor-pointer"
                                                 >
                                                     {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                        <option key={h} value={h}>{h}</option>
+                                                        <option key={h} value={h} className="bg-white dark:bg-navy-950 text-navy-950 dark:text-white">{h}</option>
                                                     ))}
                                                 </select>
                                             </label>
@@ -1120,7 +1120,7 @@ export default function AggregationPage() {
                                                     className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-blue-500 cursor-pointer"
                                                 >
                                                     {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                        <option key={h} value={h}>{h}</option>
+                                                        <option key={h} value={h} className="bg-white dark:bg-navy-950 text-navy-950 dark:text-white">{h}</option>
                                                     ))}
                                                 </select>
                                             </label>
@@ -1147,7 +1147,7 @@ export default function AggregationPage() {
                                                     className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-emerald-500 cursor-pointer"
                                                 >
                                                     {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                        <option key={h} value={h}>{h}</option>
+                                                        <option key={h} value={h} className="bg-white dark:bg-navy-950 text-navy-950 dark:text-white">{h}</option>
                                                     ))}
                                                 </select>
                                             </label>
@@ -1174,7 +1174,7 @@ export default function AggregationPage() {
                                                     className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-orange-500 cursor-pointer"
                                                 >
                                                     {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                        <option key={h} value={h}>{h}</option>
+                                                        <option key={h} value={h} className="bg-white dark:bg-navy-950 text-navy-950 dark:text-white">{h}</option>
                                                     ))}
                                                 </select>
                                             </label>
@@ -1201,7 +1201,7 @@ export default function AggregationPage() {
                                                     className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-indigo-500 cursor-pointer"
                                                 >
                                                     {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
-                                                        <option key={h} value={h}>{h}</option>
+                                                        <option key={h} value={h} className="bg-white dark:bg-navy-950 text-navy-950 dark:text-white">{h}</option>
                                                     ))}
                                                 </select>
                                             </label>
