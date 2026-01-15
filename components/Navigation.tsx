@@ -58,7 +58,7 @@ export default function Navigation() {
 
     return (
         <motion.nav
-            className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
+            className={`sticky top-0 z-[100] transition-all duration-300 ${scrolled
                 ? 'backdrop-blur-md bg-white/80 dark:bg-navy-950/80 border-b border-slate-200/50 dark:border-white/10 shadow-lg supports-[backdrop-filter]:bg-white/60 dark:supports-[backdrop-filter]:bg-navy-950/60'
                 : 'bg-transparent border-b border-transparent'
                 }`}
