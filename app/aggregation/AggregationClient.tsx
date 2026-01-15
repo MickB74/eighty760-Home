@@ -707,7 +707,7 @@ export default function AggregationPage() {
                 </div>
 
                 {/* Tab Navigation */}
-                <div className="flex border-b border-gray-200 dark:border-white/10 mb-8 overflow-x-auto">
+                <div className="sticky top-0 z-50 bg-gray-50 dark:bg-navy-950 flex border-b border-gray-200 dark:border-white/10 mb-8 overflow-x-auto pt-2">
                     <button
                         onClick={() => setActiveTab('config')}
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'config' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
