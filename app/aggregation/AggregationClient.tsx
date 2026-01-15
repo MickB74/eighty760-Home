@@ -550,7 +550,7 @@ export default function AggregationPage() {
 
     // Memoize active assets key to avoid complex dependency warning
     const activeAssetsKey = useMemo(() => {
-        return JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location })));
+        return JSON.stringify(activeAssets.map(a => ({ id: a.id, capacity_mw: a.capacity_mw, location: a.location, type: a.type })));
     }, [activeAssets]);
 
     // Run sim when key inputs change (debounced to avoid excessive re-renders)
