@@ -62,18 +62,8 @@ export default function Hero() {
                                     <p className="text-sm text-gray-500 dark:text-slate-400">Technologies</p>
                                 </div>
                                 <div>
-                                    <p className="text-3xl font-bold brand-text">Real-Time</p>
+                                    <p className="text-3xl font-bold brand-text">Historical</p>
                                     <p className="text-sm text-gray-500 dark:text-slate-400">Hub Pricing</p>
-                                </div>
-                            </div>
-
-                            {/* Industry Alignment Badges */}
-                            <div className="mt-6">
-                                <p className="text-xs text-gray-500 dark:text-slate-400 mb-2">Aligned with:</p>
-                                <div className="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-slate-500 font-mono">
-                                    <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">EnergyTag</span>
-                                    <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">GHG Protocol</span>
-                                    <span className="px-3 py-1 bg-white/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-md">RE100</span>
                                 </div>
                             </div>
                         </div>
