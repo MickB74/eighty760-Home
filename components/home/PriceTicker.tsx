@@ -64,10 +64,10 @@ export default function PriceTicker() {
 
             <motion.div
                 className="flex whitespace-nowrap pl-32"
-                animate={{ x: [0, -1000] }}
+                animate={{ x: [0, "-33.33%"] }}
                 transition={{
                     repeat: Infinity,
-                    duration: 45,
+                    duration: 30,
                     ease: "linear"
                 }}
             >

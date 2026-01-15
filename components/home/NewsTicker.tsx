@@ -41,7 +41,7 @@ export default function NewsTicker() {
 
             <motion.div
                 className="flex whitespace-nowrap pl-32" // Padding left to clear the absolute label
-                animate={{ x: [0, -1000] }}
+                animate={{ x: [0, "-33.33%"] }}
                 transition={{
                     repeat: Infinity,
                     duration: 40, // Slower than the data ticker

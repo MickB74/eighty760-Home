@@ -56,10 +56,10 @@ export default function EnergyTicker() {
         <div className="w-full bg-navy-950/90 border-b border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center absolute top-0 left-0">
             <motion.div
                 className="flex whitespace-nowrap"
-                animate={{ x: [0, -1000] }}
+                animate={{ x: [0, "-25%"] }}
                 transition={{
                     repeat: Infinity,
-                    duration: 30,
+                    duration: 20,
                     ease: "linear"
                 }}
             >
