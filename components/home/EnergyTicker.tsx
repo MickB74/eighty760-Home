@@ -53,7 +53,7 @@ export default function EnergyTicker() {
     const marqueeItems = [...items, ...items, ...items, ...items];
 
     return (
-        <div className="w-full bg-navy-950/90 border-b border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center relative">
+        <div className="w-full bg-navy-950/90 border-b border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center absolute top-0 left-0">
             <motion.div
                 className="flex whitespace-nowrap"
                 animate={{ x: [0, -1000] }}
