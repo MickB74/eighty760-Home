@@ -1087,7 +1087,15 @@ export default function AggregationPage() {
                                         <div className="flex justify-between mb-2">
                                             <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
                                                 ☀️ Solar Capacity
-                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_WEST</span>
+                                                <select
+                                                    value={solarHub}
+                                                    onChange={(e) => setSolarHub(e.target.value)}
+                                                    className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-energy-green cursor-pointer"
+                                                >
+                                                    {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                        <option key={h} value={h}>{h}</option>
+                                                    ))}
+                                                </select>
                                             </label>
                                             <span className="font-mono text-energy-green dark:text-energy-green font-bold">{capacities.Solar} MW</span>
                                         </div>
@@ -1106,7 +1114,15 @@ export default function AggregationPage() {
                                         <div className="flex justify-between mb-2">
                                             <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
                                                 💨 Wind Capacity
-                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_SOUTH</span>
+                                                <select
+                                                    value={windHub}
+                                                    onChange={(e) => setWindHub(e.target.value)}
+                                                    className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-blue-500 cursor-pointer"
+                                                >
+                                                    {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                        <option key={h} value={h}>{h}</option>
+                                                    ))}
+                                                </select>
                                             </label>
                                             <span className="font-mono text-blue-500 font-bold">{capacities.Wind} MW</span>
                                         </div>
@@ -1125,7 +1141,15 @@ export default function AggregationPage() {
                                         <div className="flex justify-between mb-2">
                                             <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
                                                 ⚛️ Nuclear Capacity
-                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_NORTH</span>
+                                                <select
+                                                    value={nuclearHub}
+                                                    onChange={(e) => setNuclearHub(e.target.value)}
+                                                    className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-emerald-500 cursor-pointer"
+                                                >
+                                                    {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                        <option key={h} value={h}>{h}</option>
+                                                    ))}
+                                                </select>
                                             </label>
                                             <span className="font-mono text-emerald-500 font-bold">{capacities.Nuclear} MW</span>
                                         </div>
@@ -1144,7 +1168,15 @@ export default function AggregationPage() {
                                         <div className="flex justify-between mb-2">
                                             <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
                                                 🌋 Geothermal Capacity
-                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_WEST</span>
+                                                <select
+                                                    value={geothermalHub}
+                                                    onChange={(e) => setGeothermalHub(e.target.value)}
+                                                    className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-orange-500 cursor-pointer"
+                                                >
+                                                    {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                        <option key={h} value={h}>{h}</option>
+                                                    ))}
+                                                </select>
                                             </label>
                                             <span className="font-mono text-orange-500 font-bold">{capacities.Geothermal} MW</span>
                                         </div>
@@ -1163,7 +1195,15 @@ export default function AggregationPage() {
                                         <div className="flex justify-between mb-2">
                                             <label className="font-semibold text-navy-950 dark:text-white flex items-center gap-2">
                                                 🏭 CCS Gas Capacity
-                                                <span className="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-white/10 px-2 py-0.5 rounded">HB_HOUSTON</span>
+                                                <select
+                                                    value={ccsHub}
+                                                    onChange={(e) => setCcsHub(e.target.value)}
+                                                    className="ml-2 py-0.5 px-2 text-xs bg-gray-100 dark:bg-white/10 border-none rounded text-gray-700 dark:text-gray-300 font-normal focus:ring-1 focus:ring-indigo-500 cursor-pointer"
+                                                >
+                                                    {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                        <option key={h} value={h}>{h}</option>
+                                                    ))}
+                                                </select>
                                             </label>
                                             <span className="font-mono text-indigo-500 font-bold">{capacities['CCS Gas']} MW</span>
                                         </div>
@@ -1212,6 +1252,24 @@ export default function AggregationPage() {
                                             </div>
                                         </div>
                                     </div>
+                                    <button
+                                        onClick={() => {
+                                            setAssets(activeAssets);
+                                            setUseAdvancedAssets(true);
+                                            setTimeout(() => {
+                                                setAssets(prev => [...prev, {
+                                                    id: crypto.randomUUID(),
+                                                    name: 'New Project',
+                                                    type: 'Solar',
+                                                    capacity_mw: 0,
+                                                    location: 'West'
+                                                }]);
+                                            }, 0);
+                                        }}
+                                        className="w-full py-2 border-2 border-dashed border-gray-300 dark:border-white/10 rounded-lg text-gray-500 hover:border-energy-green hover:text-energy-green transition-colors text-sm font-medium"
+                                    >
+                                        + Add Project
+                                    </button>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -1223,57 +1281,71 @@ export default function AggregationPage() {
                                     {/* Advanced Asset List */}
                                     <div className="space-y-3">
                                         {assets.map(asset => (
-                                            <div key={asset.id} className="flex flex-wrap items-center gap-3 p-3 bg-gray-50 dark:bg-black/20 rounded-lg border border-gray-200 dark:border-white/5">
-                                                <div className="flex-1 min-w-[150px]">
-                                                    <input
-                                                        type="text"
-                                                        value={asset.name}
-                                                        onChange={(e) => updateAsset(asset.id, { name: e.target.value })}
-                                                        className="w-full bg-transparent border-none focus:ring-0 font-medium text-navy-950 dark:text-white placeholder-gray-400"
-                                                        placeholder="Asset Name"
-                                                    />
+                                            <div key={asset.id} className="bg-gray-50 dark:bg-black/20 rounded-lg border border-gray-200 dark:border-white/5 overflow-hidden">
+                                                <div className="flex flex-wrap items-center gap-3 p-3">
+                                                    <div className="flex-1 min-w-[150px]">
+                                                        <input
+                                                            type="text"
+                                                            value={asset.name}
+                                                            onChange={(e) => updateAsset(asset.id, { name: e.target.value })}
+                                                            className="w-full bg-transparent border-none focus:ring-0 font-medium text-navy-950 dark:text-white placeholder-gray-400"
+                                                            placeholder="Asset Name"
+                                                        />
+                                                    </div>
+                                                    <select
+                                                        value={asset.type}
+                                                        onChange={(e) => updateAsset(asset.id, { type: e.target.value as any })}
+                                                        className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm"
+                                                    >
+                                                        <option value="Solar">Solar</option>
+                                                        <option value="Wind">Wind</option>
+                                                        <option value="Nuclear">Nuclear</option>
+                                                        <option value="Geothermal">Geothermal</option>
+                                                        <option value="CCS">Gas + CCS</option>
+                                                    </select>
+                                                    <select
+                                                        value={asset.location}
+                                                        onChange={(e) => updateAsset(asset.id, { location: e.target.value as any })}
+                                                        className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm w-32"
+                                                    >
+                                                        {['North', 'South', 'West', 'Houston', 'Panhandle'].map(h => (
+                                                            <option key={h} value={h}>{h}</option>
+                                                        ))}
+                                                    </select>
+                                                    <div className="flex items-center gap-1">
+                                                        <input
+                                                            type="number"
+                                                            value={asset.capacity_mw}
+                                                            onChange={(e) => updateAsset(asset.id, { capacity_mw: Number(e.target.value) })}
+                                                            className="w-20 bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm text-right"
+                                                        />
+                                                        <span className="text-xs text-gray-500">MW</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => removeAsset(asset.id)}
+                                                        className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
+                                                        title="Remove Asset"
+                                                    >
+                                                        ✕
+                                                    </button>
                                                 </div>
-                                                <select
-                                                    value={asset.type}
-                                                    onChange={(e) => updateAsset(asset.id, { type: e.target.value as any })}
-                                                    className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm"
-                                                >
-                                                    <option value="Solar">Solar</option>
-                                                    <option value="Wind">Wind</option>
-                                                    <option value="Nuclear">Nuclear</option>
-                                                    <option value="Geothermal">Geothermal</option>
-                                                    <option value="CCS">Gas + CCS</option>
-                                                </select>
-                                                <select
-                                                    value={asset.location}
-                                                    onChange={(e) => updateAsset(asset.id, { location: e.target.value as any })}
-                                                    className="bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm w-32"
-                                                >
-                                                    <option value="North">North</option>
-                                                    <option value="South">South</option>
-                                                    <option value="West">West</option>
-                                                    <option value="Houston">Houston</option>
-                                                    <option value="Panhandle">Panhandle</option>
-                                                </select>
-                                                <div className="flex items-center gap-1">
+                                                <div className="px-3 pb-2 -mt-1">
                                                     <input
-                                                        type="number"
+                                                        type="range"
+                                                        min="0"
+                                                        max="2000"
+                                                        step="10"
                                                         value={asset.capacity_mw}
                                                         onChange={(e) => updateAsset(asset.id, { capacity_mw: Number(e.target.value) })}
-                                                        className="w-20 bg-white dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-2 py-1 text-sm text-right"
+                                                        className={`w-full h-1.5 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-gray-700
+                                                            ${asset.type === 'Solar' ? 'accent-energy-green' :
+                                                                asset.type === 'Wind' ? 'accent-blue-500' :
+                                                                    asset.type === 'Nuclear' ? 'accent-emerald-500' :
+                                                                        asset.type === 'Geothermal' ? 'accent-orange-500' : 'accent-indigo-500'}`}
                                                     />
-                                                    <span className="text-xs text-gray-500">MW</span>
                                                 </div>
-                                                <button
-                                                    onClick={() => removeAsset(asset.id)}
-                                                    className="p-1 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
-                                                    title="Remove Asset"
-                                                >
-                                                    ✕
-                                                </button>
                                             </div>
                                         ))}
-
                                         <button
                                             onClick={addAsset}
                                             className="w-full py-2 border-2 border-dashed border-gray-300 dark:border-white/10 rounded-lg text-gray-500 hover:border-energy-green hover:text-energy-green transition-colors text-sm font-medium"
@@ -1321,225 +1393,240 @@ export default function AggregationPage() {
                         </div>
 
                     </div>
-                )}
+                )
+                }
 
 
                 {/* DASHBOARD CONTENT */}
-                {activeTab === 'dashboard' && (
-                    <>
-                        {result ? (
-                            <div className="space-y-8 animate-in fade-in duration-500">
-                                {/* KPI Grid */}
-                                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4">
-                                    <KPICard label="24/7 Score" value={(result.cfe_score * 100).toFixed(1) + '%'} sub="Hourly Match" />
-                                    <KPICard label="Total Load" value={result.total_load_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
-                                    <KPICard label="Annual Match" value={(result.total_load_mwh > 0 ? (result.total_gen_mwh / result.total_load_mwh * 100).toFixed(0) : '0') + '%'} sub="Gen / Load" />
-                                    <KPICard label="Grid Deficit" value={(result.total_load_mwh - result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Unmatched" />
-                                    <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
-                                    <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
-                                    <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
-                                </div>
+                {
+                    activeTab === 'dashboard' && (
+                        <>
+                            {result ? (
+                                <div className="space-y-8 animate-in fade-in duration-500">
+                                    {/* KPI Grid */}
+                                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4">
+                                        <KPICard label="24/7 Score" value={(result.cfe_score * 100).toFixed(1) + '%'} sub="Hourly Match" />
+                                        <KPICard label="Total Load" value={result.total_load_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
+                                        <KPICard label="Annual Match" value={(result.total_load_mwh > 0 ? (result.total_gen_mwh / result.total_load_mwh * 100).toFixed(0) : '0') + '%'} sub="Gen / Load" />
+                                        <KPICard label="Grid Deficit" value={(result.total_load_mwh - result.total_matched_mwh).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Unmatched" />
+                                        <KPICard label="Overgeneration" value={result.surplus_profile.reduce((a, b) => a + b, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Excess" />
+                                        <KPICard label="Clean Gen" value={result.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} sub="MWh Annual" />
+                                        <KPICard label="Net Cost" value={'$' + (result.avg_cost_per_mwh).toFixed(2)} sub="per MWh Load" />
+                                    </div>
 
-                                {/* Interactive Visualizations */}
-                                <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                                    <Timeline8760
-                                        loadProfile={result.load_profile}
-                                        matchedProfile={result.matched_profile}
-                                        solarGen={result.solar_profile}
-                                        windGen={result.wind_profile}
-                                        nuclearGen={result.nuc_profile}
-                                        batteryDischarge={result.battery_discharge}
-                                        onHourChange={(hour) => setCurrentHour(hour)}
-                                    />
-                                    <EnergyFlowDiagram
-                                        hour={currentHour}
-                                        solar={result.solar_profile[currentHour] || 0}
-                                        wind={result.wind_profile[currentHour] || 0}
-                                        nuclear={result.nuc_profile[currentHour] || 0}
-                                        geothermal={result.geo_profile[currentHour] || 0}
-                                        ccs={result.ccs_profile[currentHour] || 0}
-                                        battery={result.battery_discharge[currentHour] || 0}
-                                        load={result.load_profile[currentHour] || 0}
-                                        gridDeficit={Math.max(0, (result.load_profile[currentHour] || 0) - (result.matched_profile[currentHour] || 0))}
-                                        surplus={result.surplus_profile[currentHour] || 0}
-                                    />
-                                </div>
+                                    {/* Interactive Visualizations */}
+                                    <div className="grid lg:grid-cols-2 gap-6 mb-8">
+                                        <Timeline8760
+                                            loadProfile={result.load_profile}
+                                            matchedProfile={result.matched_profile}
+                                            solarGen={result.solar_profile}
+                                            windGen={result.wind_profile}
+                                            nuclearGen={result.nuc_profile}
+                                            batteryDischarge={result.battery_discharge}
+                                            onHourChange={(hour) => setCurrentHour(hour)}
+                                        />
+                                        <EnergyFlowDiagram
+                                            hour={currentHour}
+                                            solar={result.solar_profile[currentHour] || 0}
+                                            wind={result.wind_profile[currentHour] || 0}
+                                            nuclear={result.nuc_profile[currentHour] || 0}
+                                            geothermal={result.geo_profile[currentHour] || 0}
+                                            ccs={result.ccs_profile[currentHour] || 0}
+                                            battery={result.battery_discharge[currentHour] || 0}
+                                            load={result.load_profile[currentHour] || 0}
+                                            gridDeficit={Math.max(0, (result.load_profile[currentHour] || 0) - (result.matched_profile[currentHour] || 0))}
+                                            surplus={result.surplus_profile[currentHour] || 0}
+                                        />
+                                    </div>
 
-                                {/* Chart */}
-                                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm h-[500px]">
-                                    <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year)</h3>
-                                    <GenChart result={result} capacities={capacities} />
-                                </div>
+                                    {/* Chart */}
+                                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm h-[500px]">
+                                        <h3 className="text-sm font-medium mb-4">Generation vs Load (Full Year)</h3>
+                                        <GenChart result={result} capacities={capacities} />
+                                    </div>
 
-                                {/* Financial Summary Table */}
-                                <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
-                                    <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
-                                    {/* Table Content */}
-                                    <div className="overflow-x-auto">
-                                        <table className="w-full text-sm">
-                                            <tbody>
+                                    {/* Financial Summary Table */}
+                                    <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/10 p-6 shadow-sm">
+                                        <h3 className="text-lg font-semibold mb-4">Financial Summary</h3>
+                                        {/* Table Content */}
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-sm">
+                                                <tbody>
 
-                                                <tr className="border-b border-white/10">
-                                                    <td className="py-3 font-medium flex items-center gap-2">
-                                                        Net Settlement Value (PPA vs Market)
-                                                        <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
-                                                    </td>
-                                                    <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                        {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                    </td>
-                                                </tr>
-                                                <tr className="border-b border-white/10">
-                                                    <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                        REC Income (Surplus)
-                                                        <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
-                                                    </td>
-                                                    <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                                                </tr>
-                                                <tr className="border-b border-white/10">
-                                                    <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                        REC Cost (Deficit)
-                                                        <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
-                                                    </td>
-                                                    <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
-                                                </tr>
-                                                <tr className="border-b border-white/10">
-                                                    <td className="py-3 font-medium text-lg flex items-center gap-2">
-                                                        Net Portfolio Cashflow
-                                                        <InfoTooltip text="Net Value of PPA Settlement + Net REC Value" />
-                                                    </td>
-                                                    <td className={`py-3 text-right font-bold text-lg ${(result.settlement_value + result.rec_income - result.rec_cost) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                        {(result.settlement_value + result.rec_income - result.rec_cost) >= 0 ? '+' : '-'}${Math.abs(result.settlement_value + result.rec_income - result.rec_cost).toLocaleString(undefined, { maximumFractionDigits: 0 })}
-                                                    </td>
-                                                </tr>
-                                                <tr>
-                                                    <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                                                        Net Cashflow ($/MWh)
-                                                        <InfoTooltip text="Net Portfolio Cashflow / Total Annual Load" />
-                                                    </td>
-                                                    <td className={`py-3 text-right ${(result.settlement_value + result.rec_income - result.rec_cost) / (result.total_load_mwh || 1) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                                                        {((result.settlement_value + result.rec_income - result.rec_cost) / (result.total_load_mwh || 1)).toFixed(2)}
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 font-medium flex items-center gap-2">
+                                                            Net Settlement Value (PPA vs Market)
+                                                            <InfoTooltip text="(Generation × Asset Hub Price) - (Generation × Strike Price)" />
+                                                        </td>
+                                                        <td className={`py-3 text-right font-medium ${result.settlement_value >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                            {result.settlement_value >= 0 ? '+' : '-'}${Math.abs(result.settlement_value).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                        </td>
+                                                    </tr>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            REC Income (Surplus)
+                                                            <InfoTooltip text="Revenue from selling RECs for Surplus Generation (Surplus × REC Price)" />
+                                                        </td>
+                                                        <td className="py-3 text-right text-green-600">+${result.rec_income.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                    </tr>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            REC Cost (Deficit)
+                                                            <InfoTooltip text="Cost to purchase RECs for Unmatched Load (Deficit × REC/Scarcity Price)" />
+                                                        </td>
+                                                        <td className="py-3 text-right text-red-500">-${result.rec_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+                                                    </tr>
+                                                    <tr className="border-b border-white/10">
+                                                        <td className="py-3 font-medium text-lg flex items-center gap-2">
+                                                            Net Portfolio Cashflow
+                                                            <InfoTooltip text="Net Value of PPA Settlement + Net REC Value" />
+                                                        </td>
+                                                        <td className={`py-3 text-right font-bold text-lg ${(result.settlement_value + result.rec_income - result.rec_cost) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                            {(result.settlement_value + result.rec_income - result.rec_cost) >= 0 ? '+' : '-'}${Math.abs(result.settlement_value + result.rec_income - result.rec_cost).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td className="py-3 text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                                                            Net Cashflow ($/MWh)
+                                                            <InfoTooltip text="Net Portfolio Cashflow / Total Annual Load" />
+                                                        </td>
+                                                        <td className={`py-3 text-right ${(result.settlement_value + result.rec_income - result.rec_cost) / (result.total_load_mwh || 1) >= 0 ? 'text-green-600' : 'text-red-500'}`}>
+                                                            {((result.settlement_value + result.rec_income - result.rec_cost) / (result.total_load_mwh || 1)).toFixed(2)}
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
 
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-white/10 rounded-xl">
-                                <div className="text-5xl mb-4">📊</div>
-                                <p className="text-lg font-medium">Add Participants to Begin Simulation</p>
-                                <p className="text-sm">Configure load participants above or click &quot;Load Demo&quot; to start.</p>
-                            </div>
-                        )}
-                    </>
-                )}
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-20 text-gray-500 dark:text-gray-400 border-2 border-dashed border-white/10 rounded-xl">
+                                    <div className="text-5xl mb-4">📊</div>
+                                    <p className="text-lg font-medium">Add Participants to Begin Simulation</p>
+                                    <p className="text-sm">Configure load participants above or click &quot;Load Demo&quot; to start.</p>
+                                </div>
+                            )}
+                        </>
+                    )
+                }
 
 
 
-                {activeTab === 'analysis' && (
-                    <AnalysisTab result={result} />
-                )}
+                {
+                    activeTab === 'analysis' && (
+                        <AnalysisTab result={result} />
+                    )
+                }
 
-                {activeTab === 'financials' && result && (
-                    <FinancialAnalysisTab result={result} cvtaResult={cvtaResult} />
-                )}
+                {
+                    activeTab === 'financials' && result && (
+                        <FinancialAnalysisTab result={result} cvtaResult={cvtaResult} />
+                    )
+                }
 
-                {activeTab === 'multi-year' && (
-                    <MultiYearAnalysisTab
-                        participants={participants}
-                        assets={activeAssets}
-                        financials={financials}
-                        battery={{ mw: capacities.Battery_MW, hours: capacities.Battery_Hours }}
-                        loadHub={loadHub}
-                        solarHub={solarHub}
-                        windHub={windHub}
-                        nuclearHub={nuclearHub}
-                        geothermalHub={geothermalHub}
-                        ccsHub={ccsHub}
-                    />
-                )}
-
-                {activeTab === 'scenarios' && (
-                    <div className="animate-in fade-in duration-300">
-                        <ScenarioComparisonTab
-                            scenarios={scenarios}
-                            onLoadScenario={(s) => {
-                                handleLoadScenario(s);
-                                setActiveTab('dashboard');
-                            }}
+                {
+                    activeTab === 'multi-year' && (
+                        <MultiYearAnalysisTab
+                            participants={participants}
+                            assets={activeAssets}
+                            financials={financials}
+                            battery={{ mw: capacities.Battery_MW, hours: capacities.Battery_Hours }}
+                            loadHub={loadHub}
+                            solarHub={solarHub}
+                            windHub={windHub}
+                            nuclearHub={nuclearHub}
+                            geothermalHub={geothermalHub}
+                            ccsHub={ccsHub}
                         />
-                    </div>
-                )}
+                    )
+                }
 
-                {activeTab === 'market' && (
-                    <div className="animate-in fade-in duration-300">
-                        <MarketDataTab />
-                    </div>
-                )}
+                {
+                    activeTab === 'scenarios' && (
+                        <div className="animate-in fade-in duration-300">
+                            <ScenarioComparisonTab
+                                scenarios={scenarios}
+                                onLoadScenario={(s) => {
+                                    handleLoadScenario(s);
+                                    setActiveTab('dashboard');
+                                }}
+                            />
+                        </div>
+                    )
+                }
 
-                {activeTab === 'reports' && (
-                    <div className="animate-in fade-in duration-300">
-                        <div className="max-w-4xl mx-auto space-y-8">
-                            <div className="text-center mb-8">
-                                <h2 className="text-2xl font-bold text-navy-950 dark:text-white mb-2">Reports & Exports</h2>
-                                <p className="text-gray-600 dark:text-gray-400">Download simulation data and generate professional PDF reports.</p>
-                            </div>
+                {
+                    activeTab === 'market' && (
+                        <div className="animate-in fade-in duration-300">
+                            <MarketDataTab />
+                        </div>
+                    )
+                }
 
-                            <div className="grid md:grid-cols-2 gap-6">
-                                {/* PDF Report Card */}
-                                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="p-3 bg-red-500/10 rounded-lg text-red-500 text-2xl group-hover:scale-110 transition-transform">
-                                            📄
-                                        </div>
-                                    </div>
-                                    <h3 className="text-lg font-bold text-white mb-2">Simulation Report (PDF)</h3>
-                                    <p className="text-gray-400 text-sm mb-6">
-                                        Generate a professional PDF report containing scenario metrics, charts, and financial analysis. Ideal for stakeholder presentations.
-                                    </p>
-                                    <button
-                                        onClick={handleDownloadPDF}
-                                        disabled={!result}
-                                        className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                                    >
-                                        {!result ? 'Run Simulation First' : 'Generate PDF Report'}
-                                    </button>
+                {
+                    activeTab === 'reports' && (
+                        <div className="animate-in fade-in duration-300">
+                            <div className="max-w-4xl mx-auto space-y-8">
+                                <div className="text-center mb-8">
+                                    <h2 className="text-2xl font-bold text-navy-950 dark:text-white mb-2">Reports & Exports</h2>
+                                    <p className="text-gray-600 dark:text-gray-400">Download simulation data and generate professional PDF reports.</p>
                                 </div>
 
-                                {/* CSV Data Card */}
-                                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
-                                    <div className="flex items-start justify-between mb-4">
-                                        <div className="p-3 bg-green-500/10 rounded-lg text-green-500 text-2xl group-hover:scale-110 transition-transform">
-                                            📊
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {/* PDF Report Card */}
+                                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="p-3 bg-red-500/10 rounded-lg text-red-500 text-2xl group-hover:scale-110 transition-transform">
+                                                📄
+                                            </div>
                                         </div>
+                                        <h3 className="text-lg font-bold text-white mb-2">Simulation Report (PDF)</h3>
+                                        <p className="text-gray-400 text-sm mb-6">
+                                            Generate a professional PDF report containing scenario metrics, charts, and financial analysis. Ideal for stakeholder presentations.
+                                        </p>
+                                        <button
+                                            onClick={handleDownloadPDF}
+                                            disabled={!result}
+                                            className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                                        >
+                                            {!result ? 'Run Simulation First' : 'Generate PDF Report'}
+                                        </button>
                                     </div>
-                                    <h3 className="text-lg font-bold text-white mb-2">Raw Data Export (CSV)</h3>
-                                    <p className="text-gray-400 text-sm mb-6">
-                                        Download the full 8760-hourly dataset including load, generation profiles, and financial settlements for custom analysis.
-                                    </p>
-                                    <button
-                                        onClick={handleDownloadCSV}
-                                        disabled={!result}
-                                        className="w-full py-3 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                        {!result ? 'Run Simulation First' : 'Download CSV Data'}
-                                    </button>
-                                </div>
 
-                                {!result && (
-                                    <div className="md:col-span-2 text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm">
-                                        ⚠️ Please run a simulation on the Dashboard to generate data for reports.
+                                    {/* CSV Data Card */}
+                                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="p-3 bg-green-500/10 rounded-lg text-green-500 text-2xl group-hover:scale-110 transition-transform">
+                                                📊
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-white mb-2">Raw Data Export (CSV)</h3>
+                                        <p className="text-gray-400 text-sm mb-6">
+                                            Download the full 8760-hourly dataset including load, generation profiles, and financial settlements for custom analysis.
+                                        </p>
+                                        <button
+                                            onClick={handleDownloadCSV}
+                                            disabled={!result}
+                                            className="w-full py-3 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {!result ? 'Run Simulation First' : 'Download CSV Data'}
+                                        </button>
                                     </div>
-                                )}
+
+                                    {!result && (
+                                        <div className="md:col-span-2 text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm">
+                                            ⚠️ Please run a simulation on the Dashboard to generate data for reports.
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
+                    )
+                }
 
-            </div>
+            </div >
         </main >
     );
 }
