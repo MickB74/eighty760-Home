@@ -373,7 +373,7 @@ export default function FinancialAnalysisTab({ result, cvtaResult }: FinancialAn
                                 <th className="py-2 pr-4">Hub</th>
                                 <th className="py-2 pr-4 text-right">Capacity</th>
                                 <th className="py-2 pr-4 text-right">Generation</th>
-                                <th className="py-2 pr-4 text-right">Revenue (Basis)</th>
+                                <th className="py-2 pr-4 text-right">Revenue</th>
                                 <th className="py-2 pr-4 text-right">PPA Cost</th>
                                 <th className="py-2 text-right">Settlement</th>
                             </tr>
@@ -386,8 +386,8 @@ export default function FinancialAnalysisTab({ result, cvtaResult }: FinancialAn
                                     <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">{asset.location}</td>
                                     <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.capacity_mw} MW</td>
                                     <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{asset.total_gen_mwh.toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
-                                    <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
-                                        ${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    <td className="py-3 pr-4 text-right text-green-600">
+                                        +${asset.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                     </td>
                                     <td className="py-3 pr-4 text-right text-red-500">
                                         -${asset.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -405,8 +405,8 @@ export default function FinancialAnalysisTab({ result, cvtaResult }: FinancialAn
                                     <td className="py-3 pr-4 text-gray-700 dark:text-gray-300">-</td>
                                     <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{cvtaResult.performance.capacity_mwh / 2} MW</td>
                                     <td className="py-3 pr-4 text-right text-navy-950 dark:text-white">{(cvtaResult.performance.total_throughput_mwh / 2).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh</td>
-                                    <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
-                                        ${cvtaResult.buyer.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                    <td className="py-3 pr-4 text-right text-green-600">
+                                        +${cvtaResult.buyer.total_revenue.toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                     </td>
                                     <td className="py-3 pr-4 text-right text-red-500">
                                         -${cvtaResult.buyer.total_cost.toLocaleString(undefined, { maximumFractionDigits: 0 })}
@@ -426,8 +426,8 @@ export default function FinancialAnalysisTab({ result, cvtaResult }: FinancialAn
                                 <td className="py-3 pr-4 text-right">
                                     {result.asset_details.reduce((sum, a) => sum + a.total_gen_mwh, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} MWh
                                 </td>
-                                <td className="py-3 pr-4 text-right text-gray-900 dark:text-gray-100">
-                                    ${result.asset_details.reduce((sum, a) => sum + a.total_revenue, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
+                                <td className="py-3 pr-4 text-right text-green-600">
+                                    +${result.asset_details.reduce((sum, a) => sum + a.total_revenue, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
                                 </td>
                                 <td className="py-3 pr-4 text-right text-red-500">
                                     -${result.asset_details.reduce((sum, a) => sum + a.total_cost, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })}
