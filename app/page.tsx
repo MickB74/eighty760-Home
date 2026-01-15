@@ -2,7 +2,7 @@
 
 import Navigation from '@/components/Navigation';
 import Hero from '@/components/Hero';
-import PriceTicker from '@/components/home/PriceTicker';
+
 
 import ComparisonTable from '@/components/home/ComparisonTable';
 import HowItWorks from '@/components/home/HowItWorks';
@@ -18,7 +18,7 @@ export default function Home() {
             <Navigation />
             <Hero />
 
-            <PriceTicker />
+
 
             <MetricsBar />
 
