@@ -7,6 +7,7 @@ export const dynamic = 'force-dynamic'; // Prevent static caching
 export async function GET() {
     try {
         const apiKey = process.env.EIA_API_KEY || '';
+        if (!apiKey) console.warn('Ticker API: No EIA_API_KEY found.');
 
         // Fetch concurrently data from EIA and ERCOT
         const [load, gasPrice, ercotPrices, fuelMix] = await Promise.all([
@@ -15,6 +16,15 @@ export async function GET() {
             fetchLiveErcotPrices(),
             fetchErcotFuelMix()
         ]);
+
+        console.log('Ticker Fetch Debug:', {
+            hasKey: !!apiKey,
+            keyLen: apiKey.length,
+            load: load,
+            gas: gasPrice,
+            prices: ercotPrices ? 'OK' : 'NULL',
+            fuelMix: fuelMix ? 'OK' : 'NULL'
+        });
 
         // Parse Fuel Mix
         let solarOutput = 0;
@@ -40,7 +50,9 @@ export async function GET() {
             windOutput,
             prices: ercotPrices || generateSimulatedPrices(),
             timestamp: new Date().toISOString(),
-            isRealData: !!(load && ercotPrices)
+            isRealData: !!(load && ercotPrices),
+            isRealPrices: !!ercotPrices,
+            isRealLoad: !!load
         });
     } catch (error) {
         console.error('Ticker API error:', error);
@@ -53,7 +65,9 @@ export async function GET() {
             windOutput: 12500,
             prices: generateSimulatedPrices(),
             timestamp: new Date().toISOString(),
-            isRealData: false
+            isRealData: false,
+            isRealPrices: false,
+            isRealLoad: false
         });
     }
 }

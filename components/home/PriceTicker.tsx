@@ -11,6 +11,7 @@ interface TickerResponse {
     prices: PriceData;
     timestamp?: string;
     isRealData?: boolean;
+    isRealPrices?: boolean;
 }
 
 export default function PriceTicker() {
@@ -51,8 +52,8 @@ export default function PriceTicker() {
         { label: 'LZ_WEST', value: displayPrices.LZ_WEST },
         { label: 'LZ_HOUSTON', value: displayPrices.LZ_HOUSTON },
         {
-            label: data?.isRealData ? 'UPDATED' : 'DATA SOURCE',
-            value: data?.isRealData && data?.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED'
+            label: data?.isRealPrices ? 'UPDATED' : 'DATA SOURCE',
+            value: data?.isRealPrices && data?.timestamp ? new Date(data.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED'
         },
     ];
 
