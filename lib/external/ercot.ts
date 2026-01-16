@@ -106,3 +106,29 @@ export async function fetchLiveErcotPrices(): Promise<Record<string, string> | n
         return null;
     }
 }
+
+export async function fetchLiveErcotLoad(): Promise<number | null> {
+    try {
+        const url = 'https://www.ercot.com/content/cdr/html/real_time_system_conditions.html';
+        const res = await fetch(url, { next: { revalidate: 60 } }); // Cache for 1 min
+        if (!res.ok) return null;
+
+        const html = await res.text();
+
+        // Extract "Actual System Demand" value
+        // Pattern: <td class="tdLeft">Actual System Demand</td>...<td class="labelClassCenter">49622</td>
+        // Note: The HTML output showed newlines, so we use [\s\S]*? to match across potential newlines/spaces between cells
+        const regex = /Actual System Demand<\/td>[\s\S]*?<td[^>]*>([\d,\.]+)<\/td>/i;
+        const match = regex.exec(html);
+
+        if (match && match[1]) {
+            // Remove commas and parse
+            const val = parseFloat(match[1].replace(/,/g, ''));
+            return isNaN(val) ? null : val;
+        }
+        return null;
+    } catch (e) {
+        console.error('Failed to scrape ERCOT Load:', e);
+        return null;
+    }
+}

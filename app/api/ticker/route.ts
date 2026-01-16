@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { fetchErcotRealtimeDemand, fetchHenryHubPrice } from '@/lib/external/eia';
-import { fetchLiveErcotPrices, fetchErcotFuelMix } from '@/lib/external/ercot';
+import { fetchLiveErcotPrices, fetchErcotFuelMix, fetchLiveErcotLoad } from '@/lib/external/ercot';
 
 export const dynamic = 'force-dynamic'; // Prevent static caching
 
@@ -10,8 +10,9 @@ export async function GET() {
         if (!apiKey) console.warn('Ticker API: No EIA_API_KEY found.');
 
         // Fetch concurrently data from EIA and ERCOT
-        const [load, gasPrice, ercotPrices, fuelMix] = await Promise.all([
-            fetchErcotRealtimeDemand(apiKey),
+        // Note: We now scrape Load from ERCOT directly to avoid EIA key dependency for basic ticker data.
+        const [loadVal, gasPrice, ercotPrices, fuelMix] = await Promise.all([
+            fetchLiveErcotLoad(),
             fetchHenryHubPrice(apiKey),
             fetchLiveErcotPrices(),
             fetchErcotFuelMix()
@@ -20,7 +21,7 @@ export async function GET() {
         console.log('Ticker Fetch Debug:', {
             hasKey: !!apiKey,
             keyLen: apiKey.length,
-            load: load,
+            load: loadVal,
             gas: gasPrice,
             prices: ercotPrices ? 'OK' : 'NULL',
             fuelMix: fuelMix ? 'OK' : 'NULL'
@@ -43,16 +44,16 @@ export async function GET() {
         const carbonIntensity = Math.floor(350 + Math.random() * 50);
 
         return NextResponse.json({
-            load: load || 54000,
+            load: loadVal || 54000,
             gasPrice: gasPrice || 3.15,
             carbonIntensity,
             solarOutput,
             windOutput,
             prices: ercotPrices || generateSimulatedPrices(),
             timestamp: new Date().toISOString(),
-            isRealData: !!(load && ercotPrices),
+            isRealData: !!(loadVal && ercotPrices),
             isRealPrices: !!ercotPrices,
-            isRealLoad: !!load
+            isRealLoad: !!loadVal
         });
     } catch (error) {
         console.error('Ticker API error:', error);
