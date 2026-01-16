@@ -12,6 +12,7 @@ interface TickerData {
     timestamp?: string;
     isRealData?: boolean;
     isRealLoad?: boolean;
+    isRealGas?: boolean;
 }
 
 export default function EnergyTicker() {
@@ -48,14 +49,14 @@ export default function EnergyTicker() {
 
     const items = [
         { label: 'ERCOT LOAD', value: `${displayData.load.toLocaleString()} MW`, color: 'text-blue-600 dark:text-blue-400' },
-        { label: 'HENRY HUB', value: `$${displayData.gasPrice.toFixed(2)}`, color: 'text-green-600 dark:text-green-400' },
-        { label: 'CARBON ITY', value: `${displayData.carbonIntensity} g/kWh`, color: 'text-gray-600 dark:text-gray-400' },
+        { label: 'HENRY HUB', value: `$${displayData.gasPrice.toFixed(2)}`, color: displayData.isRealGas ? 'text-green-600 dark:text-green-400 font-bold' : 'text-green-600/70 dark:text-green-400/70' },
+        { label: 'CO2 INTENSITY', value: `${displayData.carbonIntensity} g/kWh`, color: 'text-gray-600 dark:text-gray-400' },
         { label: 'SOLAR', value: `${displayData.solarOutput.toLocaleString()} MW`, color: 'text-yellow-600 dark:text-yellow-400' },
         { label: 'WIND', value: `${displayData.windOutput.toLocaleString()} MW`, color: 'text-cyan-600 dark:text-cyan-400' },
         {
-            label: displayData.isRealLoad ? 'UPDATED' : 'DATA SOURCE',
-            value: displayData.isRealLoad && displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED',
-            color: displayData.isRealLoad ? 'text-gray-900 dark:text-white' : 'text-amber-600 dark:text-amber-500'
+            label: (displayData.isRealLoad || displayData.isRealGas) ? 'UPDATED' : 'DATA SOURCE',
+            value: (displayData.isRealLoad || displayData.isRealGas) && displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED',
+            color: (displayData.isRealLoad || displayData.isRealGas) ? 'text-gray-900 dark:text-white' : 'text-amber-600 dark:text-amber-500'
         },
     ];
 

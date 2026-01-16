@@ -107,28 +107,43 @@ export async function fetchLiveErcotPrices(): Promise<Record<string, string> | n
     }
 }
 
-export async function fetchLiveErcotLoad(): Promise<number | null> {
+export interface ErcotGridConditions {
+    load: number | null;
+    wind: number | null;
+    solar: number | null;
+}
+
+export async function fetchLiveErcotLoad(): Promise<ErcotGridConditions> {
+    const result: ErcotGridConditions = { load: null, wind: null, solar: null };
+
     try {
         const url = 'https://www.ercot.com/content/cdr/html/real_time_system_conditions.html';
         const res = await fetch(url, { next: { revalidate: 60 } }); // Cache for 1 min
-        if (!res.ok) return null;
+        if (!res.ok) return result;
 
         const html = await res.text();
 
-        // Extract "Actual System Demand" value
-        // Pattern: <td class="tdLeft">Actual System Demand</td>...<td class="labelClassCenter">49622</td>
-        // Note: The HTML output showed newlines, so we use [\s\S]*? to match across potential newlines/spaces between cells
-        const regex = /Actual System Demand<\/td>[\s\S]*?<td[^>]*>([\d,\.]+)<\/td>/i;
-        const match = regex.exec(html);
+        // Helper extraction
+        const extractVal = (label: string): number | null => {
+            // Pattern: <td class="tdLeft">LABEL</td>...<td class="labelClassCenter">VALUE</td>
+            // Use specific regex to find the value after the label cell
+            // We use [\s\S]*? to lazily match any characters (newlines) until the next td tag
+            const regex = new RegExp(`${label}<\\/td>[\\s\\S]*?<td[^>]*>([\\d,\\.]+)`, 'i');
+            const match = regex.exec(html);
+            if (match && match[1]) {
+                const val = parseFloat(match[1].replace(/,/g, ''));
+                return isNaN(val) ? null : val;
+            }
+            return null;
+        };
 
-        if (match && match[1]) {
-            // Remove commas and parse
-            const val = parseFloat(match[1].replace(/,/g, ''));
-            return isNaN(val) ? null : val;
-        }
-        return null;
+        result.load = extractVal('Actual System Demand');
+        result.wind = extractVal('Total Wind Output');
+        result.solar = extractVal('Total PVGR Output');
+
+        return result;
     } catch (e) {
-        console.error('Failed to scrape ERCOT Load:', e);
-        return null;
+        console.error('Failed to scrape ERCOT Grid Conditions:', e);
+        return result;
     }
 }

@@ -10,8 +10,9 @@ export async function GET() {
         if (!apiKey) console.warn('Ticker API: No EIA_API_KEY found.');
 
         // Fetch concurrently data from EIA and ERCOT
-        // Note: We now scrape Load from ERCOT directly to avoid EIA key dependency for basic ticker data.
-        const [loadVal, gasPrice, ercotPrices, fuelMix] = await Promise.all([
+        // Fetch concurrently data from EIA and ERCOT
+        // Note: We now scrape Load, Wind, and Solar from ERCOT directly to avoid EIA dependency and ensure reliability.
+        const [gridConditions, gasPrice, ercotPrices, fuelMix] = await Promise.all([
             fetchLiveErcotLoad(),
             fetchHenryHubPrice(apiKey),
             fetchLiveErcotPrices(),
@@ -21,21 +22,34 @@ export async function GET() {
         console.log('Ticker Fetch Debug:', {
             hasKey: !!apiKey,
             keyLen: apiKey.length,
-            load: loadVal,
+            conditions: gridConditions,
             gas: gasPrice,
             prices: ercotPrices ? 'OK' : 'NULL',
             fuelMix: fuelMix ? 'OK' : 'NULL'
         });
 
-        // Parse Fuel Mix
-        let solarOutput = 0;
-        let windOutput = 0;
+        // Parse Fuel Mix / Grid Conditions
+        // Prefer scraped "Real Time System Conditions" which is updated more frequently and reliably than the JSON fuel mix
+        let solarOutput = gridConditions.solar || 0;
+        let windOutput = gridConditions.wind || 0;
 
-        if (fuelMix && fuelMix.data) {
+        // If scraped values are missing (e.g. at night Solar might be 0 but scraped properly, but if null use fallback),
+        // actually scraper returns null if not found. If 0 it returns 0.
+        // If scraped is missing, try Fuel Mix API
+        if (gridConditions.solar === null && fuelMix && fuelMix.data) {
             solarOutput = fuelMix.data['Solar']?.gen || 0;
+        }
+        if (gridConditions.wind === null && fuelMix && fuelMix.data) {
             windOutput = fuelMix.data['Wind']?.gen || 0;
-        } else {
-            // Fallback Estimates
+        }
+
+        // If still 0 and no source found, use simulation
+        // (Note: Solar can legitimately be 0 at night, so we don't force simulation if it's 0)
+        // Check if we have *any* real data source to decide if we should simulate
+        // If we got 'gridConditions.load' we assume the scrape worked.
+
+        if (!gridConditions.load && !fuelMix && !ercotPrices) {
+            // Complete failure, use fallback simulation
             solarOutput = Math.floor(5000 + Math.random() * 8000);
             windOutput = Math.floor(8000 + Math.random() * 10000);
         }
@@ -44,16 +58,17 @@ export async function GET() {
         const carbonIntensity = Math.floor(350 + Math.random() * 50);
 
         return NextResponse.json({
-            load: loadVal || 54000,
+            load: gridConditions.load || 54000,
             gasPrice: gasPrice || 3.15,
             carbonIntensity,
             solarOutput,
             windOutput,
             prices: ercotPrices || generateSimulatedPrices(),
             timestamp: new Date().toISOString(),
-            isRealData: !!(loadVal && ercotPrices),
+            isRealData: !!(gridConditions.load && ercotPrices),
             isRealPrices: !!ercotPrices,
-            isRealLoad: !!loadVal
+            isRealLoad: !!gridConditions.load,
+            isRealGas: !!gasPrice
         });
     } catch (error) {
         console.error('Ticker API error:', error);
@@ -68,7 +83,8 @@ export async function GET() {
             timestamp: new Date().toISOString(),
             isRealData: false,
             isRealPrices: false,
-            isRealLoad: false
+            isRealLoad: false,
+            isRealGas: false
         });
     }
 }
