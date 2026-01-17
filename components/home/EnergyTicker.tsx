@@ -9,6 +9,9 @@ interface TickerData {
     carbonIntensity: number;
     solarOutput: number;
     windOutput: number;
+    gasOutput: number;
+    coalOutput: number;
+    nuclearOutput: number;
     timestamp?: string;
     isRealData?: boolean;
     isRealLoad?: boolean;
@@ -36,26 +39,39 @@ export default function EnergyTicker() {
         return () => clearInterval(interval);
     }, []);
 
-    // Placeholder if loading
+    // Placeholder if loading - show 0/empty, do NOT use made up numbers
     const displayData = data || {
-        load: 54200,
-        gasPrice: 3.10,
-        carbonIntensity: 380,
-        solarOutput: 8500,
-        windOutput: 12000,
+        load: 0,
+        gasPrice: 0,
+        carbonIntensity: 0,
+        solarOutput: 0,
+        windOutput: 0,
+        gasOutput: 0,
+        coalOutput: 0,
+        nuclearOutput: 0,
         timestamp: new Date().toISOString(),
-        isRealData: false
+        isRealData: false,
+        isRealLoad: false,
+        isRealGas: false
+    };
+
+    const formatValue = (val: number, isCurrency: boolean = false, suffix: string = '') => {
+        if (val === 0 || val === null || val === undefined) return 'N/A';
+        return `${isCurrency ? '$' : ''}${val.toLocaleString(undefined, { maximumFractionDigits: isCurrency ? 2 : 0 })}${suffix}`;
     };
 
     const items = [
-        { label: 'ERCOT LOAD', value: `${displayData.load.toLocaleString()} MW`, color: 'text-blue-600 dark:text-blue-400' },
-        { label: 'HENRY HUB', value: `$${displayData.gasPrice.toFixed(2)}`, color: displayData.isRealGas ? 'text-green-600 dark:text-green-400 font-bold' : 'text-green-600/70 dark:text-green-400/70' },
-        { label: 'CO2 INTENSITY', value: `${displayData.carbonIntensity} g/kWh`, color: 'text-gray-600 dark:text-gray-400' },
-        { label: 'SOLAR', value: `${displayData.solarOutput.toLocaleString()} MW`, color: 'text-yellow-600 dark:text-yellow-400' },
-        { label: 'WIND', value: `${displayData.windOutput.toLocaleString()} MW`, color: 'text-cyan-600 dark:text-cyan-400' },
+        { label: 'ERCOT LOAD', value: formatValue(displayData.load, false, ' MW'), color: 'text-blue-600 dark:text-blue-400' },
+        { label: 'HENRY HUB', value: formatValue(displayData.gasPrice, true, ''), color: displayData.isRealGas ? 'text-green-600 dark:text-green-400 font-bold' : 'text-green-600/70 dark:text-green-400/70' },
+        { label: 'CO2 INTENSITY', value: displayData.carbonIntensity > 0 ? `${displayData.carbonIntensity} g/kWh` : 'N/A', color: 'text-gray-600 dark:text-gray-400' },
+        { label: 'SOLAR', value: `${displayData.solarOutput >= 0 ? displayData.solarOutput.toLocaleString() : 'N/A'} MW`, color: 'text-yellow-600 dark:text-yellow-400' },
+        { label: 'WIND', value: `${displayData.windOutput >= 0 ? displayData.windOutput.toLocaleString() : 'N/A'} MW`, color: 'text-cyan-600 dark:text-cyan-400' },
+        { label: 'NAT GAS', value: `${displayData.gasOutput > 0 ? displayData.gasOutput.toLocaleString() : 'N/A'} MW`, color: 'text-orange-600 dark:text-orange-400' },
+        { label: 'COAL', value: `${displayData.coalOutput > 0 ? displayData.coalOutput.toLocaleString() : 'N/A'} MW`, color: 'text-slate-700 dark:text-slate-300' },
+        { label: 'NUCLEAR', value: `${displayData.nuclearOutput > 0 ? displayData.nuclearOutput.toLocaleString() : 'N/A'} MW`, color: 'text-purple-600 dark:text-purple-400' },
         {
-            label: (displayData.isRealLoad || displayData.isRealGas) ? 'UPDATED' : 'DATA SOURCE',
-            value: (displayData.isRealLoad || displayData.isRealGas) && displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'SIMULATED',
+            label: (displayData.isRealLoad || displayData.isRealGas) ? 'UPDATED' : 'STATUS',
+            value: (displayData.isRealLoad || displayData.isRealGas) && displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (data ? 'OFFLINE' : 'LOADING...'),
             color: (displayData.isRealLoad || displayData.isRealGas) ? 'text-gray-900 dark:text-white' : 'text-amber-600 dark:text-amber-500'
         },
     ];
@@ -70,7 +86,7 @@ export default function EnergyTicker() {
                 animate={{ x: [0, "-25%"] }}
                 transition={{
                     repeat: Infinity,
-                    duration: 20,
+                    duration: 30, // Slower for readability
                     ease: "linear"
                 }}
             >

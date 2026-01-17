@@ -43,27 +43,36 @@ export async function GET() {
             windOutput = fuelMix.data['Wind']?.gen || 0;
         }
 
-        // If still 0 and no source found, use simulation
-        // (Note: Solar can legitimately be 0 at night, so we don't force simulation if it's 0)
-        // Check if we have *any* real data source to decide if we should simulate
-        // If we got 'gridConditions.load' we assume the scrape worked.
+        let gasOutput = 0;
+        let coalOutput = 0;
+        let nuclearOutput = 0;
 
-        if (!gridConditions.load && !fuelMix && !ercotPrices) {
-            // Complete failure, use fallback simulation
-            solarOutput = Math.floor(5000 + Math.random() * 8000);
-            windOutput = Math.floor(8000 + Math.random() * 10000);
+        if (fuelMix && fuelMix.data) {
+            gasOutput = fuelMix.data['Natural Gas']?.gen || 0;
+            // ERCOT sometimes labels it 'Coal and Lignite'
+            coalOutput = (fuelMix.data['Coal and Lignite']?.gen || fuelMix.data['Coal']?.gen) || 0;
+            nuclearOutput = fuelMix.data['Nuclear']?.gen || 0;
         }
 
-        // Mock Carbon (Complex to calc from mix accurately without emissions factors)
-        const carbonIntensity = Math.floor(350 + Math.random() * 50);
+        // Remove simulation fallback - if 0, it stays 0.
+
+        // Mock Carbon -> Set to 0 if we can't calc it (or keep a static estimate if preferred, but user said no made up data)
+        // Let's keep a reasonable static estimate as a placeholder or 0? 
+        // User said "no made up data". So 0 or null is best. 
+        // However, Carbon Intensity is often a calculated metric. 
+        // Let's set it to 0 for now to be strict.
+        const carbonIntensity = 0;
 
         return NextResponse.json({
-            load: gridConditions.load || 54000,
-            gasPrice: gasPrice || 3.15,
+            load: gridConditions.load || 0,
+            gasPrice: gasPrice || 0,
             carbonIntensity,
             solarOutput,
             windOutput,
-            prices: ercotPrices || generateSimulatedPrices(),
+            gasOutput,
+            coalOutput,
+            nuclearOutput,
+            prices: ercotPrices || {},
             timestamp: new Date().toISOString(),
             isRealData: !!(gridConditions.load && ercotPrices),
             isRealPrices: !!ercotPrices,
@@ -72,34 +81,22 @@ export async function GET() {
         });
     } catch (error) {
         console.error('Ticker API error:', error);
-        // Fallback data
+        // Fallback error data - no valid data
         return NextResponse.json({
-            load: 54120,
-            gasPrice: 3.12,
-            carbonIntensity: 385,
-            solarOutput: 8400,
-            windOutput: 12500,
-            prices: generateSimulatedPrices(),
+            load: 0,
+            gasPrice: 0,
+            carbonIntensity: 0,
+            solarOutput: 0,
+            windOutput: 0,
+            gasOutput: 0,
+            coalOutput: 0,
+            nuclearOutput: 0,
+            prices: {},
             timestamp: new Date().toISOString(),
             isRealData: false,
             isRealPrices: false,
             isRealLoad: false,
             isRealGas: false
-        });
+        }, { status: 500 });
     }
-}
-
-// Helper to generate fallback simulated prices
-function generateSimulatedPrices() {
-    const basePrice = 28.50;
-    return {
-        HB_NORTH: (basePrice + Math.random() * 5).toFixed(2),
-        HB_SOUTH: (basePrice + Math.random() * 4).toFixed(2),
-        HB_WEST: (basePrice - 5 + Math.random() * 10).toFixed(2),
-        HB_HOUSTON: (basePrice + 2 + Math.random() * 6).toFixed(2),
-        LZ_NORTH: (basePrice + 0.5 + Math.random() * 2).toFixed(2),
-        LZ_SOUTH: (basePrice + 0.2 + Math.random() * 2).toFixed(2),
-        LZ_WEST: (basePrice - 4 + Math.random() * 8).toFixed(2),
-        LZ_HOUSTON: (basePrice + 3 + Math.random() * 5).toFixed(2),
-    };
 }
