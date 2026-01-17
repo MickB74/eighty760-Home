@@ -39,7 +39,12 @@ export async function fetchErcotFuelMix(): Promise<ErcotFuelMix | null> {
 export async function fetchLiveErcotPrices(): Promise<Record<string, string> | null> {
     try {
         const url = 'https://www.ercot.com/content/cdr/html/real_time_spp.html';
-        const res = await fetch(url, { next: { revalidate: 60 } }); // Cache for 1 min
+        const res = await fetch(url, {
+            next: { revalidate: 60 },
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        }); // Cache for 1 min
         if (!res.ok) return null;
 
         const html = await res.text();
@@ -118,7 +123,12 @@ export async function fetchLiveErcotLoad(): Promise<ErcotGridConditions> {
 
     try {
         const url = 'https://www.ercot.com/content/cdr/html/real_time_system_conditions.html';
-        const res = await fetch(url, { next: { revalidate: 60 } }); // Cache for 1 min
+        const res = await fetch(url, {
+            next: { revalidate: 60 },
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+        }); // Cache for 1 min
         if (!res.ok) return result;
 
         const html = await res.text();
