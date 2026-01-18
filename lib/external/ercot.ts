@@ -8,7 +8,7 @@ export interface ErcotFuelMix {
     data: {
         [fuelType: string]: {
             gen: number; // MW
-            mix: number; // Percentage
+            mix?: number; // Percentage
         }
     }
 }
@@ -27,8 +27,28 @@ export async function fetchErcotFuelMix(): Promise<ErcotFuelMix | null> {
         if (!res.ok) return null;
 
         const json = await res.json();
-        // The API returns structure like: { lastUpdated: "...", data: { Solar: { gen: 123, mix: 1.2 }, ... } }
-        return json as ErcotFuelMix;
+
+        // The API returns structure like: { lastUpdated: "...", data: { "2023-01-01": { "2023-01-01 12:00": { Solar: ... } } } }
+        // We need to find the latest day, then the latest timestamp within that day
+        if (json && json.data) {
+            const days = Object.keys(json.data).sort();
+            const latestDay = days[days.length - 1];
+
+            if (latestDay && json.data[latestDay]) {
+                const dayData = json.data[latestDay];
+                const timestamps = Object.keys(dayData).sort();
+                const latestTimestamp = timestamps[timestamps.length - 1];
+
+                if (latestTimestamp && dayData[latestTimestamp]) {
+                    return {
+                        lastUpdated: latestTimestamp,
+                        data: dayData[latestTimestamp]
+                    };
+                }
+            }
+        }
+
+        return null;
 
     } catch (e) {
         console.error('Failed to fetch ERCOT Fuel Mix:', e);
