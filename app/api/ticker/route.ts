@@ -37,10 +37,30 @@ export async function GET() {
         // actually scraper returns null if not found. If 0 it returns 0.
         // If scraped is missing, try Fuel Mix API
         if (gridConditions.solar === null && fuelMix && fuelMix.data) {
-            solarOutput = fuelMix.data['Solar']?.gen || 0;
+            // Find latest timestamp in nested structure
+            const days = Object.keys(fuelMix.data).sort();
+            const latestDay = days[days.length - 1];
+            if (latestDay && fuelMix.data[latestDay]) {
+                const timestamps = Object.keys(fuelMix.data[latestDay]).sort();
+                const latestTs = timestamps[timestamps.length - 1];
+                if (latestTs) {
+                    const data = fuelMix.data[latestDay][latestTs];
+                    solarOutput = data['Solar']?.gen || 0;
+                }
+            }
         }
         if (gridConditions.wind === null && fuelMix && fuelMix.data) {
-            windOutput = fuelMix.data['Wind']?.gen || 0;
+            // Find latest timestamp in nested structure
+            const days = Object.keys(fuelMix.data).sort();
+            const latestDay = days[days.length - 1];
+            if (latestDay && fuelMix.data[latestDay]) {
+                const timestamps = Object.keys(fuelMix.data[latestDay]).sort();
+                const latestTs = timestamps[timestamps.length - 1];
+                if (latestTs) {
+                    const data = fuelMix.data[latestDay][latestTs];
+                    windOutput = data['Wind']?.gen || 0;
+                }
+            }
         }
 
         let gasOutput = 0;
@@ -48,10 +68,18 @@ export async function GET() {
         let nuclearOutput = 0;
 
         if (fuelMix && fuelMix.data) {
-            gasOutput = fuelMix.data['Natural Gas']?.gen || 0;
-            // ERCOT sometimes labels it 'Coal and Lignite'
-            coalOutput = (fuelMix.data['Coal and Lignite']?.gen || fuelMix.data['Coal']?.gen) || 0;
-            nuclearOutput = fuelMix.data['Nuclear']?.gen || 0;
+            const days = Object.keys(fuelMix.data).sort();
+            const latestDay = days[days.length - 1];
+            if (latestDay && fuelMix.data[latestDay]) {
+                const timestamps = Object.keys(fuelMix.data[latestDay]).sort();
+                const latestTs = timestamps[timestamps.length - 1];
+                if (latestTs) {
+                    const data = fuelMix.data[latestDay][latestTs];
+                    gasOutput = data['Natural Gas']?.gen || 0;
+                    coalOutput = (data['Coal and Lignite']?.gen || data['Coal']?.gen) || 0;
+                    nuclearOutput = data['Nuclear']?.gen || 0;
+                }
+            }
         }
 
         // Remove simulation fallback - if 0, it stays 0.
