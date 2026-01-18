@@ -976,9 +976,33 @@ export default function AggregationPage() {
                                                         onChange={(e) => setFinancials(prev => ({ ...prev, scarcity_intensity: parseFloat(e.target.value) }))}
                                                         className="w-full h-1.5 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer accent-red-500"
                                                     />
-                                                    <p className="text-[10px] text-gray-400 mt-1">
+                                                    <p className="text-[10px] text-gray-400 mt-1 mb-3">
                                                         Simulates price spikes during grid stress events (Winter, Summer peaks).
                                                     </p>
+
+                                                    {/* Scarcity Timing Metrics */}
+                                                    <div className="grid grid-cols-2 gap-2 mt-2 border-t border-white/5 pt-2">
+                                                        {[
+                                                            { label: 'Winter Super Peak', color: 'red', hrs: 270, mult: 2.0, time: 'Jan/Feb/Dec (6-9 PM)' },
+                                                            { label: 'Winter Morning', color: 'orange', hrs: 270, mult: 1.4, time: 'Jan/Feb/Dec (6-9 AM)' },
+                                                            { label: 'Evening Peak', color: 'yellow', hrs: 1555, mult: 1.2, time: 'All Year (5-10 PM)' },
+                                                            { label: 'Solar Oversupply', color: 'blue', hrs: 610, mult: 0.45, time: 'Jun-Sep (10 AM-3 PM)' },
+                                                        ].map((item, idx) => {
+                                                            const intensity = financials.scarcity_intensity || 1.0;
+                                                            const finalMult = Math.max(0, 1.0 + (item.mult - 1.0) * intensity);
+                                                            const effectivePrice = financials.rec_price * finalMult;
+                                                            return (
+                                                                <div key={idx} className={`bg-${item.color}-500/10 p-2 rounded border border-${item.color}-500/20`}>
+                                                                    <div className={`text-[10px] text-${item.color === 'blue' ? 'blue-400' : `${item.color}-500`} font-bold uppercase`}>{item.label}</div>
+                                                                    <div className="flex justify-between items-baseline mb-0.5">
+                                                                        <div className="text-sm font-mono text-gray-200">{item.hrs} hrs</div>
+                                                                        <div className="text-xs font-bold text-white">${effectivePrice.toFixed(2)}</div>
+                                                                    </div>
+                                                                    <div className="text-[9px] text-gray-400">{item.time}</div>
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
                                                 </div>
                                             )}
                                         </div>
