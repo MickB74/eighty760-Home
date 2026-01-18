@@ -63,12 +63,12 @@ export default function EnergyTicker() {
     const items = [
         { label: 'ERCOT LOAD', value: formatValue(displayData.load, false, ' MW'), color: 'text-blue-600 dark:text-blue-400' },
         { label: 'HENRY HUB', value: formatValue(displayData.gasPrice, true, ''), color: displayData.isRealGas ? 'text-green-600 dark:text-green-400 font-bold' : 'text-green-600/70 dark:text-green-400/70' },
-        { label: 'CO2 INTENSITY', value: displayData.carbonIntensity > 0 ? `${displayData.carbonIntensity} g/kWh` : 'N/A', color: 'text-gray-600 dark:text-gray-400' },
-        { label: 'SOLAR', value: `${displayData.solarOutput >= 0 ? displayData.solarOutput.toLocaleString() : 'N/A'} MW`, color: 'text-yellow-600 dark:text-yellow-400' },
-        { label: 'WIND', value: `${displayData.windOutput >= 0 ? displayData.windOutput.toLocaleString() : 'N/A'} MW`, color: 'text-cyan-600 dark:text-cyan-400' },
-        { label: 'NAT GAS', value: `${displayData.gasOutput > 0 ? displayData.gasOutput.toLocaleString() : 'N/A'} MW`, color: 'text-orange-600 dark:text-orange-400' },
-        { label: 'COAL', value: `${displayData.coalOutput > 0 ? displayData.coalOutput.toLocaleString() : 'N/A'} MW`, color: 'text-slate-700 dark:text-slate-300' },
-        { label: 'NUCLEAR', value: `${displayData.nuclearOutput > 0 ? displayData.nuclearOutput.toLocaleString() : 'N/A'} MW`, color: 'text-purple-600 dark:text-purple-400' },
+        { label: 'CO2 INTENSITY', value: displayData.carbonIntensity > 0 ? `${Math.round(displayData.carbonIntensity)} g/kWh` : 'N/A', color: 'text-gray-600 dark:text-gray-400' },
+        { label: 'SOLAR', value: `${displayData.solarOutput >= 0 ? displayData.solarOutput.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'} MW`, color: 'text-yellow-600 dark:text-yellow-400' },
+        { label: 'WIND', value: `${displayData.windOutput >= 0 ? displayData.windOutput.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'} MW`, color: 'text-cyan-600 dark:text-cyan-400' },
+        { label: 'NAT GAS', value: `${displayData.gasOutput > 0 ? displayData.gasOutput.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'} MW`, color: 'text-orange-600 dark:text-orange-400' },
+        { label: 'COAL', value: `${displayData.coalOutput > 0 ? displayData.coalOutput.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'} MW`, color: 'text-slate-700 dark:text-slate-300' },
+        { label: 'NUCLEAR', value: `${displayData.nuclearOutput > 0 ? displayData.nuclearOutput.toLocaleString(undefined, { maximumFractionDigits: 0 }) : 'N/A'} MW`, color: 'text-purple-600 dark:text-purple-400' },
         {
             label: (displayData.isRealLoad || displayData.isRealGas) ? 'UPDATED' : 'STATUS',
             value: (displayData.isRealLoad || displayData.isRealGas) && displayData.timestamp ? new Date(displayData.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : (data ? 'OFFLINE' : 'LOADING...'),
