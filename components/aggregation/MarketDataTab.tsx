@@ -7,6 +7,7 @@ import {
     type HenryHubHistory,
     type FuelMixHistory
 } from '@/lib/external/eia';
+import { loadHubPrices } from '@/lib/aggregation/price-loader';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
@@ -30,6 +31,47 @@ export default function MarketDataTab() {
     const [carbonHistory, setCarbonHistory] = useState<{ time: string, intensity: number }[]>([]); // gCO2/kWh
     const [renewablesProfile, setRenewablesProfile] = useState<{ time: string, wind: number, solar: number }[]>([]);
     const [hubPrices, setHubPrices] = useState<{ name: string, price: number, trend: 'up' | 'down' | 'flat' }[]>([]);
+
+    // Historical Hub Prices (Monthly Averages)
+    const [hubHistoryData, setHubHistoryData] = useState<Record<string, number[]>>({}); // { 'North': [jan, feb...], ... }
+
+    useEffect(() => {
+        // Load 12-month history (using 2025 as proxy)
+        const loadHistory = async () => {
+            const hubs = ['North', 'South', 'West', 'Houston'];
+            const historyMap: Record<string, number[]> = {};
+
+            await Promise.all(hubs.map(async (hub) => {
+                const hourly = await loadHubPrices(2025, hub);
+                if (hourly && hourly.length > 0) {
+                    // Aggregate to Monthly Averages
+                    const monthlySums = new Array(12).fill(0);
+                    const monthlyCounts = new Array(12).fill(0);
+                    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+                    hourly.forEach((price, hourIdx) => {
+                        if (hourIdx >= 8760) return;
+                        const dayOfYear = Math.floor(hourIdx / 24);
+                        let month = 0;
+                        let d = dayOfYear;
+                        for (let m = 0; m < 12; m++) {
+                            if (d < daysInMonth[m]) {
+                                month = m;
+                                break;
+                            }
+                            d -= daysInMonth[m];
+                        }
+                        monthlySums[month] += price;
+                        monthlyCounts[month]++;
+                    });
+
+                    historyMap[hub] = monthlySums.map((sum, i) => monthlyCounts[i] > 0 ? sum / monthlyCounts[i] : 0);
+                }
+            }));
+            setHubHistoryData(historyMap);
+        };
+        loadHistory();
+    }, []);
 
     useEffect(() => {
         // Initial Fetch
@@ -481,10 +523,46 @@ export default function MarketDataTab() {
         }
     };
 
+    // Chart Data - Hub Price History (12 Months)
+    const hubHistoryChartData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [
+            {
+                label: 'North Hub',
+                data: hubHistoryData['North'] || [],
+                borderColor: '#3b82f6', // Blue
+                backgroundColor: 'transparent',
+                tension: 0.4
+            },
+            {
+                label: 'South Hub',
+                data: hubHistoryData['South'] || [],
+                borderColor: '#10b981', // Green
+                backgroundColor: 'transparent',
+                tension: 0.4
+            },
+            {
+                label: 'West Hub',
+                data: hubHistoryData['West'] || [],
+                borderColor: '#f59e0b', // Amber
+                backgroundColor: 'transparent',
+                tension: 0.4
+            },
+            {
+                label: 'Houston Hub',
+                data: hubHistoryData['Houston'] || [],
+                borderColor: '#6366f1', // Indigo
+                backgroundColor: 'transparent',
+                tension: 0.4
+            }
+        ]
+    };
+
     return (
         <div className="space-y-6 animate-in fade-in">
             {/* Header / Timestamp */}
             <div className="flex justify-between items-center">
+
                 <div>
                     <h2 className="text-xl font-bold text-navy-950 dark:text-white flex items-center gap-2">
                         Current Grid Conditions
@@ -662,6 +740,19 @@ export default function MarketDataTab() {
                     </div>
                 )}
             </div>
+
+            {/* Charts Row: Hub Price Trends (12 Months) */}
+            {Object.keys(hubHistoryData).length > 0 && (
+                <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                    <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4 flex items-center gap-2">
+                        Regional Price Trends (Last 12 Months)
+                        <InfoTooltip text="Monthly average Real-Time Market (RTM) Settlement Point Prices for major ERCOT hubs." />
+                    </h3>
+                    <div className="h-[300px]">
+                        <Line data={hubHistoryChartData} options={lineOptions} />
+                    </div>
+                </div>
+            )}
 
             {/* Charts Row 4: Fuel Mix Breakdown (6 Small Charts) */}
             {mixHistory.length > 0 && (
