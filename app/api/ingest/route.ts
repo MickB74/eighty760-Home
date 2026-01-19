@@ -2,14 +2,12 @@
 import { NextResponse } from 'next/server';
 import mongoose from 'mongoose';
 import * as cheerio from 'cheerio';
-import OpenAI from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 import dbConnect from '@/lib/db';
 import Insight from '@/lib/models/Insight';
 
-// Initialize OpenAI
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
 
 export async function POST(req: Request) {
     try {
@@ -51,8 +49,10 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'No content found to analyze' }, { status: 400 });
         }
 
-        // 2. Run LLM Relevance Check
-        const systemPrompt = `
+        // 2. Run LLM Relevance Check with Gemini
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const prompt = `
 You are an expert energy market analyst for "Eighty760", a 24/7 Carbon-Free Energy (CFE) platform.
 Your job is to act as a noise filter. Analyze the provided text and determine if it is HIGHLY RELEVANT to:
 1. Hourly 24/7 Carbon-Free Energy (CFE) matching
@@ -63,7 +63,11 @@ Your job is to act as a noise filter. Analyze the provided text and determine if
 If it is generic "sustainability" or "ESG" fluff, reject it.
 If it is about simple annual offsets without time-based granularity, reject it.
 
-Output JSON:
+Title: ${title}
+Content:
+${content}
+
+Respond STRICTLY with valid JSON (no markdown banking) in the following format:
 {
     "isRelevant": boolean,
     "relevanceReasoning": "1-sentence explanation",
@@ -72,16 +76,14 @@ Output JSON:
 }
         `;
 
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: [
-                { role: "system", content: systemPrompt },
-                { role: "user", content: `Title: ${title}\nContent:\n${content}` }
-            ],
-            response_format: { type: "json_object" },
-        });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        let text = response.text();
 
-        const analysis = JSON.parse(completion.choices[0].message.content || '{}');
+        // Clean up markdown if Gemini wraps it in ```json ... ```
+        text = text.replace(/```json/g, '').replace(/```/g, '').trim();
+
+        const analysis = JSON.parse(text);
 
         if (!analysis.isRelevant) {
             return NextResponse.json({
@@ -95,7 +97,7 @@ Output JSON:
             source: scrapedSource || 'Manual Entry',
             url: url || 'manual',
             title: title || 'Untitled Insight',
-            content: analysis.summary, // Store the rigorous summary, not raw text? Or both. Schema has content.
+            content: analysis.summary,
             isRelevant: true,
             relevanceReasoning: analysis.relevanceReasoning,
             tags: analysis.tags,
