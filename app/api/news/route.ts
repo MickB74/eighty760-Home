@@ -49,10 +49,7 @@ async function fetchGoogleNewsRSS(): Promise<string[]> {
                 title = title.substring(9, title.length - 3);
             }
 
-            // Remove HTML tags (like <b>ERCOT</b> which Google Alerts sometimes adds)
-            title = title.replace(/<[^>]*>/g, '');
-
-            // HTML Entity Decoding (Basic)
+            // HTML Entity Decoding (Basic) - Decode FIRST so encoded tags like &lt;b&gt; become <b>
             title = title
                 .replace(/&quot;/g, '"')
                 .replace(/&apos;/g, "'")
@@ -60,6 +57,9 @@ async function fetchGoogleNewsRSS(): Promise<string[]> {
                 .replace(/&#39;/g, "'")
                 .replace(/&lt;/g, '<')
                 .replace(/&gt;/g, '>');
+
+            // Remove HTML tags (now that they are decoded)
+            title = title.replace(/<[^>]*>/g, '');
 
             // Remove Source Name Suffix (e.g. " - Houston Chronicle")
             const dashIndex = title.lastIndexOf(' - ');
