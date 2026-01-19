@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import NewsTicker from "@/components/home/NewsTicker";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
 const ibmPlexMono = IBM_Plex_Mono({
@@ -87,7 +88,10 @@ export default function RootLayout({
                 />
             </head>
             <body className={`${inter.variable} ${ibmPlexMono.variable} font-sans antialiased`}>
-                {children}
+                <div className="pb-8">
+                    {children}
+                </div>
+                <NewsTicker />
                 <Script defer src="https://cdn.vercel-insights.com/v1/script.js" />
 
                 {/* Google Analytics */}
