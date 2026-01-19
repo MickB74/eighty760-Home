@@ -23,23 +23,23 @@ export async function GET() {
 }
 
 async function fetchGoogleNewsRSS(): Promise<string[]> {
-    // Queries for EIA and Energy Information Administration specific news
-    const url = 'https://news.google.com/rss/search?q=EIA+Energy+Information+Administration+report&hl=en-US&gl=US&ceid=US:en';
+    // User provided Google Alerts RSS (Atom) feed
+    const url = 'https://www.google.com/alerts/feeds/05477018627257484545/2588084030416567261';
     const res = await fetch(url, { next: { revalidate: 300 } }); // Cache for 5 mins
 
     if (!res.ok) throw new Error(`RSS fetch failed: ${res.status}`);
 
     const xml = await res.text();
 
-    // Simple Regex Parsing for <item><title>...</title></item>
-    // We avoid full XML parser libraries to keep dependencies light for this simple use case
-    const itemRegex = /<item>([\s\S]*?)<\/item>/g;
+    // Regex Parsing for Atom Feed (<entry><title>...</title></entry>)
+    const itemRegex = /<entry>([\s\S]*?)<\/entry>/g;
     const items: string[] = [];
     let match;
 
     while ((match = itemRegex.exec(xml)) !== null) {
         const itemContent = match[1];
-        const titleMatch = itemContent.match(/<title>(.*?)<\/title>/);
+        // Match <title> with optional attributes like type="html"
+        const titleMatch = itemContent.match(/<title[^>]*>([\s\S]*?)<\/title>/);
 
         if (titleMatch) {
             let title = titleMatch[1];
@@ -49,26 +49,31 @@ async function fetchGoogleNewsRSS(): Promise<string[]> {
                 title = title.substring(9, title.length - 3);
             }
 
+            // Remove HTML tags (like <b>ERCOT</b> which Google Alerts sometimes adds)
+            title = title.replace(/<[^>]*>/g, '');
+
             // HTML Entity Decoding (Basic)
             title = title
                 .replace(/&quot;/g, '"')
                 .replace(/&apos;/g, "'")
                 .replace(/&amp;/g, '&')
-                .replace(/&#39;/g, "'");
+                .replace(/&#39;/g, "'")
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>');
 
             // Remove Source Name Suffix (e.g. " - Houston Chronicle")
             const dashIndex = title.lastIndexOf(' - ');
-            if (dashIndex > 10) { // arbitrary length to avoid cutting short titles
+            if (dashIndex > 15) { // arbitrary length to avoid cutting short titles
                 title = title.substring(0, dashIndex);
             }
 
-            items.push(title);
+            items.push(title.trim());
         }
 
-        if (items.length >= 8) break; // Limit to 8 headlines
+        if (items.length >= 10) break; // Limit to 10 headlines
     }
 
     return items.length > 0 ? items : [
-        "EIA: Market data and analysis updates available."
+        "Status: Waiting for new alert updates..." // Fallback if valid XML but no entries
     ];
 }
