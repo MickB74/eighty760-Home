@@ -12,18 +12,19 @@ export async function GET() {
         // Fallback headlines
         return NextResponse.json({
             headlines: [
-                "ERCOT: Grid operating normally, sufficient generation available.",
-                "MARKET: Solar output hits new daily record.",
-                "WEATHER: Seasonal temperatures expected across Texas.",
-                "REGULATORY: PUC discusses new battery storage interconnection rules.",
-                "INDUSTRY: Texas leads nation in new utility-scale wind capacity.",
+                "EIA: Solar to drive US electricity generation growth through 2027.",
+                "GAS: Henry Hub prices expected to average $3.52/MMBtu in 2025.",
+                "OIL: US crude production forecast to dip slightly in 2026.",
+                "GRID: Renewables share to reach 21% of US generation by 2027.",
+                "MARKET: Global oil supply expected to exceed demand.",
             ]
         });
     }
 }
 
 async function fetchGoogleNewsRSS(): Promise<string[]> {
-    const url = 'https://news.google.com/rss/search?q=ERCOT+Texas+Energy&hl=en-US&gl=US&ceid=US:en';
+    // Queries for EIA and Energy Information Administration specific news
+    const url = 'https://news.google.com/rss/search?q=EIA+Energy+Information+Administration+report&hl=en-US&gl=US&ceid=US:en';
     const res = await fetch(url, { next: { revalidate: 300 } }); // Cache for 5 mins
 
     if (!res.ok) throw new Error(`RSS fetch failed: ${res.status}`);
@@ -68,6 +69,6 @@ async function fetchGoogleNewsRSS(): Promise<string[]> {
     }
 
     return items.length > 0 ? items : [
-        "ERCOT: Grid operating normally (RSS Empty)"
+        "EIA: Market data and analysis updates available."
     ];
 }
