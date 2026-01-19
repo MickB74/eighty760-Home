@@ -10,34 +10,38 @@ export default function GlobalTickers() {
     const pathname = usePathname();
     const isHome = pathname === '/';
 
+    // Desktop Nav Height: ~132px (100px logo + 32px padding)
+    // Mobile Nav Height: ~112px (80px logo + 32px padding)
+    // We position the stack starting here for Home page.
+
     return (
-        <>
-            {/* Energy Status Ticker */}
-            {/* Home: Top 0. Other: Bottom 72px (above Price and News) */}
+        <div className={`flex flex-col w-full left-0 transition-all duration-300 ${isHome
+            ? 'absolute top-[112px] md:top-[132px] z-50'
+            : 'fixed bottom-0 z-[100]'
+            }`}>
+            {/* 1. Energy Ticker (Always Top of Stack) */}
             <EnergyTicker
-                className={isHome
-                    ? "absolute top-0 left-0 z-50"
-                    : "fixed bottom-[72px] left-0 z-[100] border-t border-slate-200 dark:border-white/10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]"
-                }
+                className={`transform transition-all duration-300 relative order-1 ${isHome
+                    ? ''
+                    : 'shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] border-t border-slate-200 dark:border-white/10'
+                    }`}
             />
 
-            {/* News Ticker */}
-            {/* Home: Top 10 (40px). Other: Bottom 0 */}
+            {/* 2. News Ticker (Middle on Home, Bottom on Others) */}
             <NewsTicker
-                className={isHome
-                    ? "absolute top-10 left-0 z-40"
-                    : "fixed bottom-0 left-0 z-[100]"
-                }
+                className={`transform transition-all duration-300 relative ${isHome
+                    ? 'order-2'
+                    : 'order-3'
+                    }`}
             />
 
-            {/* Price Ticker */}
-            {/* Home: Top 72px. Other: Bottom 8 (32px) (above News) */}
+            {/* 3. Price Ticker (Bottom on Home, Middle on Others) */}
             <PriceTicker
-                className={isHome
-                    ? "absolute top-[72px] left-0 z-30"
-                    : "fixed bottom-8 left-0 z-[100] border-t border-slate-200 dark:border-white/10"
-                }
+                className={`transform transition-all duration-300 relative ${isHome
+                    ? 'order-3'
+                    : 'order-2 border-t border-slate-200 dark:border-white/10'
+                    }`}
             />
-        </>
+        </div>
     );
 }
