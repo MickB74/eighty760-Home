@@ -18,7 +18,7 @@ interface TickerData {
     isRealGas?: boolean;
 }
 
-export default function EnergyTicker() {
+export default function EnergyTicker({ className = "absolute top-0 left-0" }: { className?: string }) {
     const [data, setData] = useState<TickerData | null>(null);
 
     useEffect(() => {
@@ -78,7 +78,7 @@ export default function EnergyTicker() {
     const marqueeItems = [...items, ...items, ...items, ...items];
 
     return (
-        <div className="w-full bg-white/95 dark:bg-navy-950/90 border-b border-slate-200 dark:border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center absolute top-0 left-0">
+        <div className={`w-full bg-white/95 dark:bg-navy-950/90 border-b border-slate-200 dark:border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center ${className}`}>
             <motion.div
                 className="flex whitespace-nowrap"
                 animate={{ x: [0, "-25%"] }}

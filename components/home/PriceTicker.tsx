@@ -14,7 +14,7 @@ interface TickerResponse {
     isRealPrices?: boolean;
 }
 
-export default function PriceTicker() {
+export default function PriceTicker({ className = "absolute top-[72px] left-0" }: { className?: string }) {
     const [data, setData] = useState<TickerResponse | null>(null);
 
     useEffect(() => {
@@ -61,7 +61,7 @@ export default function PriceTicker() {
     const marqueeItems = [...items, ...items, ...items];
 
     return (
-        <div className="w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-hidden h-10 flex items-center absolute top-[72px] left-0 z-30">
+        <div className={`w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 overflow-hidden h-10 flex items-center z-30 ${className}`}>
             <div className="absolute left-0 h-full bg-white dark:bg-slate-900 px-4 flex items-center z-10 border-r border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-md">
                 <span className="text-[10px] font-bold tracking-widest text-emerald-400 uppercase">Real-Time LMP</span>
             </div>

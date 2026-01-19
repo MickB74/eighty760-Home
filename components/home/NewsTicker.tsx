@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 
-export default function NewsTicker() {
+export default function NewsTicker({ className = "fixed bottom-0 left-0" }: { className?: string }) {
     const [headlines, setHeadlines] = useState<string[]>([
         "Loading live energy news...",
     ]);
@@ -33,7 +33,7 @@ export default function NewsTicker() {
     const marqueeContent = [...headlines, ...headlines, ...headlines];
 
     return (
-        <div className="w-full bg-slate-50 dark:bg-navy-950 border-t border-slate-200 dark:border-white/5 backdrop-blur-sm overflow-hidden z-[100] h-8 flex items-center fixed bottom-0 left-0">
+        <div className={`w-full bg-slate-50 dark:bg-navy-950 border-t border-slate-200 dark:border-white/5 backdrop-blur-sm overflow-hidden z-[100] h-8 flex items-center ${className}`}>
             {/* Label */}
             <div className="absolute left-0 h-full bg-slate-100 dark:bg-navy-950/80 px-4 flex items-center z-10 border-r border-slate-200 dark:border-white/10">
                 <span className="text-[10px] font-bold tracking-widest text-red-400 uppercase">Breaking News</span>
