@@ -50,7 +50,8 @@ export async function POST(req: Request) {
         }
 
         // 2. Run LLM Relevance Check with Gemini
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Using gemini-2.0-flash-lite-preview-02-05 as requested by user
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-preview-02-05" });
 
         const prompt = `
 You are an expert energy market analyst for "Eighty760", a 24/7 Carbon-Free Energy (CFE) platform.
@@ -111,8 +112,9 @@ Respond STRICTLY with valid JSON (no markdown banking) in the following format:
             analysis
         });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Ingest error:', error);
-        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+        console.error('Error details:', error.message, error.response?.data);
+        return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
     }
 }
