@@ -79,8 +79,13 @@ export default function EnergyTicker({ className = "absolute top-0 left-0" }: { 
 
     return (
         <div className={`w-full bg-white/95 dark:bg-navy-950/90 border-b border-slate-200 dark:border-white/10 backdrop-blur-md overflow-hidden z-50 h-10 flex items-center ${className}`}>
+            {/* Label */}
+            <div className="absolute left-0 h-full bg-white/95 dark:bg-navy-950/90 px-4 flex items-center z-10 border-r border-slate-200 dark:border-white/10 shadow-sm">
+                <span className="text-[10px] font-bold tracking-widest text-blue-500 uppercase">Grid Status</span>
+            </div>
+
             <motion.div
-                className="flex whitespace-nowrap"
+                className="flex whitespace-nowrap pl-32"
                 animate={{ x: [0, "-25%"] }}
                 transition={{
                     repeat: Infinity,
