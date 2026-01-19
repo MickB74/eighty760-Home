@@ -88,6 +88,18 @@ export default function Article() {
                         </ul>
                     </div>
 
+                    <h3 className="text-xl font-semibold text-navy-950 dark:text-white mb-3 mt-8">Real-Time Dashboarding</h3>
+                    <p className="mb-4">
+                        To provide immediate context on grid conditions, Eighty760 maintains a persistent dashboard (the global tickers) sourced from live data streams:
+                    </p>
+                    <div className="bg-white dark:bg-white/5 backdrop-blur-md border border-gray-200 dark:border-white/10 rounded-xl p-6 my-6">
+                        <ul className="space-y-2 mb-0 list-disc pl-4">
+                            <li><strong>Grid Status:</strong> Real-time fuel mix (Solar, Wind, Gas, Nuclear) scraped directly from ERCOT or fetched via EIA API.</li>
+                            <li><strong>Real-Time LMP:</strong> Live Local Marginal Prices for major hubs (Houston, North, South, West) updated every minute.</li>
+                            <li><strong>Breaking News:</strong> Curated Google Alerts Atom feeds filtering for specific ERCOT and Texas energy market keywords.</li>
+                        </ul>
+                    </div>
+
                     <h2 className="text-2xl font-bold text-navy-950 dark:text-white mb-4 mt-12">Load Profile Modeling</h2>
                     <p className="mb-4">
                         Different facility types have dramatically different load patterns. Eighty760 includes four archetypal profiles:

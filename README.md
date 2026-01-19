@@ -19,6 +19,7 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 **Data sources:** 
 - **EIA Open Data API**: Real-time ERCOT grid conditions, Demand Forecasts, Henry Hub Futures (Simulated in Demo), and Carbon Intensity.
 - **GridStatus.io**: Historical ERCOT RTM pricing (2020-2025).
+- **Google Alerts**: Real-time energy news curation via specific Atom feeds.
 - **Open-Meteo**: ERA5 historical weather data.
 - **NREL**: PVWatts and SAM generation models.
 
@@ -29,6 +30,7 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 
 ## Features
 
+- **Global Real-Time Tickers**: Persistent status bars for Grid Mix, Breaking News, and Real-Time Prices visible across the platform.
 - **Interactive Portfolio Simulator**: Adjust solar, wind, and battery capacities in real-time.
 - **Instant Demo Mode**: One-click generation of randomized portfolios (3-6 varied properties) for immediate exploration.
 - **Live Market Data Tab**: View real-time ERCOT grid conditions, Fuel Mix trends, 24h Demand Forecasts, and Carbon Intensity via EIA API integration.
@@ -92,6 +94,8 @@ eighty760-Home/
 │   └── whitepaper/     # Methodology documentation route
 ├── components/
 │   ├── aggregation/    # Core business logic components (MarketData, Analysis, Financials)
+│   ├── home/           # Home page specific & Ticker components (Energy, News, Prices)
+│   ├── GlobalTickers.tsx # Orchestrator for global ticker positioning
 │   ├── Simulator.tsx   # Core simulation logic and UI
 │   ├── Navigation.tsx  # Responsive nav bar with dark mode toggle
 ├── lib/

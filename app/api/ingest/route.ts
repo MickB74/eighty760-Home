@@ -1,0 +1,116 @@
+
+import { NextResponse } from 'next/server';
+import mongoose from 'mongoose';
+import * as cheerio from 'cheerio';
+import OpenAI from 'openai';
+import dbConnect from '@/lib/db';
+import Insight from '@/lib/models/Insight';
+
+// Initialize OpenAI
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+
+export async function POST(req: Request) {
+    try {
+        const { url, category, manualContent } = await req.json();
+
+        if (!url && !manualContent) {
+            return NextResponse.json({ error: 'URL or manual content required' }, { status: 400 });
+        }
+
+        await dbConnect();
+
+        let title = '';
+        let content = manualContent || '';
+        let scrapedSource = '';
+
+        // 1. Scrape Content if URL provided
+        if (url && !manualContent) {
+            try {
+                const res = await fetch(url);
+                const html = await res.text();
+                const $ = cheerio.load(html);
+
+                // Simple heuristic scraping (can be improved for specific sites)
+                title = $('title').text().trim() || $('h1').first().text().trim();
+
+                // Remove scripts, styles, navs
+                $('script, style, nav, footer, header').remove();
+
+                // Get main content paragraphs
+                content = $('p').map((i, el) => $(el).text()).get().join('\n').substring(0, 5000); // Limit context
+                scrapedSource = new URL(url).hostname;
+            } catch (scrapeErr) {
+                console.error('Scraping failed:', scrapeErr);
+                return NextResponse.json({ error: 'Failed to scrape URL' }, { status: 500 });
+            }
+        }
+
+        if (!content) {
+            return NextResponse.json({ error: 'No content found to analyze' }, { status: 400 });
+        }
+
+        // 2. Run LLM Relevance Check
+        const systemPrompt = `
+You are an expert energy market analyst for "Eighty760", a 24/7 Carbon-Free Energy (CFE) platform.
+Your job is to act as a noise filter. Analyze the provided text and determine if it is HIGHLY RELEVANT to:
+1. Hourly 24/7 Carbon-Free Energy (CFE) matching
+2. Scope 2 GHG accounting credibility
+3. Grid-time alignment (time-based attributes)
+4. ERCOT market dynamics affecting renewables
+
+If it is generic "sustainability" or "ESG" fluff, reject it.
+If it is about simple annual offsets without time-based granularity, reject it.
+
+Output JSON:
+{
+    "isRelevant": boolean,
+    "relevanceReasoning": "1-sentence explanation",
+    "summary": "2-sentence summary of the key insight",
+    "tags": ["tag1", "tag2"]
+}
+        `;
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4o",
+            messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: `Title: ${title}\nContent:\n${content}` }
+            ],
+            response_format: { type: "json_object" },
+        });
+
+        const analysis = JSON.parse(completion.choices[0].message.content || '{}');
+
+        if (!analysis.isRelevant) {
+            return NextResponse.json({
+                message: 'Content analyzed but discarded as irrelevant',
+                reasoning: analysis.relevanceReasoning
+            });
+        }
+
+        // 3. Store in MongoDB
+        const insight = await Insight.create({
+            source: scrapedSource || 'Manual Entry',
+            url: url || 'manual',
+            title: title || 'Untitled Insight',
+            content: analysis.summary, // Store the rigorous summary, not raw text? Or both. Schema has content.
+            isRelevant: true,
+            relevanceReasoning: analysis.relevanceReasoning,
+            tags: analysis.tags,
+            category: category || 'General',
+            ingestedDate: new Date()
+        });
+
+        return NextResponse.json({
+            success: true,
+            insightId: insight._id,
+            analysis
+        });
+
+    } catch (error) {
+        console.error('Ingest error:', error);
+        return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+    }
+}
