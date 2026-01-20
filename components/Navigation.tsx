@@ -74,9 +74,9 @@ export default function Navigation() {
                             <Image
                                 src="/LogoBlackTransparent.png"
                                 alt="Eighty760 Logo"
-                                width={240}
-                                height={120}
-                                className="w-auto object-contain h-[80px] md:h-[100px]"
+                                width={480}
+                                height={240}
+                                className="w-auto object-contain h-[160px] md:h-[200px]"
                                 priority
                             />
                         </Link>
