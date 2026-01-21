@@ -51,7 +51,7 @@ export default function Navigation() {
 
         // Learn Section
         // { name: 'Resources', path: '/blog', section: 'learn' }, // Hidden as per request
-        { name: 'Intelligence', path: '/intelligence', section: 'learn' }, // New Proprietary Intelligence Page
+        // { name: 'Intelligence', path: '/intelligence', section: 'learn' }, // Hidden for now
         { name: 'Methodology', path: '/whitepaper', section: 'learn' },
         // Company Section
         { name: 'About', path: '/about', section: 'company' },
