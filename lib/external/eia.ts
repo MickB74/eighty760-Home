@@ -119,15 +119,36 @@ export async function fetchHenryHubPrice(apiKey: string): Promise<number | null>
     // Return latest
     return history.length > 0 ? history[history.length - 1].value : null;
 }
+/**
+ * Gas price data with % change metrics
+ */
+export interface GasPriceData {
+    price: number | null;
+    isDelayed: boolean;
+    previousClose: number | null;
+    dayChange: number | null;      // % change from previous close
+    ytdChange: number | null;      // % change from start of year
+    yearChange: number | null;     // % change from 1 year ago
+}
 
 /**
  * Fetches real-time Natural Gas Futures price from Yahoo Finance (NG=F).
  * This is the prompt month NYMEX futures price, ~15 min delayed.
+ * Also includes % change metrics for day, YTD, and 1 year.
  */
-export async function fetchRealTimeGasPrice(): Promise<{ price: number | null; isDelayed: boolean }> {
+export async function fetchRealTimeGasPrice(): Promise<GasPriceData> {
+    const defaultResult: GasPriceData = {
+        price: null,
+        isDelayed: true,
+        previousClose: null,
+        dayChange: null,
+        ytdChange: null,
+        yearChange: null
+    };
+
     try {
-        // Yahoo Finance API for NG=F (Natural Gas Futures)
-        const url = 'https://query1.finance.yahoo.com/v8/finance/chart/NG=F?interval=1d&range=1d';
+        // Yahoo Finance API for NG=F (Natural Gas Futures) - fetch 1 year of data
+        const url = 'https://query1.finance.yahoo.com/v8/finance/chart/NG=F?interval=1d&range=1y';
 
         const res = await fetch(url, {
             headers: {
@@ -138,25 +159,62 @@ export async function fetchRealTimeGasPrice(): Promise<{ price: number | null; i
 
         if (!res.ok) {
             console.warn('Yahoo Finance API returned non-OK status:', res.status);
-            return { price: null, isDelayed: true };
+            return defaultResult;
         }
 
         const json = await res.json();
 
-        // Extract current price from response
+        // Extract data from response
         const result = json?.chart?.result?.[0];
-        if (result) {
-            // regularMarketPrice is the current/last traded price
-            const price = result.meta?.regularMarketPrice;
-            if (typeof price === 'number' && !isNaN(price)) {
-                return { price, isDelayed: true };
+        if (!result) return defaultResult;
+
+        const meta = result.meta;
+        const timestamps = result.timestamp || [];
+        const closes = result.indicators?.quote?.[0]?.close || [];
+
+        // Current price
+        const currentPrice = meta?.regularMarketPrice;
+        const previousClose = meta?.previousClose || meta?.chartPreviousClose;
+
+        if (typeof currentPrice !== 'number' || isNaN(currentPrice)) {
+            return defaultResult;
+        }
+
+        // Calculate day change
+        let dayChange: number | null = null;
+        if (typeof previousClose === 'number' && previousClose > 0) {
+            dayChange = ((currentPrice - previousClose) / previousClose) * 100;
+        }
+
+        // Find YTD change (first trading day of current year)
+        let ytdChange: number | null = null;
+        const currentYear = new Date().getFullYear();
+        const startOfYearTimestamp = new Date(currentYear, 0, 1).getTime() / 1000;
+
+        for (let i = 0; i < timestamps.length; i++) {
+            if (timestamps[i] >= startOfYearTimestamp && typeof closes[i] === 'number') {
+                ytdChange = ((currentPrice - closes[i]) / closes[i]) * 100;
+                break;
             }
         }
 
-        return { price: null, isDelayed: true };
+        // Find 1-year change (approximately 252 trading days ago, or first available)
+        let yearChange: number | null = null;
+        if (closes.length > 0 && typeof closes[0] === 'number') {
+            yearChange = ((currentPrice - closes[0]) / closes[0]) * 100;
+        }
+
+        return {
+            price: currentPrice,
+            isDelayed: true,
+            previousClose: previousClose || null,
+            dayChange,
+            ytdChange,
+            yearChange
+        };
     } catch (e) {
         console.error('Failed to fetch real-time gas price from Yahoo Finance:', e);
-        return { price: null, isDelayed: true };
+        return defaultResult;
     }
 }
 

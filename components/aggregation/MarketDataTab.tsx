@@ -20,6 +20,9 @@ export default function MarketDataTab() {
     // API State
     const [usingRealData, setUsingRealData] = useState(false);
     const [gasSource, setGasSource] = useState<string>('EIA Spot');
+    const [gasDayChange, setGasDayChange] = useState<number | null>(null);
+    const [gasYtdChange, setGasYtdChange] = useState<number | null>(null);
+    const [gasYearChange, setGasYearChange] = useState<number | null>(null);
 
     // Data State
     const [fuelMix, setFuelMix] = useState<number[]>([42, 25, 18, 8, 5, 2]); // Default simulated
@@ -263,6 +266,10 @@ export default function MarketDataTab() {
                     if (tickerData.gasPrice && tickerData.isRealGas) {
                         setGasPrice(tickerData.gasPrice);
                         setGasSource(tickerData.gasSource || 'EIA Spot');
+                        // Set % change metrics
+                        setGasDayChange(tickerData.gasDayChange ?? null);
+                        setGasYtdChange(tickerData.gasYtdChange ?? null);
+                        setGasYearChange(tickerData.gasYearChange ?? null);
                     }
 
                     if (tickerData.prices && tickerData.isRealPrices) {
@@ -704,11 +711,32 @@ export default function MarketDataTab() {
                     </div>
                     <div className="flex items-center gap-2 mb-1">
                         <p className="text-sm text-gray-500 font-medium">Henry Hub Gas</p>
-                        <InfoTooltip text="Spot price for natural gas, a key driver of ERCOT marginal prices." />
+                        <InfoTooltip text="NYMEX Natural Gas Futures (NG), a key driver of ERCOT marginal prices." />
                     </div>
                     <h3 className="text-3xl font-bold text-navy-950 dark:text-white">${gasPrice.toFixed(2)} <span className="text-lg text-gray-400 font-normal">/MMBtu</span></h3>
                     <div className="mt-2 text-xs text-orange-500 font-medium flex items-center gap-1">
                         <span>●</span> {gasSource}{gasSource.includes('NYMEX') ? ' (15 min delay)' : ''}
+                    </div>
+                    {/* % Change Metrics */}
+                    <div className="mt-3 pt-3 border-t border-gray-100 dark:border-white/5 grid grid-cols-3 gap-2 text-xs">
+                        <div>
+                            <p className="text-gray-400 mb-0.5">Day</p>
+                            <p className={`font-semibold ${gasDayChange !== null ? (gasDayChange >= 0 ? 'text-green-500' : 'text-red-500') : 'text-gray-400'}`}>
+                                {gasDayChange !== null ? `${gasDayChange >= 0 ? '+' : ''}${gasDayChange.toFixed(2)}%` : '—'}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-gray-400 mb-0.5">YTD</p>
+                            <p className={`font-semibold ${gasYtdChange !== null ? (gasYtdChange >= 0 ? 'text-green-500' : 'text-red-500') : 'text-gray-400'}`}>
+                                {gasYtdChange !== null ? `${gasYtdChange >= 0 ? '+' : ''}${gasYtdChange.toFixed(1)}%` : '—'}
+                            </p>
+                        </div>
+                        <div>
+                            <p className="text-gray-400 mb-0.5">1Y</p>
+                            <p className={`font-semibold ${gasYearChange !== null ? (gasYearChange >= 0 ? 'text-green-500' : 'text-red-500') : 'text-gray-400'}`}>
+                                {gasYearChange !== null ? `${gasYearChange >= 0 ? '+' : ''}${gasYearChange.toFixed(1)}%` : '—'}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

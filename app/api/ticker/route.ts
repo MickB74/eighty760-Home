@@ -113,7 +113,11 @@ export async function GET() {
             isRealLoad: !!gridConditions.load,
             isRealGas: !!gasPrice,
             isGasDelayed: isGasDelayed, // True = real-time NYMEX futures (~15 min delay)
-            gasSource: isGasDelayed ? 'NYMEX NG Futures' : 'EIA Spot'
+            gasSource: isGasDelayed ? 'NYMEX NG Futures' : 'EIA Spot',
+            // Gas % change metrics
+            gasDayChange: realTimeGas.dayChange,
+            gasYtdChange: realTimeGas.ytdChange,
+            gasYearChange: realTimeGas.yearChange
         });
     } catch (error) {
         console.error('Ticker API error:', error);
