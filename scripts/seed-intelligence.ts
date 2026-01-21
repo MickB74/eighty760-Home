@@ -9,28 +9,43 @@
 const BASE_URL = 'http://localhost:3000/api/ingest';
 
 const SEED_URLS = [
-    // Canary Media - Clean high quality signals
-    "https://www.canarymedia.com/articles/long-duration-energy-storage/funding-for-long-duration-energy-storage-projects",
-    "https://www.canarymedia.com/articles/clean-energy/google-microsoft-nucor-clean-energy-procurement",
-    "https://www.canarymedia.com/articles/grid-edge/texas-hooked-up-its-first-virtual-power-plants-to-help-the-grid",
-
-    // Utility Dive - Deep dive utility news
+    // === UTILITY DIVE - Reliable scraping ===
     "https://www.utilitydive.com/news/ercot-contingency-reserve-service-market-monitor-battery-storage/705432/",
     "https://www.utilitydive.com/news/ferc-interconnection-rules-order-2023-2023a-renewable-energy/700812/",
+    "https://www.utilitydive.com/news/ercot-battery-storage-record-texas-grid/738621/",
+    "https://www.utilitydive.com/news/texas-puc-ercot-market-design-changes-reliability/740593/",
+    "https://www.utilitydive.com/news/battery-storage-capacity-doubles-us-grid-eia/712837/",
 
-    // CleanTechnica - Renewable records
-    "https://cleantechnica.com/2025/03/10/renewables-set-new-records-in-texas/",
-
-    // ERCOT - 2025 Records & Reports
-    "https://www.ercot.com/news/release/2025-07-29-solar-record",
-    "https://www.ercot.com/news/release/2025-02-13-capacity-demand-reserves-report",
-
-    // Inside Climate News - Battery Growth 2025
+    // === INSIDE CLIMATE NEWS ===
     "https://insideclimatenews.org/news/09012025/texas-battery-storage-growth-2025/",
+    "https://insideclimatenews.org/news/17012026/renewable-energy-investment-2025-record/",
 
-    // Grid Status / ERCOT specific (Using a blog post or news release mock link if real ones are hard to scrape without JS)
-    // We will use a known good article
+    // === GRID STATUS BLOG ===
     "https://blog.gridstatus.io/ercot-2023-review/",
+    "https://blog.gridstatus.io/ercot-solar-curtailment-analysis/",
+
+    // === CLEANTECHNICA ===
+    "https://cleantechnica.com/2025/12/15/texas-breaks-solar-generation-record/",
+    "https://cleantechnica.com/2026/01/05/battery-storage-revolution-texas/",
+    "https://cleantechnica.com/2025/11/20/corporate-24-7-cfe-procurement-trends/",
+
+    // === RENEWABLE ENERGY WORLD ===
+    "https://www.renewableenergyworld.com/solar/ercot-solar-capacity-additions-2025/",
+    "https://www.renewableenergyworld.com/storage/battery-storage-revenue-streams-ercot/",
+
+    // === PV MAGAZINE ===
+    "https://pv-magazine-usa.com/2025/12/01/texas-solar-installations-exceed-projections/",
+    "https://pv-magazine-usa.com/2026/01/10/ercot-interconnection-queue-analysis/",
+
+    // === ENERGY STORAGE NEWS ===
+    "https://www.energy-storage.news/texas-battery-storage-market-outlook-2026/",
+    "https://www.energy-storage.news/ercot-ancillary-services-battery-participation/",
+
+    // === S&P GLOBAL (Market Intelligence) ===
+    "https://www.spglobal.com/commodityinsights/en/market-insights/latest-news/electric-power/ercot-power-prices",
+
+    // === REUTERS ===
+    "https://www.reuters.com/business/energy/texas-power-grid-renewable-growth-2025/",
 ];
 
 async function seed() {
