@@ -19,6 +19,7 @@ export default function MarketDataTab() {
 
     // API State
     const [usingRealData, setUsingRealData] = useState(false);
+    const [gasSource, setGasSource] = useState<string>('EIA Spot');
 
     // Data State
     const [fuelMix, setFuelMix] = useState<number[]>([42, 25, 18, 8, 5, 2]); // Default simulated
@@ -257,6 +258,13 @@ export default function MarketDataTab() {
                 // Use real ERCOT RTM prices from ticker endpoint
                 if (tickerRes.ok) {
                     const tickerData = await tickerRes.json();
+
+                    // Update gas price and source from ticker
+                    if (tickerData.gasPrice && tickerData.isRealGas) {
+                        setGasPrice(tickerData.gasPrice);
+                        setGasSource(tickerData.gasSource || 'EIA Spot');
+                    }
+
                     if (tickerData.prices && tickerData.isRealPrices) {
                         // Real prices from ERCOT
                         const hubNames = ['HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_HOUSTON'];
@@ -700,7 +708,7 @@ export default function MarketDataTab() {
                     </div>
                     <h3 className="text-3xl font-bold text-navy-950 dark:text-white">${gasPrice.toFixed(2)} <span className="text-lg text-gray-400 font-normal">/MMBtu</span></h3>
                     <div className="mt-2 text-xs text-orange-500 font-medium flex items-center gap-1">
-                        <span>●</span> {usingRealData ? 'EIA Spot Price' : 'Live Spot Price'}
+                        <span>●</span> {gasSource}{gasSource.includes('NYMEX') ? ' (15 min delay)' : ''}
                     </div>
                 </div>
             </div>

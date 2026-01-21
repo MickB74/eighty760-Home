@@ -120,6 +120,46 @@ export async function fetchHenryHubPrice(apiKey: string): Promise<number | null>
     return history.length > 0 ? history[history.length - 1].value : null;
 }
 
+/**
+ * Fetches real-time Natural Gas Futures price from Yahoo Finance (NG=F).
+ * This is the prompt month NYMEX futures price, ~15 min delayed.
+ */
+export async function fetchRealTimeGasPrice(): Promise<{ price: number | null; isDelayed: boolean }> {
+    try {
+        // Yahoo Finance API for NG=F (Natural Gas Futures)
+        const url = 'https://query1.finance.yahoo.com/v8/finance/chart/NG=F?interval=1d&range=1d';
+
+        const res = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+            },
+            next: { revalidate: 300 } // Cache for 5 min
+        });
+
+        if (!res.ok) {
+            console.warn('Yahoo Finance API returned non-OK status:', res.status);
+            return { price: null, isDelayed: true };
+        }
+
+        const json = await res.json();
+
+        // Extract current price from response
+        const result = json?.chart?.result?.[0];
+        if (result) {
+            // regularMarketPrice is the current/last traded price
+            const price = result.meta?.regularMarketPrice;
+            if (typeof price === 'number' && !isNaN(price)) {
+                return { price, isDelayed: true };
+            }
+        }
+
+        return { price: null, isDelayed: true };
+    } catch (e) {
+        console.error('Failed to fetch real-time gas price from Yahoo Finance:', e);
+        return { price: null, isDelayed: true };
+    }
+}
+
 export type FuelMixHistory = { period: string;[fuelType: string]: number | string };
 
 /**

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchErcotRealtimeDemand, fetchHenryHubPrice } from '@/lib/external/eia';
+import { fetchErcotRealtimeDemand, fetchHenryHubPrice, fetchRealTimeGasPrice } from '@/lib/external/eia';
 import { fetchLiveErcotPrices, fetchErcotFuelMix, fetchLiveErcotLoad } from '@/lib/external/ercot';
 
 export const dynamic = 'force-dynamic'; // Prevent static caching
@@ -12,12 +12,18 @@ export async function GET() {
         // Fetch concurrently data from EIA and ERCOT
         // Fetch concurrently data from EIA and ERCOT
         // Note: We now scrape Load, Wind, and Solar from ERCOT directly to avoid EIA dependency and ensure reliability.
-        const [gridConditions, gasPrice, ercotPrices, fuelMix] = await Promise.all([
+        // Gas price now uses Yahoo Finance for real-time NYMEX futures (NG=F) with fallback to EIA spot price.
+        const [gridConditions, realTimeGas, eiaGasPrice, ercotPrices, fuelMix] = await Promise.all([
             fetchLiveErcotLoad(),
+            fetchRealTimeGasPrice(),
             fetchHenryHubPrice(apiKey),
             fetchLiveErcotPrices(),
             fetchErcotFuelMix()
         ]);
+
+        // Use real-time gas price if available, fallback to EIA
+        const gasPrice = realTimeGas.price ?? eiaGasPrice;
+        const isGasDelayed = realTimeGas.price !== null;
 
         console.log('Ticker Fetch Debug:', {
             hasKey: !!apiKey,
@@ -105,7 +111,9 @@ export async function GET() {
             isRealData: !!(gridConditions.load && ercotPrices),
             isRealPrices: !!ercotPrices,
             isRealLoad: !!gridConditions.load,
-            isRealGas: !!gasPrice
+            isRealGas: !!gasPrice,
+            isGasDelayed: isGasDelayed, // True = real-time NYMEX futures (~15 min delay)
+            gasSource: isGasDelayed ? 'NYMEX NG Futures' : 'EIA Spot'
         });
     } catch (error) {
         console.error('Ticker API error:', error);
