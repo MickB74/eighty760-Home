@@ -129,9 +129,10 @@ export default function MarketDataTab() {
 
     const updateData = async () => {
         try {
-            const [statusRes, mixRes] = await Promise.all([
+            const [statusRes, mixRes, tickerRes] = await Promise.all([
                 fetch('/api/ercot/status'),
-                fetch('/api/ercot/fuel-mix')
+                fetch('/api/ercot/fuel-mix'),
+                fetch('/api/ticker')
             ]);
 
             if (statusRes.ok && mixRes.ok) {
@@ -250,20 +251,36 @@ export default function MarketDataTab() {
                 });
                 setCarbonHistory(derivedCarbon);
 
-                // Mock Futures and Hub Prices (until we have real sources)
+                // Fetch real hub prices from ticker API (scrapes ERCOT real_time_spp.html)
                 generateFutures(2.84);
-                const estimatedPrice = (2.5 * 8) + Math.max(0, (latestTotalGen - 50000) * 0.005);
-                const hubs = [
-                    { name: 'HB_NORTH', factor: 1.0 },
-                    { name: 'HB_SOUTH', factor: 1.05 },
-                    { name: 'HB_WEST', factor: 0.85 },
-                    { name: 'HB_HOUSTON', factor: 1.02 }
-                ];
-                setHubPrices(hubs.map(h => ({
-                    name: h.name,
-                    price: Math.max(10, estimatedPrice * h.factor + (Math.random() - 0.5) * 5),
-                    trend: Math.random() > 0.5 ? 'up' : 'down' as 'up' | 'down' | 'flat'
-                })));
+
+                // Use real ERCOT RTM prices from ticker endpoint
+                if (tickerRes.ok) {
+                    const tickerData = await tickerRes.json();
+                    if (tickerData.prices && tickerData.isRealPrices) {
+                        // Real prices from ERCOT
+                        const hubNames = ['HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_HOUSTON'];
+                        setHubPrices(hubNames.map(name => ({
+                            name,
+                            price: parseFloat(tickerData.prices[name] || '0'),
+                            trend: 'flat' as 'up' | 'down' | 'flat' // Could track trend by comparing to previous value
+                        })));
+                    } else {
+                        // Fallback to estimated prices if ticker failed
+                        const estimatedPrice = (2.5 * 8) + Math.max(0, (latestTotalGen - 50000) * 0.005);
+                        const hubs = [
+                            { name: 'HB_NORTH', factor: 1.0 },
+                            { name: 'HB_SOUTH', factor: 1.05 },
+                            { name: 'HB_WEST', factor: 0.85 },
+                            { name: 'HB_HOUSTON', factor: 1.02 }
+                        ];
+                        setHubPrices(hubs.map(h => ({
+                            name: h.name,
+                            price: Math.max(10, estimatedPrice * h.factor + (Math.random() - 0.5) * 5),
+                            trend: 'flat' as 'up' | 'down' | 'flat'
+                        })));
+                    }
+                }
 
 
             } else {
