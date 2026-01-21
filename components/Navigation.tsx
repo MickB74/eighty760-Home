@@ -117,13 +117,13 @@ export default function Navigation() {
                         {/* User Profile Removed */}
 
 
-                        {/* High-contrast CTA */}
-                        <a
+                        {/* High-contrast CTA - Hidden for now */}
+                        {/* <a
                             href="mailto:contact@eighty760.com"
                             className="px-6 py-2 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-all hover:scale-105"
                         >
                             Contact Us
-                        </a>
+                        </a> */}
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -195,12 +195,13 @@ export default function Navigation() {
                             )}
                         </button>
 
-                        <a
+                        {/* Contact Us - Hidden for now */}
+                        {/* <a
                             href="mailto:contact@eighty760.com"
                             className="block px-4 py-3 mt-4 bg-energy-green text-navy-950 font-bold rounded-lg text-center hover:bg-energy-green/90 transition"
                         >
                             Contact Us
-                        </a>
+                        </a> */}
                     </div>
                 </motion.div>
             )}
