@@ -11,7 +11,58 @@ import { loadHubPrices } from '@/lib/aggregation/price-loader';
 
 ChartJS.register(ArcElement, CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
 
+// Loading skeleton component for fast perceived load
+const LoadingSkeleton = () => (
+    <div className="space-y-6 animate-pulse">
+        {/* Header skeleton */}
+        <div className="flex justify-between items-center">
+            <div>
+                <div className="h-7 w-64 bg-gray-200 dark:bg-navy-700 rounded mb-2"></div>
+                <div className="h-4 w-48 bg-gray-100 dark:bg-navy-800 rounded"></div>
+            </div>
+            <div className="text-right">
+                <div className="h-8 w-24 bg-gray-200 dark:bg-navy-700 rounded mb-1"></div>
+                <div className="h-3 w-20 bg-gray-100 dark:bg-navy-800 rounded"></div>
+            </div>
+        </div>
+        {/* KPI Cards skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white dark:bg-navy-900 p-5 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-navy-700 rounded mb-3"></div>
+                    <div className="h-9 w-32 bg-gray-300 dark:bg-navy-600 rounded mb-2"></div>
+                    <div className="h-3 w-20 bg-gray-100 dark:bg-navy-800 rounded"></div>
+                </div>
+            ))}
+        </div>
+        {/* Hub Prices skeleton */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => (
+                <div key={i} className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                    <div className="h-3 w-16 bg-gray-200 dark:bg-navy-700 rounded mb-2"></div>
+                    <div className="h-7 w-20 bg-gray-300 dark:bg-navy-600 rounded"></div>
+                </div>
+            ))}
+        </div>
+        {/* Charts skeleton */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm lg:col-span-1">
+                <div className="h-5 w-32 bg-gray-200 dark:bg-navy-700 rounded mb-4"></div>
+                <div className="h-[300px] bg-gray-100 dark:bg-navy-800 rounded"></div>
+            </div>
+            <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm lg:col-span-2">
+                <div className="h-5 w-48 bg-gray-200 dark:bg-navy-700 rounded mb-4"></div>
+                <div className="h-[300px] bg-gray-100 dark:bg-navy-800 rounded"></div>
+            </div>
+        </div>
+    </div>
+);
+
 export default function MarketDataTab() {
+    // Loading states for perceived performance
+    const [isLoading, setIsLoading] = useState(true);
+    const [isHistoryLoading, setIsHistoryLoading] = useState(false);
+
     const [lastUpdated, setLastUpdated] = useState<string>('');
     const [load, setLoad] = useState(0);
     const [capacity, setCapacity] = useState(0);
@@ -80,9 +131,11 @@ export default function MarketDataTab() {
         }
     };
 
-    useEffect(() => {
-        // Load 12-month history (using 2025 as proxy)
-        const loadHistory = async () => {
+    // Deferred hub history loading - loads AFTER main content for faster perceived load
+    const loadHubHistory = async () => {
+        if (Object.keys(hubHistoryData).length > 0) return; // Already loaded
+        setIsHistoryLoading(true);
+        try {
             const hubs = ['North', 'South', 'West', 'Houston'];
             const historyMap: Record<string, number[]> = {};
 
@@ -114,13 +167,21 @@ export default function MarketDataTab() {
                 }
             }));
             setHubHistoryData(historyMap);
-        };
-        loadHistory();
-    }, []);
+        } finally {
+            setIsHistoryLoading(false);
+        }
+    };
 
     useEffect(() => {
-        // Initial Fetch
-        updateData();
+        // Initial Fetch - track loading state for skeleton
+        const initLoad = async () => {
+            setIsLoading(true);
+            await updateData();
+            setIsLoading(false);
+            // Defer heavy hub history load until AFTER main content displays
+            loadHubHistory();
+        };
+        initLoad();
 
         const interval = setInterval(() => {
             updateData();
@@ -129,6 +190,7 @@ export default function MarketDataTab() {
         return () => {
             clearInterval(interval);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const updateData = async () => {
@@ -631,6 +693,11 @@ export default function MarketDataTab() {
         ]
     };
 
+    // Show loading skeleton for instant perceived performance
+    if (isLoading) {
+        return <LoadingSkeleton />;
+    }
+
     return (
         <div className="space-y-6 animate-in fade-in">
             {/* Header / Timestamp */}
@@ -835,18 +902,28 @@ export default function MarketDataTab() {
                 )}
             </div>
 
-            {/* Charts Row: Hub Price Trends (12 Months) */}
-            {Object.keys(hubHistoryData).length > 0 && (
-                <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
-                    <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4 flex items-center gap-2">
-                        Regional Price Trends (Last 12 Months)
-                        <InfoTooltip text="Monthly average Real-Time Market (RTM) Settlement Point Prices for major ERCOT hubs." />
-                    </h3>
-                    <div className="h-[300px]">
+            {/* Charts Row: Hub Price Trends (12 Months) - Loaded after main content */}
+            <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4 flex items-center gap-2">
+                    Regional Price Trends (Last 12 Months)
+                    <InfoTooltip text="Monthly average Real-Time Market (RTM) Settlement Point Prices for major ERCOT hubs." />
+                    {isHistoryLoading && (
+                        <span className="text-xs text-gray-400 font-normal animate-pulse">Loading...</span>
+                    )}
+                </h3>
+                <div className="h-[300px]">
+                    {Object.keys(hubHistoryData).length > 0 ? (
                         <Line data={hubHistoryChartData} options={lineOptions} />
-                    </div>
+                    ) : (
+                        <div className="h-full flex items-center justify-center">
+                            <div className="text-center">
+                                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                                <p className="text-sm text-gray-400">Loading historical data...</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
 
             {/* Charts Row 4: Fuel Mix Breakdown (6 Small Charts) */}
             {mixHistory.length > 0 && (
