@@ -84,7 +84,7 @@ export default function MarketDataTab() {
     const [mixHistory, setMixHistory] = useState<FuelMixHistory[]>([]);
 
     // New State for enhancements
-    const [futuresData, setFuturesData] = useState<{ month: string, price: number }[]>([]);
+    const [futuresData, setFuturesData] = useState<{ month: string, price: number, isHistory?: boolean }[]>([]);
     const [isRealFutures, setIsRealFutures] = useState(false);
     const [carbonHistory, setCarbonHistory] = useState<{ time: string, intensity: number }[]>([]); // gCO2/kWh
     const [renewablesProfile, setRenewablesProfile] = useState<{ time: string, wind: number, solar: number }[]>([]);
@@ -394,15 +394,29 @@ export default function MarketDataTab() {
         const now = new Date();
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-        // Simple Contango curve
         const curve = [];
-        for (let i = 1; i <= 3; i++) {
+
+        // History: Last 3 Months
+        for (let i = -3; i < 0; i++) {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-            // Price increase by ~3% per month
+            // Simulate random variation for history
+            const price = currentPrice * (1 + (i * 0.02) + (Math.random() - 0.5) * 0.1);
+            curve.push({
+                month: `${months[d.getMonth()]} '${d.getFullYear().toString().slice(2)}`,
+                price: parseFloat(price.toFixed(2)),
+                isHistory: true
+            });
+        }
+
+        // Futures: Next 6 Months (to include May-July)
+        for (let i = 1; i <= 6; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+            // Price increase by ~3% per month (Contango)
             const price = currentPrice * (1 + (i * 0.03) + (Math.random() * 0.02));
             curve.push({
                 month: `${months[d.getMonth()]} '${d.getFullYear().toString().slice(2)}`,
-                price: parseFloat(price.toFixed(2))
+                price: parseFloat(price.toFixed(2)),
+                isHistory: false
             });
         }
         setFuturesData(curve);
@@ -603,9 +617,9 @@ export default function MarketDataTab() {
         labels: futuresData.map(f => f.month),
         datasets: [
             {
-                label: 'Futures Price ($/MMBtu)',
+                label: 'Price ($/MMBtu)',
                 data: futuresData.map(f => f.price),
-                backgroundColor: '#f97316',
+                backgroundColor: futuresData.map(f => f.isHistory ? '#64748b' : '#f97316'), // Slate-500 for history, Orange-500 for futures
                 borderRadius: 4,
             }
         ]
