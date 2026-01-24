@@ -406,10 +406,10 @@ export async function fetchNaturalGasFutures(): Promise<FuturesResponse> {
     const futures: FuturesDataPoint[] = [];
 
     try {
-        // Build symbols for next 3 months
+        // Build symbols for next 6 months
         const symbols: { symbol: string; month: string }[] = [];
 
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 6; i++) {
             const futureDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
             const monthCode = FUTURES_MONTH_CODES[futureDate.getMonth()];
             const yearShort = futureDate.getFullYear().toString().slice(2);
@@ -492,7 +492,7 @@ function generateSimulatedFutures(): FuturesResponse {
     const basePrice = 2.84; // Baseline price
     const futures: FuturesDataPoint[] = [];
 
-    for (let i = 1; i <= 3; i++) {
+    for (let i = 1; i <= 6; i++) {
         const futureDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
         const monthCode = FUTURES_MONTH_CODES[futureDate.getMonth()];
         const yearShort = futureDate.getFullYear().toString().slice(2);
