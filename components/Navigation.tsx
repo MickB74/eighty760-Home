@@ -44,9 +44,9 @@ export default function Navigation() {
     const isActive = (path: string) => pathname === path;
 
     const navLinks = [
-        { name: 'Live Market', path: '/intelligence', section: 'tools' },
         { name: 'Home', path: '/', section: null },
         { name: '24/7 CFE Calculator', path: '/aggregation', section: 'tools' },
+        { name: 'Live Market', path: '/live-market', section: 'tools' },
         { name: 'Methodology', path: '/whitepaper', section: 'learn' },
         { name: 'About', path: '/about', section: 'company' },
     ];

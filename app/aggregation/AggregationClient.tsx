@@ -106,7 +106,7 @@ const HISTORICAL_REC_PRICES: Record<number, number> = {
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'scenarios' | 'analysis' | 'financials' | 'multi-year' | 'reports' | 'config' | 'market'>('config');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'scenarios' | 'analysis' | 'financials' | 'multi-year' | 'reports' | 'config'>('config');
     const [loading, setLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -744,12 +744,6 @@ export default function AggregationPage() {
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'scenarios' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                         Scenario Comparison
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('market')}
-                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'market' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
-                    >
-                        <span className="mr-2">⚡</span>Live Market
                     </button>
                     <button
                         onClick={() => setActiveTab('reports')}
@@ -1398,13 +1392,6 @@ export default function AggregationPage() {
                     )
                 }
 
-                {
-                    activeTab === 'market' && (
-                        <div className="animate-in fade-in duration-300">
-                            <MarketDataTab />
-                        </div>
-                    )
-                }
 
                 {
                     activeTab === 'reports' && (
