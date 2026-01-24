@@ -17,15 +17,16 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 - **Virtual PPAs**: Power Purchase Agreements with basis risk and settlement modeling
 
 **Data sources:** 
-- **EIA Open Data API**: Real-time ERCOT grid conditions, Demand Forecasts, Henry Hub Futures (Simulated in Demo), and Carbon Intensity.
-- **GridStatus.io**: Historical ERCOT RTM pricing (2020-2025).
+- **EIA Open Data API**: Real-time ERCOT grid conditions, Demand Forecasts, and Carbon Intensity.
+- **Yahoo Finance API**: Real-time Natural Gas Futures (NG=F) and historical metrics.
+- **GridStatus.io**: Historical ERCOT RTM pricing (2020-2026).
 - **Google Alerts**: Real-time energy news curation via specific Atom feeds.
-- **Open-Meteo**: ERA5 historical weather data.
+- **Open-Meteo**: ERA5 historical weather data (2020-2026).
 - **NREL**: PVWatts and SAM generation models.
 
 **Tools available:** 
 - **Aggregation Tool** (`/aggregation`): Build and optimize portfolios with real-time feedback. Includes sub-tabs for **Live Market Data**, **Detailed Analysis**, **Financials**, and **Scenario Comparison**.
-- **Weather Performance** (`/weather-performance`): Analyze how your portfolio would have performed in past years (2020-2025).
+- **Weather Performance** (`/weather-performance`): Analyze how your portfolio would have performed in past years (2020-2026).
 - **Interactive Home Simulator** (`/`): Quick educational tool for understanding 24/7 concepts.
 
 ## Features
@@ -33,11 +34,11 @@ Eighty760 acts as a "digital twin" for energy portfolios, allowing users to veri
 - **Global Real-Time Tickers**: Persistent status bars for Grid Mix, Breaking News, and Real-Time Prices visible across the platform.
 - **Interactive Portfolio Simulator**: Adjust solar, wind, and battery capacities in real-time.
 - **Instant Demo Mode**: One-click generation of randomized portfolios (3-6 varied properties) for immediate exploration.
-- **Live Market Data Tab**: View real-time ERCOT grid conditions, Fuel Mix trends, 24h Demand Forecasts, and Carbon Intensity via EIA API integration.
+- **Live Market Data Tab**: View real-time ERCOT grid conditions, Fuel Mix trends, 24h Demand Forecasts, Carbon Intensity, and Real-Time Natural Gas Futures (with Pct Change metrics) via EIA and Yahoo Finance integration.
 - **Scenario Comparison**: Save and compare multiple portfolio configurations side-by-side to evaluate different strategies.
 - **Financial Modeling**: Deep dive into PPA settlement costs, basis risk (Hub vs Node), Battery Arbitrage revenue, and REC costs.
 - **Smart Fill Optimization**: Automatically size your generation and storage to meet a target CFE score.
-- **Weather Performance Analysis**: Backcast your portfolio against 5 years of historical weather and price data.
+- **Weather Performance Analysis**: Backcast your portfolio against 7 years of historical weather and price data (2020-2026).
 - **24-Hour Generation Profiles**: Visualize hourly generation vs. load with dynamic charts (Duck Curve, Net Load).
 - **Dark Mode Support**: Fully responsive design with light/dark themes.
 

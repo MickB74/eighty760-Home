@@ -83,6 +83,7 @@ export default function MarketDataTab() {
 
     // New State for enhancements
     const [futuresData, setFuturesData] = useState<{ month: string, price: number }[]>([]);
+    const [isRealFutures, setIsRealFutures] = useState(false);
     const [carbonHistory, setCarbonHistory] = useState<{ time: string, intensity: number }[]>([]); // gCO2/kWh
     const [renewablesProfile, setRenewablesProfile] = useState<{ time: string, wind: number, solar: number }[]>([]);
     const [hubPrices, setHubPrices] = useState<{ name: string, price: number, trend: 'up' | 'down' | 'flat' }[]>([]);
@@ -317,8 +318,26 @@ export default function MarketDataTab() {
                 });
                 setCarbonHistory(derivedCarbon);
 
-                // Fetch real hub prices from ticker API (scrapes ERCOT real_time_spp.html)
-                generateFutures(2.84);
+                // Fetch real futures data from API
+                try {
+                    const futuresRes = await fetch('/api/futures');
+                    if (futuresRes.ok) {
+                        const futuresJson = await futuresRes.json();
+                        if (futuresJson.futures && futuresJson.futures.length > 0) {
+                            setFuturesData(futuresJson.futures.map((f: any) => ({ month: f.month, price: f.price })));
+                            setIsRealFutures(futuresJson.isRealData === true);
+                        } else {
+                            generateFutures(2.84);
+                            setIsRealFutures(false);
+                        }
+                    } else {
+                        generateFutures(2.84);
+                        setIsRealFutures(false);
+                    }
+                } catch {
+                    generateFutures(2.84);
+                    setIsRealFutures(false);
+                }
 
                 // Use real ERCOT RTM prices from ticker endpoint
                 if (tickerRes.ok) {
@@ -863,7 +882,12 @@ export default function MarketDataTab() {
                 {/* New Futures Chart */}
                 {futuresData.length > 0 && (
                     <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
-                        <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4">Henry Hub Futures (Next 3 Months)</h3>
+                        <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4 flex items-center gap-2">
+                            Henry Hub Futures (Next 3 Months)
+                            <span className={`px-2 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wider ${isRealFutures ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
+                                {isRealFutures ? 'NYMEX' : 'Simulated'}
+                            </span>
+                        </h3>
                         <div className="h-[250px]">
                             <Bar data={futuresChartData} options={{
                                 ...lineOptions,

@@ -44,16 +44,10 @@ export default function Navigation() {
     const isActive = (path: string) => pathname === path;
 
     const navLinks = [
+        { name: 'Live Market', path: '/intelligence', section: 'tools' },
         { name: 'Home', path: '/', section: null },
-        // Tools Section
-        // Tools Section
         { name: '24/7 CFE Calculator', path: '/aggregation', section: 'tools' },
-
-        // Learn Section
-        // { name: 'Resources', path: '/blog', section: 'learn' }, // Hidden as per request
-        // { name: 'Intelligence', path: '/intelligence', section: 'learn' }, // Hidden for now
         { name: 'Methodology', path: '/whitepaper', section: 'learn' },
-        // Company Section
         { name: 'About', path: '/about', section: 'company' },
     ];
 
@@ -68,7 +62,7 @@ export default function Navigation() {
             transition={{ duration: 0.5, ease: 'easeOut' }}
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex justify-between items-center py-4">
+                <div className="relative flex justify-between items-center py-4">
                     <div className="flex flex-row items-center gap-4">
                         <Link href="/" className="flex items-center">
                             <Image
@@ -83,7 +77,7 @@ export default function Navigation() {
                     </div>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden md:flex items-center space-x-8">
+                    <div className="hidden md:flex items-center space-x-8 absolute left-1/2 -translate-x-1/2">
                         {navLinks.map((link) => (
                             <Link
                                 key={link.path}
@@ -97,54 +91,47 @@ export default function Navigation() {
                             </Link>
                         ))}
 
-                        {/* Theme Toggle */}
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
-                            aria-label="Toggle theme"
-                        >
-                            {darkMode ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                                </svg>
-                            )}
-                        </button>
-
-                        {/* User Profile Removed */}
-
-
-                        {/* High-contrast CTA - Hidden for now */}
-                        {/* <a
-                            href="mailto:contact@eighty760.com"
-                            className="px-6 py-2 bg-energy-green text-navy-950 font-bold rounded-lg hover:bg-energy-green/90 transition-all hover:scale-105"
-                        >
-                            Contact Us
-                        </a> */}
                     </div>
 
-                    {/* Mobile Menu Button */}
-                    <div className="md:hidden flex items-center gap-4">
+                    {/* Right Side Tools */}
+                    <div className="flex items-center gap-4">
+                        {/* Desktop Theme Toggle */}
+                        <div className="hidden md:flex items-center">
+                            <button
+                                onClick={toggleTheme}
+                                className="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
+                                aria-label="Toggle theme"
+                            >
+                                {darkMode ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                    </svg>
+                                )}
+                            </button>
+                        </div>
 
-
-                        <button
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className="text-gray-700 dark:text-slate-300 hover:text-energy-green focus:outline-none p-2"
-                            aria-label="Toggle mobile menu"
-                        >
-                            {isMobileMenuOpen ? (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                </svg>
-                            ) : (
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                                </svg>
-                            )}
-                        </button>
+                        {/* Mobile Menu Button */}
+                        <div className="md:hidden flex items-center">
+                            <button
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className="text-gray-700 dark:text-slate-300 hover:text-energy-green focus:outline-none p-2"
+                                aria-label="Toggle mobile menu"
+                            >
+                                {isMobileMenuOpen ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                )}
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
