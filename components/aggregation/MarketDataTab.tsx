@@ -323,78 +323,78 @@ export default function MarketDataTab() {
                 // Fetch real futures data from API
                 try {
                     const futuresRes = await fetch('/api/futures');
-                    if (futuresJson.futures && futuresJson.futures.length > 0) {
-                        // Generate history locally (since API only returns futures)
-                        const historyData = generateHistory(2.84); // Use base price or fetch real spot history if possible
-                        const apiFutures = futuresJson.futures.map((f: any) => ({ month: f.month, price: f.price, isHistory: false }));
-                        setFuturesData([...historyData, ...apiFutures]);
-                        setIsRealFutures(futuresJson.isRealData === true);
+                    if (futuresRes.ok) {
+                        const futuresJson = await futuresRes.json();
+                        if (futuresJson.futures && futuresJson.futures.length > 0) {
+                            // Generate history locally (since API only returns futures)
+                            const historyData = generateHistory(2.84);
+                            const apiFutures = futuresJson.futures.map((f: any) => ({ month: f.month, price: f.price, isHistory: false }));
+                            setFuturesData([...historyData, ...apiFutures]);
+                            setIsRealFutures(futuresJson.isRealData === true);
+                        } else {
+                            generateFutures(2.84);
+                            setIsRealFutures(false);
+                        }
                     } else {
                         generateFutures(2.84);
                         setIsRealFutures(false);
                     }
+                } catch (e) {
+                    console.warn("Futures fetch failed", e);
                     generateFutures(2.84);
                     setIsRealFutures(false);
                 }
-                } catch {
-                generateFutures(2.84);
-                setIsRealFutures(false);
-            }
 
-            // Use real ERCOT RTM prices from ticker endpoint
-            if (tickerRes.ok) {
-                const tickerData = await tickerRes.json();
+                // Use real ERCOT RTM prices from ticker endpoint
+                if (tickerRes.ok) {
+                    const tickerData = await tickerRes.json();
 
-                // Update gas price and source from ticker
-                if (tickerData.gasPrice && tickerData.isRealGas) {
-                    setGasPrice(tickerData.gasPrice);
-                    setGasSource(tickerData.gasSource || 'EIA Spot');
-                    // Set % change metrics
-                    setGasDayChange(tickerData.gasDayChange ?? null);
-                    setGasYtdChange(tickerData.gasYtdChange ?? null);
-                    setGasYearChange(tickerData.gasYearChange ?? null);
+                    // Update gas price and source from ticker
+                    if (tickerData.gasPrice && tickerData.isRealGas) {
+                        setGasPrice(tickerData.gasPrice);
+                        setGasSource(tickerData.gasSource || 'EIA Spot');
+                        // Set % change metrics
+                        setGasDayChange(tickerData.gasDayChange ?? null);
+                        setGasYtdChange(tickerData.gasYtdChange ?? null);
+                        setGasYearChange(tickerData.gasYearChange ?? null);
+                    }
+
+                    if (tickerData.prices && tickerData.isRealPrices) {
+                        // Real prices from ERCOT
+                        const hubNames = ['HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_HOUSTON'];
+                        setHubPrices(hubNames.map(name => ({
+                            name,
+                            price: parseFloat(tickerData.prices[name] || '0'),
+                            trend: 'flat' as 'up' | 'down' | 'flat' // Could track trend by comparing to previous value
+                        })));
+                    } else {
+                        // Fallback to estimated prices if ticker failed
+                        const estimatedPrice = (2.5 * 8) + Math.max(0, (latestTotalGen - 50000) * 0.005);
+                        const hubs = [
+                            { name: 'HB_NORTH', factor: 1.0 },
+                            { name: 'HB_SOUTH', factor: 1.05 },
+                            { name: 'HB_WEST', factor: 0.85 },
+                            { name: 'HB_HOUSTON', factor: 1.02 }
+                        ];
+                        setHubPrices(hubs.map(h => ({
+                            name: h.name,
+                            price: Math.max(10, estimatedPrice * h.factor + (Math.random() - 0.5) * 5),
+                            trend: 'flat' as 'up' | 'down' | 'flat'
+                        })));
+                    }
                 }
 
-                if (tickerData.prices && tickerData.isRealPrices) {
-                    // Real prices from ERCOT
-                    const hubNames = ['HB_NORTH', 'HB_SOUTH', 'HB_WEST', 'HB_HOUSTON'];
-                    setHubPrices(hubNames.map(name => ({
-                        name,
-                        price: parseFloat(tickerData.prices[name] || '0'),
-                        trend: 'flat' as 'up' | 'down' | 'flat' // Could track trend by comparing to previous value
-                    })));
-                } else {
-                    // Fallback to estimated prices if ticker failed
-                    const estimatedPrice = (2.5 * 8) + Math.max(0, (latestTotalGen - 50000) * 0.005);
-                    const hubs = [
-                        { name: 'HB_NORTH', factor: 1.0 },
-                        { name: 'HB_SOUTH', factor: 1.05 },
-                        { name: 'HB_WEST', factor: 0.85 },
-                        { name: 'HB_HOUSTON', factor: 1.02 }
-                    ];
-                    setHubPrices(hubs.map(h => ({
-                        name: h.name,
-                        price: Math.max(10, estimatedPrice * h.factor + (Math.random() - 0.5) * 5),
-                        trend: 'flat' as 'up' | 'down' | 'flat'
-                    })));
-                }
+
+            } else {
+                throw new Error("API Error");
             }
-
-
-        } else {
-            throw new Error("API Error");
+        } catch (e) {
+            console.warn("Falling back to simulation", e);
+            runSimulation();
         }
-    } catch (e) {
-        console.warn("Falling back to simulation", e);
-        runSimulation();
-    }
-};
+    };
 
-const generateFutures = (currentPrice: number) => {
-    const now = new Date();
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-    const generateHistory = (currentPrice: number) => {
+    function generateHistory(currentPrice: number) {
         const now = new Date();
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const curve = [];
@@ -409,9 +409,9 @@ const generateFutures = (currentPrice: number) => {
             });
         }
         return curve;
-    };
+    }
 
-    const generateFutures = (currentPrice: number) => {
+    function generateFutures(currentPrice: number) {
         const now = new Date();
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -430,10 +430,11 @@ const generateFutures = (currentPrice: number) => {
             });
         }
         setFuturesData(curve);
-    };
+    }
 
-    const runSimulation = () => {
+    function runSimulation() {
         const now = new Date();
+
         const hour = now.getHours() + now.getMinutes() / 60;
 
         // Simple daily load curve simulation
