@@ -54,14 +54,51 @@ export default function NodeAnalysisTab() {
 
     // Locations State
     const [locations, setLocations] = useState<LocationData | null>(null);
+    const [availableLocations, setAvailableLocations] = useState<string[]>([]);
 
-    // Load locations on mount
+    // Load all locations on mount
     useEffect(() => {
         fetch('/data/ercot_locations.json')
             .then(res => res.json())
             .then(data => setLocations(data))
             .catch(err => console.error('Failed to load locations:', err));
     }, []);
+
+    // Load available locations when year or market changes
+    useEffect(() => {
+        const fetchAvailableLocations = async () => {
+            try {
+                // Fetch for both markets to get union of available locations
+                const [rtmRes, damRes] = await Promise.all([
+                    fetch(`/api/prices/available-locations?year=${year}&market=RTM`),
+                    fetch(`/api/prices/available-locations?year=${year}&market=DAM`)
+                ]);
+
+                const rtmData = await rtmRes.json();
+                const damData = await damRes.json();
+
+                // Combine and deduplicate
+                const combined = new Set([
+                    ...(rtmData.locations || []),
+                    ...(damData.locations || [])
+                ]);
+
+                setAvailableLocations(Array.from(combined).sort());
+            } catch (error) {
+                console.error('Failed to fetch available locations:', error);
+                // Fallback to showing all
+                if (locations) {
+                    setAvailableLocations([
+                        ...locations.hubs,
+                        ...locations.zones,
+                        ...locations.resources
+                    ]);
+                }
+            }
+        };
+
+        fetchAvailableLocations();
+    }, [year, locations]);
 
     useEffect(() => {
         fetchData();
@@ -284,17 +321,17 @@ export default function NodeAnalysisTab() {
                                             {locations ? (
                                                 <>
                                                     <optgroup label="Hubs">
-                                                        {locations.hubs.map(l => <option key={l} value={l}>{l}</option>)}
+                                                        {locations.hubs.filter(l => availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)}
                                                     </optgroup>
                                                     <optgroup label="Load Zones">
-                                                        {locations.zones.map(l => <option key={l} value={l}>{l}</option>)}
+                                                        {locations.zones.filter(l => availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)}
                                                     </optgroup>
                                                     <optgroup label="Resource Nodes">
-                                                        {locations.resources.map(l => <option key={l} value={l}>{l}</option>)}
+                                                        {locations.resources.filter(l => availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)}
                                                     </optgroup>
                                                 </>
                                             ) : (
-                                                LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)
+                                                LOCATIONS.filter(l => availableLocations.length === 0 || availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)
                                             )}
                                         </select>
                                     </div>
@@ -329,17 +366,17 @@ export default function NodeAnalysisTab() {
                                             {locations ? (
                                                 <>
                                                     <optgroup label="Hubs">
-                                                        {locations.hubs.map(l => <option key={l} value={l}>{l}</option>)}
+                                                        {locations.hubs.filter(l => availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)}
                                                     </optgroup>
                                                     <optgroup label="Load Zones">
-                                                        {locations.zones.map(l => <option key={l} value={l}>{l}</option>)}
+                                                        {locations.zones.filter(l => availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)}
                                                     </optgroup>
                                                     <optgroup label="Resource Nodes">
-                                                        {locations.resources.map(l => <option key={l} value={l}>{l}</option>)}
+                                                        {locations.resources.filter(l => availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)}
                                                     </optgroup>
                                                 </>
                                             ) : (
-                                                LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)
+                                                LOCATIONS.filter(l => availableLocations.length === 0 || availableLocations.includes(l)).map(l => <option key={l} value={l}>{l}</option>)
                                             )}
                                         </select>
                                     </div>
