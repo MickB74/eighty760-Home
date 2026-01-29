@@ -60,26 +60,32 @@ export default function NodeAnalysisTab() {
             const refJson = await refRes.json();
 
             if (refRes.ok) {
-                // If DA, data is number[], if RTM data is { Time: string, SPP: number }[]
+                // If DA, data is number[], if RTM data is { data: [[time, price], ...], format: 'compact' }
                 let parsedRef = [];
                 if (market === 'DA') {
-                    // Assuming JSON returns { prices: [...] } or array directly depending on my API implementation
-                    // My API returns { prices: [...] } OR raw array if not filtered? 
-                    // Let's check API: returns { ..., prices: [...] } if location filtered.
                     parsedRef = refJson.prices.map((p: number, i: number) => ({
                         time: i, // Index as hour
                         price: p
                     }));
                 } else {
-                    // RTM
-                    parsedRef = (refJson.data || []).map((r: any) => ({
-                        time: r.Time_Central || r.Time,
-                        price: r.SPP
-                    }));
+                    // RTM - Check for compact format
+                    if (refJson.format === 'compact') {
+                        parsedRef = (refJson.data || []).map((r: any[]) => ({
+                            time: r[0], // Time is first col
+                            price: r[1] // Price is second col
+                        }));
+                    } else {
+                        // Legacy object format (fallback)
+                        parsedRef = (refJson.data || []).map((r: any) => ({
+                            time: r.Time_Central || r.Time,
+                            price: r.SPP
+                        }));
+                    }
                 }
                 setRefData(parsedRef);
             } else {
                 console.warn("Ref fetch failed", refJson);
+                setError(`Failed to load reference data: ${refJson.error || 'Unknown Error'}`);
             }
 
             // 2. Fetch Compare Data
@@ -94,12 +100,22 @@ export default function NodeAnalysisTab() {
                             price: p
                         }));
                     } else {
-                        parsedComp = (compJson.data || []).map((r: any) => ({
-                            time: r.Time_Central || r.Time,
-                            price: r.SPP
-                        }));
+                        if (compJson.format === 'compact') {
+                            parsedComp = (compJson.data || []).map((r: any[]) => ({
+                                time: r[0],
+                                price: r[1]
+                            }));
+                        } else {
+                            parsedComp = (compJson.data || []).map((r: any) => ({
+                                time: r.Time_Central || r.Time,
+                                price: r.SPP
+                            }));
+                        }
                     }
                     setCompareData(parsedComp);
+                } else {
+                    // Non-blocking but warn
+                    console.warn("Compare fetch failed", compJson);
                 }
             }
 

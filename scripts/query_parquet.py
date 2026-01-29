@@ -35,17 +35,28 @@ def query_parquet(year, location=None):
                 return {"error": "Location column not found"}
 
         # Convert all datetime columns to string (or just all object/datetime columns)
-        for col in df.columns:
-            if pd.api.types.is_datetime64_any_dtype(df[col]):
-                df[col] = df[col].astype(str)
+        # Optimization: Only select relevant columns to reduce payload
+        cols_to_keep = []
+        time_col = 'Time'
+        if 'Time_Central' in df.columns:
+            time_col = 'Time_Central'
+            cols_to_keep.append(time_col)
+        elif 'Time' in df.columns:
+            cols_to_keep.append('Time')
+            
+        if 'SPP' in df.columns:
+            cols_to_keep.append('SPP')
+            
+        if cols_to_keep:
+            df = df[cols_to_keep]
+            
+        # Convert Time to string
+        df[time_col] = df[time_col].astype(str)
         
-        # If dataset is huge, maybe sample or aggregate?
-        # For 15-min data of one location, it's ~35k rows. JSON string might be ~2-3MB.
-        # This is acceptable for a modern app fetch.
-        
-        # Convert to records
-        records = df.to_dict(orient='records')
-        return {"data": records}
+        # Convert to list of lists (compact)
+        # Format: [[Time, SPP], [Time, SPP], ...]
+        data = df.values.tolist()
+        return {"data": data, "format": "compact", "columns": cols_to_keep}
 
     except Exception as e:
         return {"error": str(e)}
