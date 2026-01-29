@@ -170,7 +170,9 @@ function getPromptMonthSymbol(): string {
         expirationDate = getPreviousBusinessDay(expirationDate);
     }
 
-    // Set expiration to end of day logic (just strictly compare dates)
+    // Set expiration to end of day (23:59:59) so the contract is valid through the entire expiration day
+    expirationDate.setHours(23, 59, 59, 999);
+
     // If today is AFTER expiration, roll to next month
     if (now > expirationDate) {
         // Roll to next month
