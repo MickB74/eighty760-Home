@@ -28,31 +28,32 @@ export async function GET(request: NextRequest) {
         if (market === 'RTM') {
             // Use Python script to read Parquet
             // This requires 'python3' and 'pandas'/'pyarrow' in the environment
-            const { exec } = require('child_process');
+            const util = require('util');
+            const exec = util.promisify(require('child_process').exec);
             const scriptPath = path.join(process.cwd(), 'scripts', 'query_parquet.py');
 
             const cmd = `python3 "${scriptPath}" ${year} ${location ? `"${location}"` : ''}`;
 
-            return new Promise((resolve) => {
-                exec(cmd, { maxBuffer: 1024 * 1024 * 50 }, (error: any, stdout: string, stderr: string) => {
-                    if (error) {
-                        console.error('Python Exec Error:', error, stderr);
-                        resolve(NextResponse.json({ error: 'Failed to read data' }, { status: 500 }));
-                        return;
+            try {
+                const { stdout, stderr } = await exec(cmd, { maxBuffer: 1024 * 1024 * 50 });
+                if (stderr && stderr.trim().length > 0) {
+                    // console.warn('Python Stderr:', stderr);
+                }
+
+                try {
+                    const result = JSON.parse(stdout);
+                    if (result.error) {
+                        return NextResponse.json({ error: result.error }, { status: 404 });
                     }
-                    try {
-                        const result = JSON.parse(stdout);
-                        if (result.error) {
-                            resolve(NextResponse.json({ error: result.error }, { status: 404 }));
-                        } else {
-                            resolve(NextResponse.json(result));
-                        }
-                    } catch (parseError) {
-                        console.error('JSON Parse Error:', parseError);
-                        resolve(NextResponse.json({ error: 'Invalid data format' }, { status: 500 }));
-                    }
-                });
-            });
+                    return NextResponse.json(result);
+                } catch (parseError) {
+                    console.error('JSON Parse Error:', parseError);
+                    return NextResponse.json({ error: 'Invalid data format' }, { status: 500 });
+                }
+            } catch (execError: any) {
+                console.error('Python Exec Error:', execError);
+                return NextResponse.json({ error: 'Failed to read data' }, { status: 500 });
+            }
         } else {
             // Day Ahead (Hourly) - Read JSON
             const fileName = `ercot_${year}_hubs.json`;
