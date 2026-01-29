@@ -30,6 +30,7 @@ const NODES = [
 export default function TexasNodeMap({ className = "", selectedNode, onNodeSelect, highlightedNode }: TexasNodeMapProps) {
     return (
         <div className={`relative ${className}`}>
+            {/* Map is now 2x bigger: max-w-[280px] → max-w-[560px] */}
             <svg viewBox="0 0 400 400" className="w-full h-auto drop-shadow-sm filter">
                 {/* Background Map Shapes (Simplified Texas Regions) */}
                 <path
@@ -65,7 +66,7 @@ export default function TexasNodeMap({ className = "", selectedNode, onNodeSelec
                                 cx={node.x}
                                 cy={node.y}
                                 r={isHub ? (isSelected ? 10 : 6) : (isSelected ? 7 : 4)}
-                                className={`transition-all duration-300 stroke-whitestroke-2
+                                className={`transition-all duration-300 stroke-white stroke-2
                                     ${isSelected ? 'fill-blue-600 stroke-white' :
                                         isHighlighted ? 'fill-orange-500 stroke-white' :
                                             isHub ? 'fill-navy-900 dark:fill-gray-300' : 'fill-gray-400 dark:fill-gray-600'
@@ -93,8 +94,9 @@ export default function TexasNodeMap({ className = "", selectedNode, onNodeSelec
             </svg>
 
             <div className="absolute bottom-2 right-2 bg-white/80 dark:bg-black/50 p-2 rounded text-[10px] text-gray-500">
-                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-navy-900 dark:bg-gray-300"></span> Hub</div>
-                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-400"></span> Load Zone</div>
+                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-navy-900 dark:bg-gray-300"></span> Hub (5)</div>
+                <div className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-gray-400"></span> Load Zone (8)</div>
+                <div className="flex items-center gap-1 text-[9px]"><span className="w-2 h-2 rounded-full bg-green-500"></span> 995 Resources</div>
             </div>
         </div>
     );

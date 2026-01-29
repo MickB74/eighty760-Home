@@ -365,7 +365,7 @@ export default function NodeAnalysisTab() {
                             Click to set <span className={`font-bold ${mapTarget === 'reference' ? 'text-blue-500' : 'text-orange-500'}`}>{mapTarget === 'reference' ? 'Reference' : 'Comparison'}</span>
                         </div>
                         <TexasNodeMap
-                            className="w-full max-w-[280px]"
+                            className="w-full max-w-[560px]"
                             selectedNode={mapTarget === 'reference' ? referenceLocation : compareLocation}
                             highlightedNode={mapTarget === 'reference' ? compareLocation : referenceLocation}
                             onNodeSelect={(node) => {
