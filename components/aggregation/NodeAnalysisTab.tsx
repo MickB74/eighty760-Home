@@ -153,7 +153,18 @@ export default function NodeAnalysisTab() {
         return {
             labels: displayDataRef.map(d => {
                 if (market === 'DA') return `Hour ${d.time}`;
-                return d.time.substring(0, 16); // Date string
+                // RTM: If it's a timestamp (numeric), format it
+                const num = Number(d.time);
+                if (!isNaN(num) && num > 2000000000) { // Milliseconds epoch > 2000000000 (year 1970). Or use > 1600000000000 for 2020+.
+                    // Actually, let's just check length > 10.
+                    return new Date(num).toLocaleString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: '2-digit'
+                    });
+                }
+                return String(d.time).substring(0, 16);
             }),
             datasets: [
                 {
