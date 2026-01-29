@@ -34,7 +34,8 @@ const LOCATIONS = [
 
 export default function NodeAnalysisTab() {
     const [year, setYear] = useState(2024);
-    const [market, setMarket] = useState<'RTM' | 'DA'>('RTM');
+    const [refMarket, setRefMarket] = useState<'RTM' | 'DA'>('RTM');
+    const [compMarket, setCompMarket] = useState<'RTM' | 'DA'>('RTM');
     const [referenceLocation, setReferenceLocation] = useState('HB_HOUSTON');
     const [compareLocation, setCompareLocation] = useState('HB_NORTH');
     const [mapTarget, setMapTarget] = useState<'reference' | 'compare'>('compare');
@@ -48,7 +49,7 @@ export default function NodeAnalysisTab() {
     useEffect(() => {
         fetchData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [year, market, referenceLocation, compareLocation]);
+    }, [year, refMarket, compMarket, referenceLocation, compareLocation]);
 
     const fetchData = async () => {
         setIsLoading(true);
@@ -58,26 +59,23 @@ export default function NodeAnalysisTab() {
 
         try {
             // 1. Fetch Reference Data
-            const refRes = await fetch(`/api/prices/history?year=${year}&market=${market}&location=${referenceLocation}`);
+            const refRes = await fetch(`/api/prices/history?year=${year}&market=${refMarket}&location=${referenceLocation}`);
             const refJson = await refRes.json();
 
             if (refRes.ok) {
-                // If DA, data is number[], if RTM data is { data: [[time, price], ...], format: 'compact' }
                 let parsedRef = [];
-                if (market === 'DA') {
+                if (refMarket === 'DA') {
                     parsedRef = refJson.prices.map((p: number, i: number) => ({
-                        time: i, // Index as hour
+                        time: i,
                         price: p
                     }));
                 } else {
-                    // RTM - Check for compact format
                     if (refJson.format === 'compact') {
                         parsedRef = (refJson.data || []).map((r: any[]) => ({
-                            time: r[0], // Time is first col
-                            price: r[1] // Price is second col
+                            time: r[0],
+                            price: r[1]
                         }));
                     } else {
-                        // Legacy object format (fallback)
                         parsedRef = (refJson.data || []).map((r: any) => ({
                             time: r.Time_Central || r.Time,
                             price: r.SPP
@@ -92,11 +90,11 @@ export default function NodeAnalysisTab() {
 
             // 2. Fetch Compare Data
             if (compareLocation) {
-                const compRes = await fetch(`/api/prices/history?year=${year}&market=${market}&location=${compareLocation}`);
+                const compRes = await fetch(`/api/prices/history?year=${year}&market=${compMarket}&location=${compareLocation}`);
                 const compJson = await compRes.json();
                 if (compRes.ok) {
                     let parsedComp = [];
-                    if (market === 'DA') {
+                    if (compMarket === 'DA') {
                         parsedComp = compJson.prices.map((p: number, i: number) => ({
                             time: i,
                             price: p
@@ -116,14 +114,13 @@ export default function NodeAnalysisTab() {
                     }
                     setCompareData(parsedComp);
                 } else {
-                    // Non-blocking but warn
                     console.warn("Compare fetch failed", compJson);
                 }
             }
 
         } catch (err) {
             console.error(err);
-            setError('Failed to load data. Ensure Python environment is set up for Parquet reading.');
+            setError('Failed to load data.');
         } finally {
             setIsLoading(false);
         }
@@ -133,42 +130,43 @@ export default function NodeAnalysisTab() {
     const chartData = useMemo(() => {
         if (refData.length === 0) return null;
 
-        // Downsample for rendering if too large (RTM is 35k points)
-        // Chart.js chokes on 35k points. We need to aggregate visually or zoom.
-        // For "15 min basis" request, user likely wants detail, but we can't render 35k labels.
-        // We'll show a subset or aggregated view if full year selected.
+        // Align Data:
+        // RTM is 35k points. DA is 8.7k points.
+        // We use Stride to align roughly to Hourly.
+        // RTM Stride = 4. DA Stride = 1.
 
-        // Actually, rendering 35k points is slow. Let's slice to last 1000 or aggregate?
-        // Or perhaps changing year view to "Month" selector is better?
-        // For now, let's take a slice (first 1000 points) or simplistic stride.
+        const refStride = refMarket === 'RTM' ? 4 : 1;
+        const compStride = compMarket === 'RTM' ? 4 : 1;
 
-        // BETTER: Use a stride to show trend, allow drilldown later?
-        // Let's stride by 20 for full year RTM.
-        const stride = market === 'RTM' ? 24 : 1; // Show daily avg ish? No 24*4=96 indices is 1 day. 
-        // We have 35000 points. Stride 100 = 350 points.
-
-        const displayDataRef = refData.filter((_, i) => i % stride === 0);
-        const displayDataComp = compareData.filter((_, i) => i % stride === 0);
+        const displayDataRef = refData.filter((_, i) => i % refStride === 0);
+        const displayDataComp = compareData.filter((_, i) => i % compStride === 0);
 
         return {
             labels: displayDataRef.map(d => {
-                if (market === 'DA') return `Hour ${d.time}`;
-                // RTM: If it's a timestamp (numeric), format it
+                if (refMarket === 'DA' && compMarket === 'DA') return `Hour ${d.time}`;
+                // RTM involved: Use timestamp formatting
                 const num = Number(d.time);
-                if (!isNaN(num) && num > 2000000000) { // Milliseconds epoch > 2000000000 (year 1970). Or use > 1600000000000 for 2020+.
-                    // Actually, let's just check length > 10.
+                if (!isNaN(num) && num > 2000000000) {
                     return new Date(num).toLocaleString('en-US', {
                         month: 'short',
                         day: 'numeric',
-                        hour: 'numeric',
-                        minute: '2-digit'
+                        hour: 'numeric'
                     });
+                }
+                if (refMarket === 'DA') {
+                    // If Ref is DA but Comp is RTM, Ref has hour index. 
+                    // We might need to map index to approx date? Or just use "Hour X" and let user figure it out?
+                    // Better: If Comp is RTM, Use Comp labels!
+                    // But we iterate displayDataRef here.
+                    // If Ref is DA, we return `Hour ${d.time}`.
+                    // If Comp is RTM, it aligns index-wise, so it will show Hour X.
+                    return `Hour ${d.time}`;
                 }
                 return String(d.time).substring(0, 16);
             }),
             datasets: [
                 {
-                    label: `${referenceLocation} (${market})`,
+                    label: `${referenceLocation} (${refMarket})`,
                     data: displayDataRef.map(d => d.price),
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -177,7 +175,7 @@ export default function NodeAnalysisTab() {
                     tension: 0.1
                 },
                 {
-                    label: `${compareLocation} (${market})`,
+                    label: `${compareLocation} (${compMarket})`,
                     data: displayDataComp.map(d => d.price),
                     borderColor: '#f97316',
                     backgroundColor: 'rgba(249, 115, 22, 0.1)',
@@ -187,7 +185,7 @@ export default function NodeAnalysisTab() {
                 }
             ]
         };
-    }, [refData, compareData, referenceLocation, compareLocation, market]);
+    }, [refData, compareData, referenceLocation, compareLocation, refMarket, compMarket]);
 
     return (
 
@@ -213,42 +211,67 @@ export default function NodeAnalysisTab() {
                                     ))}
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-xs text-gray-500 mb-1">Market Type</label>
-                                <select
-                                    value={market}
-                                    onChange={e => setMarket(e.target.value as any)}
-                                    className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
-                                >
-                                    <option value="RTM">Real-Time (15m)</option>
-                                    <option value="DA">Day-Ahead (1h)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label className="block text-xs text-gray-500 mb-1 flex justify-between">
-                                    Reference Hub
+
+                            {/* Reference Group */}
+                            <div className="pt-2 border-t border-gray-100 dark:border-white/5">
+                                <label className="block text-xs font-bold text-blue-500 mb-2 flex justify-between items-center">
+                                    REFERENCE
                                     <span onClick={() => setMapTarget('reference')} className={`cursor-pointer text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${mapTarget === 'reference' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-white/10 text-gray-500'}`}>Set on Map</span>
                                 </label>
-                                <select
-                                    value={referenceLocation}
-                                    onChange={e => setReferenceLocation(e.target.value)}
-                                    className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
-                                >
-                                    {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-                                </select>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="block text-[10px] text-gray-400 mb-0.5">Location</label>
+                                        <select
+                                            value={referenceLocation}
+                                            onChange={e => setReferenceLocation(e.target.value)}
+                                            className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-2 py-1.5 text-xs"
+                                        >
+                                            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] text-gray-400 mb-0.5">Market</label>
+                                        <select
+                                            value={refMarket}
+                                            onChange={e => setRefMarket(e.target.value as any)}
+                                            className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-2 py-1.5 text-xs"
+                                        >
+                                            <option value="RTM">Real-Time</option>
+                                            <option value="DA">Day-Ahead</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-xs text-gray-500 mb-1 flex justify-between">
-                                    Comparison Node
+
+                            {/* Comparison Group */}
+                            <div className="pt-2 border-t border-gray-100 dark:border-white/5">
+                                <label className="block text-xs font-bold text-orange-500 mb-2 flex justify-between items-center">
+                                    COMPARISON
                                     <span onClick={() => setMapTarget('compare')} className={`cursor-pointer text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${mapTarget === 'compare' ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-white/10 text-gray-500'}`}>Set on Map</span>
                                 </label>
-                                <select
-                                    value={compareLocation}
-                                    onChange={e => setCompareLocation(e.target.value)}
-                                    className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
-                                >
-                                    {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-                                </select>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label className="block text-[10px] text-gray-400 mb-0.5">Location</label>
+                                        <select
+                                            value={compareLocation}
+                                            onChange={e => setCompareLocation(e.target.value)}
+                                            className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-2 py-1.5 text-xs"
+                                        >
+                                            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] text-gray-400 mb-0.5">Market</label>
+                                        <select
+                                            value={compMarket}
+                                            onChange={e => setCompMarket(e.target.value as any)}
+                                            className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-2 py-1.5 text-xs"
+                                        >
+                                            <option value="RTM">Real-Time</option>
+                                            <option value="DA">Day-Ahead</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -297,7 +320,7 @@ export default function NodeAnalysisTab() {
                                     },
                                     title: {
                                         display: true,
-                                        text: `${market} Price Comparison: ${referenceLocation} vs ${compareLocation} (${year})`
+                                        text: `Price Comparison: ${referenceLocation} (${refMarket}) vs ${compareLocation} (${compMarket}) (${year})`
                                     }
                                 },
                                 scales: {
