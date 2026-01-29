@@ -99,9 +99,37 @@ async function main() {
         }
     });
 
+    // Extract lists for dropdowns
+    const hubs = Object.keys(hierarchy.hubs).sort();
+    const zones = Object.keys(hierarchy.load_zones).sort();
+    const resourceSet = new Set();
+
+    // Traverse to find all resource nodes
+    const traverse = (obj) => {
+        if (obj.substations) {
+            Object.values(obj.substations).forEach(nodes => {
+                nodes.forEach(n => {
+                    if (n.resource_node) resourceSet.add(n.resource_node);
+                });
+            });
+        }
+    };
+
+    Object.values(hierarchy.hubs).forEach(traverse);
+    Object.values(hierarchy.load_zones).forEach(traverse);
+    Object.values(hierarchy.other).forEach(traverse); // Also check unclassified
+
+    const locations = {
+        hubs,
+        zones,
+        resources: Array.from(resourceSet).sort()
+    };
+
     // Write Output
     fs.writeFileSync(OUTPUT_FILE, JSON.stringify(hierarchy, null, 2));
+    fs.writeFileSync('public/data/ercot_locations.json', JSON.stringify(locations, null, 2));
     console.log(`Wrote structure to ${OUTPUT_FILE}`);
+    console.log(`Wrote locations to public/data/ercot_locations.json (${locations.resources.length} resources)`);
 }
 
 main();

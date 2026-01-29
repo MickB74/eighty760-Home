@@ -32,6 +32,12 @@ const LOCATIONS = [
     'LZ_AEN', 'LZ_CPS', 'LZ_HOUSTON', 'LZ_LCRA', 'LZ_NORTH', 'LZ_RAYBN', 'LZ_SOUTH', 'LZ_WEST'
 ];
 
+interface LocationData {
+    hubs: string[];
+    zones: string[];
+    resources: string[];
+}
+
 export default function NodeAnalysisTab() {
     const [year, setYear] = useState(2024);
     const [refMarket, setRefMarket] = useState<'RTM' | 'DA'>('RTM');
@@ -45,6 +51,17 @@ export default function NodeAnalysisTab() {
     const [compareData, setCompareData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+
+    // Locations State
+    const [locations, setLocations] = useState<LocationData | null>(null);
+
+    // Load locations on mount
+    useEffect(() => {
+        fetch('/data/ercot_locations.json')
+            .then(res => res.json())
+            .then(data => setLocations(data))
+            .catch(err => console.error('Failed to load locations:', err));
+    }, []);
 
     useEffect(() => {
         fetchData();
@@ -264,7 +281,21 @@ export default function NodeAnalysisTab() {
                                             onChange={e => setReferenceLocation(e.target.value)}
                                             className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-2 py-1.5 text-xs"
                                         >
-                                            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                                            {locations ? (
+                                                <>
+                                                    <optgroup label="Hubs">
+                                                        {locations.hubs.map(l => <option key={l} value={l}>{l}</option>)}
+                                                    </optgroup>
+                                                    <optgroup label="Load Zones">
+                                                        {locations.zones.map(l => <option key={l} value={l}>{l}</option>)}
+                                                    </optgroup>
+                                                    <optgroup label="Resource Nodes">
+                                                        {locations.resources.map(l => <option key={l} value={l}>{l}</option>)}
+                                                    </optgroup>
+                                                </>
+                                            ) : (
+                                                LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)
+                                            )}
                                         </select>
                                     </div>
                                     <div>
@@ -295,7 +326,21 @@ export default function NodeAnalysisTab() {
                                             onChange={e => setCompareLocation(e.target.value)}
                                             className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-2 py-1.5 text-xs"
                                         >
-                                            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                                            {locations ? (
+                                                <>
+                                                    <optgroup label="Hubs">
+                                                        {locations.hubs.map(l => <option key={l} value={l}>{l}</option>)}
+                                                    </optgroup>
+                                                    <optgroup label="Load Zones">
+                                                        {locations.zones.map(l => <option key={l} value={l}>{l}</option>)}
+                                                    </optgroup>
+                                                    <optgroup label="Resource Nodes">
+                                                        {locations.resources.map(l => <option key={l} value={l}>{l}</option>)}
+                                                    </optgroup>
+                                                </>
+                                            ) : (
+                                                LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)
+                                            )}
                                         </select>
                                     </div>
                                     <div>
