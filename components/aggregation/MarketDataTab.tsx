@@ -982,6 +982,7 @@ export default function MarketDataTab() {
                     <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4 mt-2">Source Generation Trends (24h)</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {[
+                            { id: 'Total Load', color: '#6366f1', label: 'Total Load' },
                             { id: 'Natural Gas', color: '#f97316', label: 'Natural Gas' },
                             { id: 'Wind', color: '#3b82f6', label: 'Wind' },
                             { id: 'Solar', color: '#eab308', label: 'Solar' },
@@ -996,7 +997,12 @@ export default function MarketDataTab() {
                             });
 
                             const historyData = mixHistory.map(m => {
-                                if (fuel.id === 'Other') {
+                                if (fuel.id === 'Total Load') {
+                                    // Sum all sources to get total load
+                                    return Object.entries(m)
+                                        .filter(([k]) => k !== 'period')
+                                        .reduce((sum, [, v]) => sum + (typeof v === 'number' ? v : 0), 0);
+                                } else if (fuel.id === 'Other') {
                                     // Sum up others
                                     const mainCats = ['Natural Gas', 'Wind', 'Solar', 'Nuclear', 'Coal'];
                                     return Object.entries(m)
