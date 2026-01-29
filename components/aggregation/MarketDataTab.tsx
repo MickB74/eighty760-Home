@@ -294,14 +294,14 @@ export default function MarketDataTab() {
 
                 // 3. Derived Carbon & Renewables
                 const factors: Record<string, number> = {
-                    'Natural Gas': 490,
-                    'Coal': 820,
-                    'Nuclear': 12,
-                    'Wind': 11,
-                    'Solar': 41,
-                    'Other': 200,
+                    'Natural Gas': 435, // EPA 2023 Direct (0.96 lbs/kWh)
+                    'Coal': 1048,       // EPA 2023 Direct (2.31 lbs/kWh)
+                    'Nuclear': 0,
+                    'Wind': 0,
+                    'Solar': 0,
+                    'Other': 1116,      // EPA 2023 Direct (Petroleum proxy)
                     'Hydro': 0,
-                    'Power Storage': 100
+                    'Power Storage': 0
                 };
 
                 const derivedCarbon = recentHistory.map(h => {

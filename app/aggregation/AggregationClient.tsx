@@ -48,6 +48,7 @@ import Link from 'next/link';
 import { generatePDFReport } from '@/lib/reporting/pdf-generator';
 import { generateExcelReport } from '@/lib/reporting/excel-generator';
 import MultiYearAnalysisTab from '@/components/aggregation/MultiYearAnalysisTab';
+import NodeAnalysisTab from '@/components/aggregation/NodeAnalysisTab';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
 function aggregateTo12x24(data: number[]): number[][] {
@@ -107,7 +108,7 @@ const HISTORICAL_REC_PRICES: Record<number, number> = {
 // --- Component ---
 export default function AggregationPage() {
     // --- State ---
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'scenarios' | 'analysis' | 'financials' | 'multi-year' | 'reports' | 'config'>('config');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'scenarios' | 'analysis' | 'financials' | 'multi-year' | 'reports' | 'config' | 'node-analysis'>('config');
     const [loading, setLoading] = useState(false);
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -739,6 +740,12 @@ export default function AggregationPage() {
                         className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
                     >
                         <span className="mr-2">📈</span>Detailed Analysis
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('node-analysis')}
+                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === 'node-analysis' ? 'border-energy-green-dark dark:border-energy-green text-energy-green-dark dark:text-energy-green' : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                    >
+                        <span className="mr-2">🗺️</span>Node Prices
                     </button>
                     <button
                         onClick={() => setActiveTab('financials')}
@@ -1388,6 +1395,12 @@ export default function AggregationPage() {
                             geothermalHub={geothermalHub}
                             ccsHub={ccsHub}
                         />
+                    )
+                }
+
+                {
+                    activeTab === 'node-analysis' && (
+                        <NodeAnalysisTab />
                     )
                 }
 
