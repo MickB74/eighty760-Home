@@ -126,14 +126,9 @@ export default function NodeAnalysisTab() {
         }
     };
 
-    // Prepare Chart Data
-    const chartData = useMemo(() => {
+    // Align Data for Chart & Metrics
+    const alignedData = useMemo(() => {
         if (refData.length === 0) return null;
-
-        // Align Data:
-        // RTM is 35k points. DA is 8.7k points.
-        // We use Stride to align roughly to Hourly.
-        // RTM Stride = 4. DA Stride = 1.
 
         const refStride = refMarket === 'RTM' ? 4 : 1;
         const compStride = compMarket === 'RTM' ? 4 : 1;
@@ -141,8 +136,59 @@ export default function NodeAnalysisTab() {
         const displayDataRef = refData.filter((_, i) => i % refStride === 0);
         const displayDataComp = compareData.filter((_, i) => i % compStride === 0);
 
+        // Truncate to matching length to be safe
+        const minLen = Math.min(displayDataRef.length, displayDataComp.length);
+
         return {
-            labels: displayDataRef.map(d => {
+            ref: displayDataRef.slice(0, minLen),
+            comp: displayDataComp.slice(0, minLen)
+        };
+    }, [refData, compareData, refMarket, compMarket]);
+
+    // Calculate Metrics
+    const metrics = useMemo(() => {
+        if (!alignedData || alignedData.comp.length === 0) return null;
+
+        const pricesRef = alignedData.ref.map(d => d.price);
+        const pricesComp = alignedData.comp.map(d => d.price);
+        const n = pricesRef.length;
+        if (n === 0) return null;
+
+        // Averages
+        const avgRef = pricesRef.reduce((a, b) => a + b, 0) / n;
+        const avgComp = pricesComp.reduce((a, b) => a + b, 0) / n;
+
+        // Spread (Ref - Comp)
+        const diffs = pricesRef.map((p, i) => p - pricesComp[i]);
+        const avgSpread = diffs.reduce((a, b) => a + b, 0) / n;
+
+        // Correlation (Pearson)
+        const sumX = pricesRef.reduce((a, b) => a + b, 0);
+        const sumY = pricesComp.reduce((a, b) => a + b, 0);
+        const sumXY = pricesRef.reduce((a, b, i) => a + b * pricesComp[i], 0);
+        const sumX2 = pricesRef.reduce((a, b) => a + b * b, 0);
+        const sumY2 = pricesComp.reduce((a, b) => a + b * b, 0);
+
+        const numerator = n * sumXY - sumX * sumY;
+        const denom = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+        const correlation = denom === 0 ? 0 : numerator / denom;
+
+        return {
+            avgRef,
+            avgComp,
+            avgSpread,
+            correlation,
+            count: n
+        };
+    }, [alignedData]);
+
+    // Prepare Chart Data
+    const chartData = useMemo(() => {
+        if (!alignedData) return null;
+        const { ref, comp } = alignedData;
+
+        return {
+            labels: ref.map(d => {
                 if (refMarket === 'DA' && compMarket === 'DA') return `Hour ${d.time}`;
                 // RTM involved: Use timestamp formatting
                 const num = Number(d.time);
@@ -153,21 +199,13 @@ export default function NodeAnalysisTab() {
                         hour: 'numeric'
                     });
                 }
-                if (refMarket === 'DA') {
-                    // If Ref is DA but Comp is RTM, Ref has hour index. 
-                    // We might need to map index to approx date? Or just use "Hour X" and let user figure it out?
-                    // Better: If Comp is RTM, Use Comp labels!
-                    // But we iterate displayDataRef here.
-                    // If Ref is DA, we return `Hour ${d.time}`.
-                    // If Comp is RTM, it aligns index-wise, so it will show Hour X.
-                    return `Hour ${d.time}`;
-                }
+                if (refMarket === 'DA') return `Hour ${d.time}`;
                 return String(d.time).substring(0, 16);
             }),
             datasets: [
                 {
                     label: `${referenceLocation} (${refMarket})`,
-                    data: displayDataRef.map(d => d.price),
+                    data: ref.map(d => d.price),
                     borderColor: '#3b82f6',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     borderWidth: 1,
@@ -176,7 +214,7 @@ export default function NodeAnalysisTab() {
                 },
                 {
                     label: `${compareLocation} (${compMarket})`,
-                    data: displayDataComp.map(d => d.price),
+                    data: comp.map(d => d.price),
                     borderColor: '#f97316',
                     backgroundColor: 'rgba(249, 115, 22, 0.1)',
                     borderWidth: 1,
@@ -185,7 +223,7 @@ export default function NodeAnalysisTab() {
                 }
             ]
         };
-    }, [refData, compareData, referenceLocation, compareLocation, refMarket, compMarket]);
+    }, [alignedData, referenceLocation, compareLocation, refMarket, compMarket]);
 
     return (
 
@@ -299,6 +337,36 @@ export default function NodeAnalysisTab() {
                     {error && (
                         <div className="p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg text-sm">
                             {error}
+                        </div>
+                    )}
+
+                    {/* Statistics Panel */}
+                    {metrics && (
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                                <div className="text-xs text-gray-400 mb-1">Correlation</div>
+                                <div className={`text-xl font-bold ${metrics.correlation > 0.8 ? 'text-green-500' : metrics.correlation < 0.5 ? 'text-yellow-500' : 'text-gray-700 dark:text-gray-200'}`}>
+                                    {metrics.correlation.toFixed(3)}
+                                </div>
+                            </div>
+                            <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                                <div className="text-xs text-gray-400 mb-1">Avg Spread ($)</div>
+                                <div className={`text-xl font-bold ${Math.abs(metrics.avgSpread) > 10 ? 'text-orange-500' : 'text-gray-700 dark:text-gray-200'}`}>
+                                    {metrics.avgSpread.toFixed(2)}
+                                </div>
+                            </div>
+                            <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                                <div className="text-xs text-gray-400 mb-1">Avg Ref Price</div>
+                                <div className="text-xl font-bold text-blue-500">
+                                    ${metrics.avgRef.toFixed(2)}
+                                </div>
+                            </div>
+                            <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
+                                <div className="text-xs text-gray-400 mb-1">Avg Comp Price</div>
+                                <div className="text-xl font-bold text-orange-500">
+                                    ${metrics.avgComp.toFixed(2)}
+                                </div>
+                            </div>
                         </div>
                     )}
 
