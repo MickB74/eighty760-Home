@@ -10,7 +10,7 @@ export const runtime = 'nodejs';
 
 // Helper to ensure WASM is initialized
 async function initWasm() {
-    const wasmPath = path.join(process.cwd(), 'node_modules', 'parquet-wasm', 'esm', 'parquet_wasm_bg.wasm');
+    const wasmPath = path.join(process.cwd(), 'public', 'wasm', 'parquet_wasm_bg.wasm');
     const wasmBuffer = fs.readFileSync(wasmPath);
     await init(wasmBuffer);
 }
