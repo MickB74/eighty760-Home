@@ -46,6 +46,7 @@ import {
 import Link from 'next/link';
 
 import { generatePDFReport } from '@/lib/reporting/pdf-generator';
+import { generateExcelReport } from '@/lib/reporting/excel-generator';
 import MultiYearAnalysisTab from '@/components/aggregation/MultiYearAnalysisTab';
 
 // Helper: Aggregate 8760 to 12x24 (Month x Hour)
@@ -638,12 +639,24 @@ export default function AggregationPage() {
         downloadCSV(csvContent, filename);
     };
 
+    const handleDownloadExcel = async () => {
+        if (!result) return;
+
+        await generateExcelReport({
+            scenarioName: scenarioName || 'Simulation Results',
+            results: result,
+            year: selectedYear,
+            participants: participants,
+            assets: activeAssets
+        });
+    };
+
     const handleDownloadPDF = async () => {
         if (!result) return;
 
         const { generateComprehensivePDFReport } = await import('@/lib/reporting/pdf-generator');
 
-        generateComprehensivePDFReport({
+        await generateComprehensivePDFReport({
             scenarioName: 'Portfolio Analysis',
             results: result,
             year: selectedYear,
@@ -1402,7 +1415,7 @@ export default function AggregationPage() {
                                     <p className="text-gray-600 dark:text-gray-400">Download simulation data and generate professional PDF reports.</p>
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-6">
+                                <div className="grid md:grid-cols-3 gap-6">
                                     {/* PDF Report Card */}
                                     <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
                                         <div className="flex items-start justify-between mb-4">
@@ -1420,6 +1433,26 @@ export default function AggregationPage() {
                                             className="w-full py-3 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2"
                                         >
                                             {!result ? 'Run Simulation First' : 'Generate PDF Report'}
+                                        </button>
+                                    </div>
+
+                                    {/* Excel Report Card */}
+                                    <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-6 hover:bg-white/10 transition-colors group">
+                                        <div className="flex items-start justify-between mb-4">
+                                            <div className="p-3 bg-green-600/10 rounded-lg text-green-600 text-2xl group-hover:scale-110 transition-transform">
+                                                📊
+                                            </div>
+                                        </div>
+                                        <h3 className="text-lg font-bold text-white mb-2">Excel Analysis (.xlsx)</h3>
+                                        <p className="text-gray-400 text-sm mb-6">
+                                            Download a multi-tab Excel workbook with formatted tables, summaries, and monthly analysis ready for charting.
+                                        </p>
+                                        <button
+                                            onClick={handleDownloadExcel}
+                                            disabled={!result}
+                                            className="w-full py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {!result ? 'Run Simulation First' : 'Download Excel Report'}
                                         </button>
                                     </div>
 
@@ -1444,7 +1477,7 @@ export default function AggregationPage() {
                                     </div>
 
                                     {!result && (
-                                        <div className="md:col-span-2 text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm">
+                                        <div className="md:col-span-3 text-center p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-yellow-500 text-sm">
                                             ⚠️ Please run a simulation on the Dashboard to generate data for reports.
                                         </div>
                                     )}

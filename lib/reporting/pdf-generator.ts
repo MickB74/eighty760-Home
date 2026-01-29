@@ -68,13 +68,33 @@ function getTechDisplayName(tech: string): string {
     return names[tech] || tech;
 }
 
-export const generateComprehensivePDFReport = (data: PDFReportData) => {
+const fetchImage = async (url: string): Promise<string> => {
+    try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('Failed to load image');
+        const blob = await response.blob();
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    } catch (e) {
+        console.warn('Could not load logo:', e);
+        return '';
+    }
+};
+
+export const generateComprehensivePDFReport = async (data: PDFReportData) => {
     const doc = new jsPDF();
     const { results, scenarioName, year, participants, assets } = data;
     const pageWidth = doc.internal.pageSize.getWidth();
     const pageHeight = doc.internal.pageSize.getHeight();
     const margin = 14;
     let currentPage = 1;
+
+    // Load Logo
+    const logoData = await fetchImage('/LogoBlackTransparent.png');
 
     // Colors
     const primaryColor: [number, number, number] = [10, 20, 40]; // Navy
@@ -86,13 +106,40 @@ export const generateComprehensivePDFReport = (data: PDFReportData) => {
         doc.setFillColor(...primaryColor);
         doc.rect(0, 0, pageWidth, 35, 'F');
 
-        doc.setFontSize(18);
-        doc.setTextColor(255, 255, 255);
-        doc.text('Eighty760', margin, 15);
+        // Add Logo if available
+        if (logoData) {
+            // Adjust position and size as needed
+            const logoWidth = 35;
+            const logoHeight = 35 / 3; // Approx aspect ratio if known, or let it scale
+            // Assuming the logo is roughly 3:1 or 4:1 width:height. 
+            // Let's guess a reasonable size.
+            doc.addImage(logoData, 'PNG', margin, 10, 30, 15);
+        } else {
+            // Fallback text if logo fails
+            doc.setFontSize(18);
+            doc.setTextColor(255, 255, 255);
+            doc.text('Eighty760', margin, 15);
+        }
+
+        // Move title if logo is present or keep it?
+        // If logo is present, maybe we don't need text 'Eighty760' or we place it next to it.
+        // User said "also make sure the pdf and excel have the eighty760 logo".
+        // The original code had:
+        // doc.text('Eighty760', margin, 15);
+        // doc.text('24/7 Carbon-Free Energy Report', margin, 25);
+
+        // Let's put logo on left, and title on right or below.
+        // The original text 'Eighty760' was at margin, 15.
+        // If we put the logo there, we should move the text or remove 'Eighty760' text if the logo contains it.
+        // LogoBlackTransparent probably contains the text.
+
+        // Let's assume the logo replaces the text "Eighty760".
+        // But we still want "24/7 Carbon-Free Energy Report".
 
         doc.setFontSize(10);
         doc.setTextColor(...accentColor);
-        doc.text('24/7 Carbon-Free Energy Report', margin, 25);
+        // Align this with the bottom of the header area roughly
+        doc.text('24/7 Carbon-Free Energy Report', margin, 30);
 
         doc.setFontSize(8);
         doc.setTextColor(200, 200, 200);
@@ -454,13 +501,13 @@ export const generateComprehensivePDFReport = (data: PDFReportData) => {
 };
 
 // Legacy export for backward compatibility
-export const generatePDFReport = (
+export const generatePDFReport = async (
     scenarioName: string,
     results: SimulationResult,
     year: string | number,
     charts: { cfe?: string; generation?: string }
 ) => {
-    generateComprehensivePDFReport({
+    await generateComprehensivePDFReport({
         scenarioName,
         results,
         year,
