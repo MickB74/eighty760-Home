@@ -1,5 +1,6 @@
 
 'use client';
+import TexasNodeMap from './TexasNodeMap';
 
 import React, { useState, useEffect, useMemo } from 'react';
 import {
@@ -36,6 +37,7 @@ export default function NodeAnalysisTab() {
     const [market, setMarket] = useState<'RTM' | 'DA'>('RTM');
     const [referenceLocation, setReferenceLocation] = useState('HB_HOUSTON');
     const [compareLocation, setCompareLocation] = useState('HB_NORTH');
+    const [mapTarget, setMapTarget] = useState<'reference' | 'compare'>('compare');
 
     // Data State
     const [refData, setRefData] = useState<any[]>([]);
@@ -177,103 +179,132 @@ export default function NodeAnalysisTab() {
     }, [refData, compareData, referenceLocation, compareLocation, market]);
 
     return (
+
         <div className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-white dark:bg-navy-800 p-4 rounded-xl border border-gray-200 dark:border-white/10">
-                <div className="flex gap-4">
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Year</label>
-                        <select
-                            value={year}
-                            onChange={e => setYear(Number(e.target.value))}
-                            className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
-                        >
-                            {[2020, 2021, 2022, 2023, 2024, 2025].map(y => (
-                                <option key={y} value={y}>{y}</option>
-                            ))}
-                        </select>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                {/* Left Column: Controls & Map */}
+                <div className="lg:col-span-4 space-y-6">
+                    {/* Controls */}
+                    <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-gray-200 dark:border-white/10 space-y-4">
+                        <h3 className="font-bold text-navy-950 dark:text-white mb-2">Configuration</h3>
+
+                        <div className="space-y-3">
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">Simulated Year</label>
+                                <select
+                                    value={year}
+                                    onChange={e => setYear(Number(e.target.value))}
+                                    className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
+                                >
+                                    {[2020, 2021, 2022, 2023, 2024, 2025].map(y => (
+                                        <option key={y} value={y}>{y}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">Market Type</label>
+                                <select
+                                    value={market}
+                                    onChange={e => setMarket(e.target.value as any)}
+                                    className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
+                                >
+                                    <option value="RTM">Real-Time (15m)</option>
+                                    <option value="DA">Day-Ahead (1h)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1 flex justify-between">
+                                    Reference Hub
+                                    <span onClick={() => setMapTarget('reference')} className={`cursor-pointer text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${mapTarget === 'reference' ? 'bg-blue-500 text-white' : 'bg-gray-100 dark:bg-white/10 text-gray-500'}`}>Set on Map</span>
+                                </label>
+                                <select
+                                    value={referenceLocation}
+                                    onChange={e => setReferenceLocation(e.target.value)}
+                                    className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
+                                >
+                                    {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1 flex justify-between">
+                                    Comparison Node
+                                    <span onClick={() => setMapTarget('compare')} className={`cursor-pointer text-[10px] uppercase font-bold px-1.5 py-0.5 rounded ${mapTarget === 'compare' ? 'bg-orange-500 text-white' : 'bg-gray-100 dark:bg-white/10 text-gray-500'}`}>Set on Map</span>
+                                </label>
+                                <select
+                                    value={compareLocation}
+                                    onChange={e => setCompareLocation(e.target.value)}
+                                    className="w-full bg-gray-50 dark:bg-black/20 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
+                                >
+                                    {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Market</label>
-                        <select
-                            value={market}
-                            onChange={e => setMarket(e.target.value as any)}
-                            className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
-                        >
-                            <option value="RTM">Real-Time (15m)</option>
-                            <option value="DA">Day-Ahead (1h)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Reference Hub</label>
-                        <select
-                            value={referenceLocation}
-                            onChange={e => setReferenceLocation(e.target.value)}
-                            className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
-                        >
-                            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-                        </select>
-                    </div>
-                    <div>
-                        <label className="block text-xs text-gray-500 mb-1">Comparison Node</label>
-                        <select
-                            value={compareLocation}
-                            onChange={e => setCompareLocation(e.target.value)}
-                            className="bg-gray-50 dark:bg-navy-900 border border-gray-200 dark:border-white/10 rounded px-3 py-1.5 text-sm"
-                        >
-                            {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
-                        </select>
+
+                    {/* Map */}
+                    <div className="bg-white dark:bg-navy-900 p-4 rounded-xl border border-gray-200 dark:border-white/10 flex flex-col items-center">
+                        <div className="text-xs text-gray-500 mb-2 w-full text-center">
+                            Click to set <span className={`font-bold ${mapTarget === 'reference' ? 'text-blue-500' : 'text-orange-500'}`}>{mapTarget === 'reference' ? 'Reference' : 'Comparison'}</span>
+                        </div>
+                        <TexasNodeMap
+                            className="w-full max-w-[280px]"
+                            selectedNode={mapTarget === 'reference' ? referenceLocation : compareLocation}
+                            highlightedNode={mapTarget === 'reference' ? compareLocation : referenceLocation}
+                            onNodeSelect={(node) => {
+                                if (mapTarget === 'reference') setReferenceLocation(node);
+                                else setCompareLocation(node);
+                            }}
+                        />
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors">
-                        Add Node...
-                    </button>
+                {/* Right Column: Chart (Cols 5-12) */}
+                <div className="lg:col-span-8 flex flex-col gap-6">
+                    {/* Error Message */}
+                    {error && (
+                        <div className="p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg text-sm">
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Chart */}
+                    <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm flex-1 min-h-[500px]">
+                        {isLoading ? (
+                            <div className="h-full flex items-center justify-center text-gray-400">Loading Data...</div>
+                        ) : chartData ? (
+                            <Line data={chartData} options={{
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    mode: 'index',
+                                    intersect: false,
+                                },
+                                plugins: {
+                                    legend: {
+                                        position: 'top',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: `${market} Price Comparison: ${referenceLocation} vs ${compareLocation} (${year})`
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        title: { display: true, text: 'Price ($/MWh)' }
+                                    }
+                                }
+                            }} />
+                        ) : (
+                            <div className="h-full flex items-center justify-center text-gray-400">No Data Available</div>
+                        )}
+                    </div>
+
+                    <div className="text-xs text-gray-400 text-center">
+                        * Note: Real-Time data shown is downsampled for performance. Download full report for 15-min granularity.
+                        Data source: ERCOT.
+                    </div>
                 </div>
-            </div>
-
-            {/* Error Message */}
-            {error && (
-                <div className="p-4 bg-red-100 border border-red-200 text-red-700 rounded-lg text-sm">
-                    {error}
-                </div>
-            )}
-
-            {/* Chart */}
-            <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm h-[500px]">
-                {isLoading ? (
-                    <div className="h-full flex items-center justify-center text-gray-400">Loading Data...</div>
-                ) : chartData ? (
-                    <Line data={chartData} options={{
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            mode: 'index',
-                            intersect: false,
-                        },
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                            title: {
-                                display: true,
-                                text: `${market} Price Comparison: ${referenceLocation} vs ${compareLocation} (${year})`
-                            }
-                        },
-                        scales: {
-                            y: {
-                                title: { display: true, text: 'Price ($/MWh)' }
-                            }
-                        }
-                    }} />
-                ) : (
-                    <div className="h-full flex items-center justify-center text-gray-400">No Data Available</div>
-                )}
-            </div>
-
-            <div className="text-xs text-gray-400 text-center">
-                * Note: Real-Time data shown is downsampled for performance. Download full report for 15-min granularity.
-                Data source: ERCOT.
             </div>
         </div>
     );

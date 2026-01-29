@@ -47,6 +47,7 @@ export default function Navigation() {
         { name: 'Home', path: '/', section: null },
         { name: '24/7 CFE Calculator', path: '/aggregation', section: 'tools' },
         { name: 'Live Market', path: '/live-market', section: 'tools' },
+        { name: 'Node Prices', path: '/node-prices', section: 'tools' },
         { name: 'Methodology', path: '/whitepaper', section: 'learn' },
         { name: 'About', path: '/about', section: 'company' },
     ];
