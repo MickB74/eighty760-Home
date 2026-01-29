@@ -418,8 +418,8 @@ export default function MarketDataTab() {
         const history = generateHistory(currentPrice);
         const curve = [...history];
 
-        // Futures: Next 6 Months (to include May-July)
-        for (let i = 1; i <= 6; i++) {
+        // Futures: Through year-end (12 months)
+        for (let i = 1; i <= 12; i++) {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
             // Price increase by ~3% per month (Contango)
             const price = currentPrice * (1 + (i * 0.03) + (Math.random() * 0.02));
@@ -910,7 +910,7 @@ export default function MarketDataTab() {
                 {futuresData.length > 0 && (
                     <div className="bg-white dark:bg-navy-900 p-6 rounded-xl border border-gray-200 dark:border-white/10 shadow-sm">
                         <h3 className="text-lg font-bold text-navy-950 dark:text-white mb-4 flex items-center gap-2">
-                            Henry Hub Futures (Next 3 Months)
+                            Henry Hub Futures (Through Year-End)
                             <span className={`px-2 py-0.5 rounded-full text-xs font-bold border uppercase tracking-wider ${isRealFutures ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-amber-500/10 text-amber-500 border-amber-500/20'}`}>
                                 {isRealFutures ? 'NYMEX' : 'Simulated'}
                             </span>

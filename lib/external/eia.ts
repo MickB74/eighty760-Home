@@ -400,7 +400,7 @@ export interface FuturesResponse {
 }
 
 /**
- * Fetches real-time Natural Gas Futures prices for the next 3 months from Yahoo Finance.
+ * Fetches real-time Natural Gas Futures prices through year-end from Yahoo Finance.
  * Uses NYMEX contract symbols like NGG26.NYM (Feb 2026), NGH26.NYM (Mar 2026), etc.
  */
 export async function fetchNaturalGasFutures(): Promise<FuturesResponse> {
@@ -408,10 +408,11 @@ export async function fetchNaturalGasFutures(): Promise<FuturesResponse> {
     const futures: FuturesDataPoint[] = [];
 
     try {
-        // Build symbols for next 6 months
+        // Build symbols for remaining months in the year (through December)
         const symbols: { symbol: string; month: string }[] = [];
+        const monthsToFetch = 12; // Fetch 12 months of futures data
 
-        for (let i = 1; i <= 6; i++) {
+        for (let i = 1; i <= monthsToFetch; i++) {
             const futureDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
             const monthCode = FUTURES_MONTH_CODES[futureDate.getMonth()];
             const yearShort = futureDate.getFullYear().toString().slice(2);
@@ -494,7 +495,7 @@ function generateSimulatedFutures(): FuturesResponse {
     const basePrice = 2.84; // Baseline price
     const futures: FuturesDataPoint[] = [];
 
-    for (let i = 1; i <= 6; i++) {
+    for (let i = 1; i <= 12; i++) {
         const futureDate = new Date(now.getFullYear(), now.getMonth() + i, 1);
         const monthCode = FUTURES_MONTH_CODES[futureDate.getMonth()];
         const yearShort = futureDate.getFullYear().toString().slice(2);
