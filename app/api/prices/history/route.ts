@@ -1,12 +1,19 @@
 
 import { NextRequest, NextResponse } from 'next/server';
-import fs from 'fs';
 import path from 'path';
+import fs from 'fs';
+import { tableFromIPC } from 'apache-arrow';
 // @ts-ignore
-import { readParquet } from 'parquet-wasm/node';
+import init, { readParquet } from 'parquet-wasm/esm/parquet_wasm.js';
 
-// Force dynamic to allow reading files at runtime
-export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
+// Helper to ensure WASM is initialized
+async function initWasm() {
+    const wasmPath = path.join(process.cwd(), 'node_modules', 'parquet-wasm', 'esm', 'parquet_wasm_bg.wasm');
+    const wasmBuffer = fs.readFileSync(wasmPath);
+    await init(wasmBuffer);
+}
 
 export async function GET(request: NextRequest) {
     try {
@@ -19,65 +26,83 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Year is required' }, { status: 400 });
         }
 
-        // Determine file path
-        // Real-Time (15-min) -> Parquet
-        // Day-Ahead (Hourly) -> JSON (assuming existing JSONs are DA/Hourly)
-
-        let data: any[] = [];
-
         if (market === 'RTM') {
-            // Use Python script to read Parquet
-            // This requires 'python3' and 'pandas'/'pyarrow' in the environment
-            const util = require('util');
-            const exec = util.promisify(require('child_process').exec);
-            const scriptPath = path.join(process.cwd(), 'scripts', 'query_parquet.py');
-
-            const cmd = `python3 "${scriptPath}" ${year} ${location ? `"${location}"` : ''}`;
-
+            // RTM Data - Read Parquet via WASM
             try {
-                const { stdout, stderr } = await exec(cmd, { maxBuffer: 1024 * 1024 * 50 });
-                if (stderr && stderr.trim().length > 0) {
-                    // console.warn('Python Stderr:', stderr);
+                await initWasm();
+
+                const filePath = path.join(process.cwd(), 'public', 'data', 'prices', `ercot_rtm_${year}.parquet`);
+                if (!fs.existsSync(filePath)) {
+                    return NextResponse.json({ error: `File not found for year ${year}` }, { status: 404 });
                 }
 
-                try {
-                    const result = JSON.parse(stdout);
-                    if (result.error) {
-                        return NextResponse.json({ error: result.error }, { status: 404 });
-                    }
-                    return NextResponse.json(result);
-                } catch (parseError) {
-                    console.error('JSON Parse Error:', parseError);
-                    return NextResponse.json({ error: 'Invalid data format' }, { status: 500 });
+                const fileBuffer = fs.readFileSync(filePath);
+
+                // Read Parquet -> Arrow IPC
+                const wasmTable = readParquet(fileBuffer);
+                const ipcBuffer = wasmTable.intoIPCStream();
+                // wasmTable.free(); 
+
+                const table = tableFromIPC(ipcBuffer);
+
+                // Filter by Location
+                const locCol = table.getChild('Location');
+                const timeCol = table.getChild('Time_Central') || table.getChild('Time'); // Try both
+                const sppCol = table.getChild('SPP');
+
+                if (!locCol || !timeCol || !sppCol) {
+                    return NextResponse.json({ error: 'Required columns not found in Parquet file' }, { status: 500 });
                 }
-            } catch (execError: any) {
-                console.error('Python Exec Error:', execError);
-                return NextResponse.json({ error: 'Failed to read data' }, { status: 500 });
+
+                const data: any[] = [];
+                // data format: [[time, price], ...]
+
+                for (let i = 0; i < table.numRows; i++) {
+                    if (!location || locCol.get(i) === location) {
+                        data.push([
+                            String(timeCol.get(i)), // Ensure string for JSON
+                            Number(sppCol.get(i))
+                        ]);
+                    }
+                }
+
+                return NextResponse.json({
+                    data: data,
+                    format: 'compact',
+                    columns: ['Time', 'SPP']
+                });
+
+            } catch (err: any) {
+                console.error('WASM Parquet Error:', err);
+                return NextResponse.json({ error: `Failed to process Parquet: ${err.message}` }, { status: 500 });
             }
+
         } else {
             // Day Ahead (Hourly) - Read JSON
             const fileName = `ercot_${year}_hubs.json`;
             const filePath = path.join(process.cwd(), 'public', 'data', 'prices', fileName);
-            if (!fs.existsSync(filePath)) {
-                return NextResponse.json({ error: `Data not found for year ${year}` }, { status: 404 });
-            }
-            const fileContent = fs.readFileSync(filePath, 'utf-8');
-            const jsonData = JSON.parse(fileContent);
 
-            // Handle filtering if 'location' is provided
-            // JSON structure: { "HB_NORTH": [p1, p2...], ... }
-            if (location && jsonData[location]) {
-                return NextResponse.json({
-                    marketing: 'Day-Ahead',
-                    interval: 'Hourly',
-                    location,
-                    prices: jsonData[location]
-                });
+            try {
+                const fileContents = await fs.promises.readFile(filePath, 'utf8');
+                const jsonData = JSON.parse(fileContents);
+
+                if (location && jsonData[location]) {
+                    return NextResponse.json({
+                        location: location,
+                        prices: jsonData[location]
+                    });
+                } else if (location) {
+                    return NextResponse.json({ error: 'Location not found in DA data' }, { status: 404 });
+                } else {
+                    return NextResponse.json(jsonData);
+                }
+            } catch (err) {
+                console.error('JSON Read Error:', err);
+                return NextResponse.json({ error: 'Failed to read DA data' }, { status: 500 });
             }
-            return NextResponse.json(jsonData);
         }
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('API Error:', error);
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
