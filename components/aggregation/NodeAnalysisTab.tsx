@@ -45,12 +45,43 @@ export default function NodeAnalysisTab() {
     const [referenceLocation, setReferenceLocation] = useState('HB_HOUSTON');
     const [compareLocation, setCompareLocation] = useState('HB_NORTH');
     const [mapTarget, setMapTarget] = useState<'reference' | 'compare'>('compare');
+    const [showTable, setShowTable] = useState(false);
 
     // Data State
     const [refData, setRefData] = useState<any[]>([]);
     const [compareData, setCompareData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+
+    // CSV Download Handler
+    const handleDownloadCSV = () => {
+        if (!alignedData) return;
+        const { ref, comp } = alignedData;
+        const headers = ['Timestamp', `${referenceLocation} (${refMarket})`, `${compareLocation} (${compMarket})`, 'Spread'];
+        const rows = ref.map((r, i) => {
+            const timeLabel = (refMarket === 'RTM' || compMarket === 'RTM')
+                ? new Date(r.time).toLocaleString()
+                : `Hour ${r.time}`;
+            const c = comp[i];
+            return [
+                `"${timeLabel}"`,
+                r.price.toFixed(2),
+                c?.price.toFixed(2) || '',
+                (r.price - (c?.price || 0)).toFixed(2)
+            ].join(',');
+        });
+
+        const csvContent = [headers.join(','), ...rows].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.setAttribute('href', url);
+        link.setAttribute('download', `${referenceLocation}_vs_${compareLocation}_${year}.csv`);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
 
     // Locations State
     const [locations, setLocations] = useState<LocationData | null>(null);
@@ -487,6 +518,71 @@ export default function NodeAnalysisTab() {
                     <div className="text-xs text-gray-400 text-center">
                         * Note: Real-Time data shown is downsampled for performance. Download full report for 15-min granularity.
                         Data source: ERCOT.
+                    </div>
+
+                    {/* Data Table & Download */}
+                    <div className="bg-white dark:bg-navy-900 rounded-xl border border-gray-200 dark:border-white/10 overflow-hidden">
+                        <div className="p-4 border-b border-gray-200 dark:border-white/10 flex justify-between items-center bg-gray-50 dark:bg-white/5">
+                            <h3 className="font-bold text-navy-950 dark:text-white text-sm">Detailed Data</h3>
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setShowTable(!showTable)}
+                                    className="px-3 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-white/10 rounded transition-colors"
+                                >
+                                    {showTable ? 'Hide Table' : 'Show Table'}
+                                </button>
+                                <button
+                                    onClick={handleDownloadCSV}
+                                    disabled={!alignedData}
+                                    className="px-3 py-1.5 text-xs font-bold text-white bg-blue-500 hover:bg-blue-600 rounded shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Download CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        {showTable && alignedData && (
+                            <div className="max-h-[400px] overflow-y-auto">
+                                <table className="w-full text-xs text-left">
+                                    <thead className="bg-gray-50 dark:bg-black/20 text-gray-500 sticky top-0">
+                                        <tr>
+                                            <th className="px-4 py-2 font-medium">Timestamp</th>
+                                            <th className="px-4 py-2 font-medium text-blue-500">{referenceLocation}</th>
+                                            <th className="px-4 py-2 font-medium text-orange-500">{compareLocation}</th>
+                                            <th className="px-4 py-2 font-medium text-right">Spread</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-gray-100 dark:divide-white/5">
+                                        {alignedData.ref.map((d, i) => {
+                                            const compItem = alignedData.comp[i];
+                                            const spread = d.price - (compItem?.price || 0);
+                                            return (
+                                                <tr key={i} className="hover:bg-gray-50 dark:hover:bg-white/5">
+                                                    <td className="px-4 py-2 font-mono text-gray-600 dark:text-gray-400">
+                                                        {(refMarket === 'RTM' || compMarket === 'RTM')
+                                                            ? new Date(d.time).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                                                            : `Hour ${d.time}`
+                                                        }
+                                                    </td>
+                                                    <td className="px-4 py-2 font-medium text-navy-950 dark:text-gray-200">
+                                                        ${d.price.toFixed(2)}
+                                                    </td>
+                                                    <td className="px-4 py-2 font-medium text-navy-950 dark:text-gray-200">
+                                                        ${compItem?.price.toFixed(2)}
+                                                    </td>
+                                                    <td className={`px-4 py-2 text-right font-medium ${spread > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                                        {spread.toFixed(2)}
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
