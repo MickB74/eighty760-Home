@@ -68,7 +68,7 @@ export default function MarketDataTab() {
     const [lastUpdated, setLastUpdated] = useState<string>('');
     const [load, setLoad] = useState(0);
     const [capacity, setCapacity] = useState(0);
-    const [gasPrice, setGasPrice] = useState(2.84);
+    const [gasPrice, setGasPrice] = useState(7.46);
 
     // API State
     const [usingRealData, setUsingRealData] = useState(false);
@@ -327,21 +327,21 @@ export default function MarketDataTab() {
                         const futuresJson = await futuresRes.json();
                         if (futuresJson.futures && futuresJson.futures.length > 0) {
                             // Generate history locally (since API only returns futures)
-                            const historyData = generateHistory(2.84);
+                            const historyData = generateHistory(7.46);
                             const apiFutures = futuresJson.futures.map((f: any) => ({ month: f.month, price: f.price, isHistory: false }));
                             setFuturesData([...historyData, ...apiFutures]);
                             setIsRealFutures(futuresJson.isRealData === true);
                         } else {
-                            generateFutures(2.84);
+                            generateFutures(7.46);
                             setIsRealFutures(false);
                         }
                     } else {
-                        generateFutures(2.84);
+                        generateFutures(7.46);
                         setIsRealFutures(false);
                     }
                 } catch (e) {
                     console.warn("Futures fetch failed", e);
-                    generateFutures(2.84);
+                    generateFutures(7.46);
                     setIsRealFutures(false);
                 }
 
@@ -401,7 +401,14 @@ export default function MarketDataTab() {
         // History: Last 3 Months (plus current month)
         for (let i = -3; i <= 0; i++) {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-            const price = currentPrice * (1 + (i * 0.02) + (Math.random() - 0.5) * 0.1);
+            let price = currentPrice * (1 + (i * 0.02) + (Math.random() - 0.5) * 0.1);
+
+            // FIX: February 2026 Settlement Price (Traded end of Jan 2026)
+            // If the month is February 2026, use the official settlement price of $7.460
+            if (d.getMonth() === 1 && d.getFullYear() === 2026) {
+                price = 7.460;
+            }
+
             curve.push({
                 month: `${months[d.getMonth()]} '${d.getFullYear().toString().slice(2)}`,
                 price: parseFloat(price.toFixed(2)),
@@ -450,7 +457,7 @@ export default function MarketDataTab() {
         setLastUpdated(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
 
         // Random walk gas price slightly
-        const simGasPrice = Math.max(1.5, Math.min(5.0, 2.84 + (Math.random() - 0.5) * 0.1));
+        const simGasPrice = Math.max(1.5, Math.min(10.0, 7.46 + (Math.random() - 0.5) * 0.1));
         setGasPrice(simGasPrice);
 
         // Use default fuel mix
