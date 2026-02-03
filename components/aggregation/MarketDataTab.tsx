@@ -403,15 +403,18 @@ export default function MarketDataTab() {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
             let price = currentPrice * (1 + (i * 0.02) + (Math.random() - 0.5) * 0.1);
 
-            // FIX: February 2026 Settlement Price (Traded end of Jan 2026)
-            // If the month is February 2026, use the official settlement price of $7.460
-            if (d.getMonth() === 1 && d.getFullYear() === 2026) {
-                price = 7.460;
-            }
+            const m = d.getMonth(); // 0=Jan, 1=Feb, 10=Nov, 11=Dec
+            const y = d.getFullYear();
+
+            // FIXED: Validated Settlement Prices
+            if (y === 2025 && m === 10) price = 3.376; // Nov '25
+            else if (y === 2025 && m === 11) price = 4.424; // Dec '25
+            else if (y === 2026 && m === 0) price = 4.687; // Jan '26
+            else if (y === 2026 && m === 1) price = 7.460; // Feb '26
 
             curve.push({
                 month: `${months[d.getMonth()]} '${d.getFullYear().toString().slice(2)}`,
-                price: parseFloat(price.toFixed(2)),
+                price: parseFloat(price.toFixed(3)), // Use 3 decimals for precision
                 isHistory: true
             });
         }
