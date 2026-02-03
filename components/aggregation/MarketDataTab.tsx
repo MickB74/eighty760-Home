@@ -398,8 +398,8 @@ export default function MarketDataTab() {
         const now = new Date();
         const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
         const curve = [];
-        // History: Last 3 Months
-        for (let i = -3; i < 0; i++) {
+        // History: Last 3 Months (plus current month)
+        for (let i = -3; i <= 0; i++) {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
             const price = currentPrice * (1 + (i * 0.02) + (Math.random() - 0.5) * 0.1);
             curve.push({
@@ -418,8 +418,8 @@ export default function MarketDataTab() {
         const history = generateHistory(currentPrice);
         const curve = [...history];
 
-        // Futures: Through year-end (12 months), include current month to avoid gaps
-        for (let i = 0; i < 12; i++) {
+        // Futures: Through year-end (12 months), starting next month
+        for (let i = 1; i < 12; i++) {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
             // Price increase by ~3% per month (Contango)
             const price = currentPrice * (1 + (i * 0.03) + (Math.random() * 0.02));
