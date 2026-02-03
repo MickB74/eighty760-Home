@@ -418,8 +418,8 @@ export default function MarketDataTab() {
         const history = generateHistory(currentPrice);
         const curve = [...history];
 
-        // Futures: Through year-end (12 months)
-        for (let i = 1; i <= 12; i++) {
+        // Futures: Through year-end (12 months), include current month to avoid gaps
+        for (let i = 0; i < 12; i++) {
             const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
             // Price increase by ~3% per month (Contango)
             const price = currentPrice * (1 + (i * 0.03) + (Math.random() * 0.02));

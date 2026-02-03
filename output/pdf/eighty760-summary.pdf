@@ -1,0 +1,64 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R /F2 6 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 2812 >>
+stream
+BT /F2 18 Tf 1 0 0 1 36 734 Tm (Eighty760 App Summary) Tj ET
+BT /F2 12 Tf 1 0 0 1 36 708 Tm (What It Is) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 694 Tm (Eighty760 is a web-based simulation framework for modeling 24/7 carbon-free energy portfolios and) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 680 Tm (hourly matching across a full year \(8,760 hours\). It acts as a digital twin for renewable portfolios) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 666 Tm (to compare generation against real-world load profiles.) Tj ET
+BT /F2 12 Tf 1 0 0 1 36 640 Tm (Who It's For) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 626 Tm (Primary users are energy portfolio planners, sustainability teams, and analysts evaluating 24/7 CFE) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 612 Tm (performance.) Tj ET
+BT /F2 12 Tf 1 0 0 1 36 586 Tm (What It Does) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 572 Tm (- Interactive portfolio simulator to adjust solar, wind, and battery capacity in real time.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 558 Tm (- Aggregation tool with live market data, detailed analysis, financials, and scenario comparison.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 544 Tm (- Scenario comparison to save and evaluate multiple portfolio configurations side by side.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 530 Tm (- Financial modeling for PPA settlement costs, basis risk, battery arbitrage revenue, and REC costs.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 516 Tm (- Weather performance backcasting using historical data \(2020-2026\).) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 502 Tm (- Global real-time tickers and hourly generation profiles \(duck curve, net load\).) Tj ET
+BT /F2 12 Tf 1 0 0 1 36 476 Tm (How It Works \(Repo Evidence\)) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 462 Tm (- Next.js 14 App Router UI in app/ with page routes for home, aggregation, weather performance, and) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 448 Tm (  whitepaper.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 434 Tm (- React components in components/ and core simulation UI in components/Simulator.tsx with supporting) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 420 Tm (  logic in lib/aggregation/.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 406 Tm (- API routes under app/api/ for market data, news, prices, and tickers; external API clients in) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 392 Tm (  lib/external/.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 378 Tm (- Python utilities in scripts/ for historical price and weather data processing.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 364 Tm (- Persistent database or backend service beyond Next.js API routes: Not found in repo.) Tj ET
+BT /F2 12 Tf 1 0 0 1 36 338 Tm (How To Run \(Minimal\)) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 324 Tm (- Prerequisite: Node.js v18 or higher.) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 310 Tm (- Install dependencies: npm install) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 296 Tm (- Start dev server: npm run dev) Tj ET
+BT /F1 10 Tf 1 0 0 1 36 282 Tm (- Open: http://localhost:3000) Tj ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+6 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>
+endobj
+xref
+0 7
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000251 00000 n 
+0000003115 00000 n 
+0000003185 00000 n 
+trailer
+<< /Size 7 /Root 1 0 R >>
+startxref
+3260
+%%EOF
